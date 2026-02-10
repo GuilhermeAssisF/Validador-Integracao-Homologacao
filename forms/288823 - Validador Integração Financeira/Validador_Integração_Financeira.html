@@ -1,0 +1,714 @@
+<html>
+
+<head>
+	<link type="text/css" rel="stylesheet" href="/style-guide/css/fluig-style-guide.min.css" />
+	<script type="text/javascript" src="/portal/resources/js/jquery/jquery.js"></script>
+	<script type="text/javascript" src="/portal/resources/js/jquery/jquery-ui.min.js"></script>
+
+	<script type="text/javascript" src="/portal/resources/js/mustache/mustache-min.js"></script>
+	<script type="text/javascript" src="/style-guide/js/fluig-style-guide.min.js" charset="utf-8"></script>
+	<script type="text/javascript" src="/webdesk/vcXMLRPC.js" charset="utf-8"></script>
+</head>
+
+<body>
+	<div class="fluig-style-guide">
+		<form name="form" role="form">
+
+			<input type="hidden" name="cpResponsavelEnvio" id="cpResponsavelEnvio">
+			<input type="hidden" name="cpStatusDivergencia" id="cpStatusDivergencia" value="0">
+			<input type="hidden" name="cpTemDivergencia" id="cpTemDivergencia" value="nao">
+			<input type="hidden" name="cpIdProcessoPagamento" id="cpIdProcessoPagamento">
+
+			<div class="panel panel-warning" id="painel_email_rh" style="display:none;">
+				<div class="panel-heading">
+					<h3 class="panel-title">Resumo para Envio de E-mail (RH)</h3>
+				</div>
+				<div class="panel-body">
+					<div class="form-group">
+						<label for="txt_assunto_email">Assunto do E-mail</label>
+						<div class="input-group">
+							<input type="text" class="form-control" name="txt_assunto_email" id="txt_assunto_email"
+								readonly>
+							<span class="input-group-btn">
+								<button class="btn btn-default" type="button" onclick="copiarAssuntoEmail()">
+									<i class="flaticon flaticon-content-copy"></i> Copiar Assunto
+								</button>
+							</span>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label for="texto_email_resumo">Corpo do E-mail</label>
+						<textarea class="form-control" name="texto_email_resumo" id="texto_email_resumo" rows="10"
+							readonly></textarea>
+					</div>
+
+					<div class="row">
+						<div class="col-md-12">
+							<button type="button" class="btn btn-primary" onclick="copiarTextoEmail()">
+								<i class="flaticon flaticon-content-copy"></i> Copiar Corpo do E-mail
+							</button>
+							<button type="button" id="btn_copiar_anexo" class="btn btn-info"
+								onclick="baixarAnexoValidado()">
+								<i class="flaticon flaticon-attachment"></i> Baixar Arquivo
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+						<i class="fluigicon fluigicon-user fluigicon-sm"></i> Dados do Solicitante
+					</h3>
+				</div>
+				<div class="panel-body">
+					<div class="row">
+						<div class="col-md-3">
+							<div class="form-group">
+								<label for="cpNumeroSolicitacao">N. Solicitação</label>
+								<input type="text" class="form-control" name="cpNumeroSolicitacao"
+									id="cpNumeroSolicitacao" readonly>
+							</div>
+						</div>
+
+						<div class="col-md-3">
+							<div class="form-group">
+								<label for="cpDataAbertura">Data Abertura</label>
+								<input type="text" class="form-control" name="cpDataAbertura" id="cpDataAbertura"
+									readonly>
+							</div>
+						</div>
+
+						<div class="col-md-3">
+							<div class="form-group">
+								<label for="cpNomeSolicitante">Solicitante</label>
+								<input type="text" class="form-control" name="cpNomeSolicitante" id="cpNomeSolicitante"
+									readonly>
+							</div>
+						</div>
+
+						<div class="col-md-3">
+							<div class="form-group">
+								<label for="cpEmailSolicitante">Email</label>
+								<input type="text" class="form-control" name="cpEmailSolicitante"
+									id="cpEmailSolicitante" readonly>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="panel panel-primary" id="painel_info">
+				<div class="panel-heading">
+					<h3 class="panel-title"><i class="flaticon flaticon-playlist-add icon-sm"></i> Informações da
+						Solicitação</h3>
+				</div>
+				<div class="panel-body">
+					<div class="row">
+						<div class="form-group col-md-3">
+							<label for="tipo_documento">Tipo de Documento</label>
+							<select name="tipo_documento" id="tipo_documento" class="form-control"
+								onchange="alternarTipoDocumento()">
+								<option value="cnab" selected>CNAB Bancário</option>
+								<option value="guia_outros">Guia / Outros</option>
+							</select>
+						</div>
+
+						<div id="campos_originais_cnab">
+							<div class="form-group col-md-3">
+								<label for="txt_empresa">Empresa</label>
+								<div class="input-group">
+									<input type="text" id="txt_empresa" name="txt_empresa" class="form-control" readonly
+										placeholder="Clique na lupa">
+									<span class="input-group-btn">
+										<button class="btn btn-primary" type="button" onclick="zoomEmpresa()">
+											<i class="flaticon flaticon-search"></i>
+										</button>
+									</span>
+								</div>
+								<input type="hidden" id="cod_empresa" name="cod_empresa">
+							</div>
+
+							<div class="form-group col-md-3">
+								<label for="txt_filial">Filial / Obra</label>
+								<input type="text" id="txt_filial" name="txt_filial" class="form-control" readonly>
+								<input type="hidden" id="cod_filial" name="cod_filial">
+							</div>
+
+							<div class="form-group col-md-3">
+								<label for="txt_cnpj">CNPJ</label>
+								<input type="text" id="txt_cnpj" name="txt_cnpj" class="form-control" readonly>
+							</div>
+						</div>
+
+						<div id="row_guia_header" style="display:none;">
+							<div class="form-group col-md-9">
+								<label>Comprovante / Guia</label>
+								<div class="input-group">
+									<input type="text" class="form-control" id="fileNameGuia" name="fileNameGuia"
+										readonly placeholder="Clique no botão ao lado para anexar ->">
+									<span class="input-group-btn">
+										<button class="btn btn-primary" type="button"
+											onclick="anexarArquivoGuiaNativo()">
+											<i class="flaticon flaticon-paperclip"></i> Anexar
+										</button>
+									</span>
+								</div>
+							</div>
+							<div class="form-group col-md-4">
+								<label for="guia_tipo">Tipo da Guia</label>
+								<select name="guia_tipo" id="guia_tipo" class="form-control">
+									<option value="">Selecione...</option>
+									<option value="DCTFWEB">DCTFWEB</option>
+									<option value="FGTS DIGITAL">FGTS DIGITAL</option>
+									<option value="GFD RESCISORIO">GFD RESCISORIO</option>
+									<option value="IRRF">IRRF</option>
+									<option value="INSS TERCEIROS">INSS TERCEIROS</option>
+									<option value="PENSAO">PENSAO</option>
+								</select>
+							</div>
+							<div class="form-group col-md-4">
+								<label for="guia_data_venc">Data Vencimento</label>
+								<input type="date" name="guia_data_venc" id="guia_data_venc" class="form-control">
+							</div>
+							<div class="form-group col-md-4">
+								<label for="guia_valor_total">Valor Total da Guia</label>
+								<div class="input-group">
+									<span class="input-group-addon">R$</span>
+									<input type="text" name="guia_valor_total" id="guia_valor_total"
+										class="form-control" mask="#00.000.000,00" placeholder="0,00">
+								</div>
+							</div>
+
+						</div>
+					</div>
+
+					<div class="row" id="row_cnab_inputs">
+						<div class="form-group col-md-3">
+							<label for="cnab_tipo_lancamento">Tipo de Lançamento</label>
+							<select name="cnab_tipo_lancamento" id="cnab_tipo_lancamento" class="form-control">
+								<option value="">Selecione...</option>
+								<option value="Liquido Salarial">Liquido Salarial</option>
+								<option value="Liquido Ferias">Liquido Ferias</option>
+								<option value="Liquido Rescisão">Liquido Rescisão</option>
+								<option value="Liquido Pro-Labore">Liquido Pro-Labore</option>
+								<option value="Liquido PLR">Liquido PLR</option>
+								<option value="Liquido Folha Complementar">Liquido Folha Complementar</option>
+								<option value="Liquido Rescisão Complementar">Liquido Rescisão Complementar</option>
+								<option value="Liquido 13 º salario">Liquido 13 º salario</option>
+								<option value="Liquido Adiantamento Folha">Liquido Adiantamento Folha</option>
+								<option value="Liquido Adiantamento 13º salario">Liquido Adiantamento 13º salario
+								</option>
+							</select>
+						</div>
+
+						<div class="form-group col-md-3">
+							<label for="txt_banco">Banco Pagamento</label>
+							<div class="input-group">
+								<input type="text" id="txt_banco" name="txt_banco" class="form-control" readonly>
+								<span class="input-group-btn">
+									<button class="btn btn-primary" type="button" onclick="zoomBanco()">
+										<i class="flaticon flaticon-search"></i>
+									</button>
+								</span>
+							</div>
+							<input type="hidden" id="cod_banco" name="cod_banco">
+						</div>
+
+						<div class="form-group col-md-6">
+							<label>Selecione o Arquivo (.txt)</label>
+							<div class="input-group">
+								<input type="text" class="form-control" id="fileNameVisual" name="fileNameVisual"
+									readonly>
+								<span class="input-group-btn">
+									<button class="btn btn-primary" type="button" id="btn_upload_cnab" disabled
+										title="Selecione o Banco primeiro">
+										<i class="flaticon flaticon-file-upload"></i> Localizar e Anexar
+									</button>
+								</span>
+							</div>
+							<input type="file" id="fileUpload" name="fileUpload" accept=".txt" style="display:none"
+								onchange="processarEAnexarUnificado(this)">
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="panel panel-info" id="painel_multi_lancamentos" style="display:none;">
+				<div class="panel-heading">
+					<h3 class="panel-title"><i class="flaticon flaticon-layers icon-sm"></i> Quadro Contas a Pagar
+					</h3>
+				</div>
+				<div class="panel-body">
+					<button type="button" class="btn btn-success" onclick="adicionarCardGuia()">
+						<i class="flaticon flaticon-plus icon-sm"></i> Adicionar Título/Lançamento
+					</button>
+					<br><br>
+
+					<table tablename="tbl_lancamentos_guia" class="table" noaddbutton="true" nodeletebutton="true">
+						<thead>
+							<tr>
+								<td></td>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>
+									<div class="panel panel-default"
+										style="border: 1px solid #ccc; box-shadow: 2px 2px 5px #eee; margin-bottom: 15px;">
+
+										<div class="panel-heading"
+											style="background-color: #f5f5f5; padding: 10px 15px;">
+											<button type="button" class="btn btn-danger btn-xs pull-right"
+												style="margin-left: 10px;" onclick="removerCardGuia(this)">
+												<i class="flaticon flaticon-trash"></i>
+											</button>
+
+											<button type="button" class="btn btn-default btn-xs pull-right"
+												onclick="toggleCard(this)">
+												<i class="flaticon flaticon-chevron-up icon-collapse"></i>
+											</button>
+
+											<h3 class="panel-title">
+												<strong>Lançamento Financeiro</strong>
+												<span class="text-muted small resumo-card"
+													style="display:none; margin-left: 15px;"></span>
+											</h3>
+										</div>
+
+										<div class="panel-body body-card-collapse">
+
+											<div class="row">
+												<div class="form-group col-md-6">
+													<label>Empresa / Filial (Filtro)</label>
+													<div class="input-group">
+														<input type="text" name="card_empresa"
+															class="form-control input-sm" readonly
+															placeholder="Selecione a empresa...">
+														<span class="input-group-btn">
+															<button class="btn btn-primary btn-sm" type="button"
+																onclick="zoomEmpresaCard(this)">
+																<i class="flaticon flaticon-search"></i>
+															</button>
+														</span>
+													</div>
+													<input type="hidden" name="card_cod_coligada">
+													<input type="hidden" name="card_cod_filial">
+													<input type="hidden" name="card_id_processo">
+												</div>
+												<div class="form-group col-md-6">
+													<label>CNPJ</label>
+													<input type="text" name="card_cnpj" class="form-control input-sm"
+														readonly>
+												</div>
+											</div>
+
+											<hr style="margin: 10px 0;">
+
+											<div class="row">
+												<div class="form-group col-md-3">
+													<label style="color:#d9534f">Título (ID LAN) *</label>
+													<input type="text" name="card_id_lan" class="form-control input-sm"
+														placeholder="Digite e saia..." onblur="buscarDadosCard(this)">
+												</div>
+												<div class="form-group col-md-9">
+													<label>Histórico</label>
+													<input type="text" name="card_historico"
+														class="form-control input-sm" readonly>
+												</div>
+											</div>
+
+											<div class="row">
+												<div class="form-group col-md-3">
+													<label>Emissão</label>
+													<input type="text" name="card_data_emissao"
+														class="form-control input-sm" readonly>
+												</div>
+												<div class="form-group col-md-3">
+													<label>Vencimento</label>
+													<input type="text" name="card_data_venc"
+														class="form-control input-sm" readonly>
+												</div>
+												<div class="form-group col-md-3">
+													<label>Valor Líquido</label>
+													<input type="text" name="card_valor" class="form-control input-sm"
+														readonly style="font-weight: bold; color: #337ab7;">
+												</div>
+											</div>
+
+											<div class="panel panel-warning"
+												style="margin-top: 10px; margin-bottom: 0;">
+												<div class="panel-heading" style="padding: 5px 15px; font-size: 12px;">
+													Rateio Financeiro</div>
+												<div class="panel-body" style="padding: 0;">
+													<input type="hidden" name="card_json_rateio">
+
+													<table class="table table-condensed table-striped"
+														style="margin-bottom: 0;">
+														<thead>
+															<tr>
+																<th>Centro de Custo</th>
+																<th class="text-center" style="width: 100px;">%</th>
+																<th class="text-right" style="width: 150px;">Valor
+																</th>
+															</tr>
+														</thead>
+														<tbody class="tbody-rateio-card">
+														</tbody>
+														<tfoot
+															style="background-color: #fcf8e3; border-top: 2px solid #faebcc;">
+															<tr>
+																<td class="text-right"><strong>TOTAIS:</strong></td>
+																<td class="text-center">
+																	<strong class="total-perc-card">0%</strong>
+																</td>
+																<td class="text-right">
+																	<strong class="total-valor-card">0,00</strong>
+																</td>
+															</tr>
+														</tfoot>
+													</table>
+												</div>
+											</div>
+
+										</div>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<div class="panel panel-primary" id="painel_consolidado_guia" style="display:none;">
+				<div class="panel-heading">
+					<h3 class="panel-title"><i class="flaticon flaticon-monetization-on icon-sm"></i> Resumo
+						Financeiro da Guia</h3>
+				</div>
+				<div class="panel-body">
+					<div class="row">
+						<div class="col-md-12">
+							<table class="table table-bordered table-striped table-condensed">
+								<thead>
+									<tr>
+										<th>Título (ID LAN)</th>
+										<th>Cód. Coligada - Filial</th>
+										<th class="text-right">Valor (R$)</th>
+									</tr>
+								</thead>
+								<tbody id="tbody_resumo_guia">
+								</tbody>
+								<tfoot>
+									<tr class="active">
+										<td colspan="2" class="text-right" style="font-size: 16px;"><strong>TOTAL
+												CONSOLIDADO:</strong></td>
+										<td class="text-right" style="font-size: 16px;">
+											<strong id="lbl_total_consolidado" style="color: #337ab7;">0,00</strong>
+										</td>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+					</div>
+
+					<div class="alert alert-warning" id="alert_divergencia_guia"
+						style="display:none; margin-bottom: 0;">
+						<b>Atenção:</b> O total dos lançamentos (<span id="span_total_lanc"></span>) não bate com o
+						valor total informado no cabeçalho da Guia (<span id="span_total_cabeca"></span>).
+					</div>
+					<div class="alert alert-success" id="alert_sucesso_guia" style="display:none; margin-bottom: 0;">
+						<b>Sucesso:</b> O total dos lançamentos confere com o valor da Guia.
+					</div>
+				</div>
+			</div>
+
+			<div class="panel panel-info" id="painel_leitura">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+						<i class="flaticon flaticon-file-check icon-sm"></i> Quadro Leitura Arquivo (Dados
+						extraídos)
+					</h3>
+				</div>
+				<div class="panel-body">
+					<div class="row">
+						<div class="form-group col-md-6">
+							<label for="arq_empresa">Nome da Empresa</label>
+							<input type="text" name="arq_empresa" id="arq_empresa" class="form-control" readonly>
+						</div>
+						<div class="form-group col-md-6">
+							<label for="arq_cnpj">CNPJ</label>
+							<input type="text" name="arq_cnpj" id="arq_cnpj" class="form-control" readonly>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="form-group col-md-4">
+							<label for="arq_banco">Banco</label>
+							<input type="text" name="arq_banco" id="arq_banco" class="form-control" readonly>
+						</div>
+						<div class="form-group col-md-4">
+							<label for="arq_agencia">Agência</label>
+							<input type="text" name="arq_agencia" id="arq_agencia" class="form-control" readonly>
+						</div>
+						<div class="form-group col-md-4">
+							<label for="arq_conta">Conta</label>
+							<input type="text" name="arq_conta" id="arq_conta" class="form-control" readonly>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="form-group col-md-4">
+							<label for="arq_convenio">Convênio</label>
+							<input type="text" name="arq_convenio" id="arq_convenio" class="form-control" readonly>
+						</div>
+
+						<div class="form-group col-md-4">
+							<label for="arq_data_cred">Data de Crédito</label>
+							<input type="text" name="arq_data_cred" id="arq_data_cred" class="form-control" readonly>
+						</div>
+
+						<div class="form-group col-md-4">
+							<label for="arq_valor">Valor Total</label>
+							<input type="text" name="arq_valor" id="arq_valor" class="form-control" readonly
+								style="color:rgb(17, 41, 224); font-weight:bold;">
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="panel panel-default" id="painel_erp">
+				<div class="panel-heading">
+					<h3 class="panel-title"><i class="flaticon flaticon-system-tools icon-sm"></i> Quadro Contas a
+						Pagar
+						(Dados ERP)</h3>
+				</div>
+				<div class="panel-body">
+					<div class="row">
+						<div class="form-group col-md-3">
+							<label for="erp_id_lan">Título (ID LAN) <span class="text-danger">*</span></label>
+							<input type="text" name="erp_id_lan" id="erp_id_lan" class="form-control"
+								placeholder="Digite o ID e tecle TAB">
+						</div>
+						<div class="form-group col-md-9">
+							<label for="erp_historico">Histórico</label>
+							<input type="text" name="erp_historico" id="erp_historico" class="form-control" readonly>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="form-group col-md-4">
+							<label for="erp_empresa">Empresa</label>
+							<input type="text" name="erp_empresa" id="erp_empresa" class="form-control" readonly>
+						</div>
+						<div class="form-group col-md-4">
+							<label for="erp_banco">Banco</label>
+							<input type="text" name="erp_banco" id="erp_banco" class="form-control" readonly>
+						</div>
+						<div class="form-group col-md-4">
+							<label for="erp_cnpj">CNPJ</label>
+							<input type="text" name="erp_cnpj" id="erp_cnpj" class="form-control" readonly>
+						</div>
+					</div>
+
+					<div class="row" style="display:none;">
+
+						<div class="form-group col-md-4">
+							<label for="erp_agencia">Agência</label>
+							<input type="text" name="erp_agencia" id="erp_agencia" class="form-control" readonly>
+						</div>
+						<div class="form-group col-md-4">
+							<label for="erp_conta">Conta</label>
+							<input type="text" name="erp_conta" id="erp_conta" class="form-control" readonly>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="form-group col-md-4">
+							<label for="erp_data_emissao">Data Emissão</label>
+							<input type="text" name="erp_data_emissao" id="erp_data_emissao" class="form-control"
+								readonly>
+						</div>
+						<div class="form-group col-md-4">
+							<label for="erp_data_cred">Data Vencimento</label>
+							<input type="text" name="erp_data_cred" id="erp_data_cred" class="form-control" readonly>
+						</div>
+						<div class="form-group col-md-4">
+							<label for="erp_valor">Valor Líquido</label>
+							<input type="text" name="erp_valor" id="erp_valor" class="form-control" readonly
+								style="font-weight: bold; color: #337ab7;">
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="panel panel-info" id="painel_rateio">
+				<div class="panel-heading">
+					<h3 class="panel-title">Rateio Financeiro</h3>
+				</div>
+				<div class="panel-body" style="padding: 0;">
+					<table tablename="tbl_rateio" class="table table-striped table-condensed" noaddbutton="true"
+						nodeletebutton="true">
+						<thead>
+							<tr style="border-bottom: 2px solid #ddd;">
+								<th class="col-md-7" style="color: #333;">Centro de Custo</th>
+								<th class="col-md-2" style="text-align: center; color: #333;">%</th>
+								<th class="col-md-3" style="text-align: right; color: #333;">Valor (R$)</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>
+									<input type="text" name="rateio_cc" class="form-control input-sm" readonly
+										style="border:none; background:transparent; box-shadow:none; color: #000; cursor: default;">
+									<input type="hidden" name="rateio_cod_puro">
+								</td>
+								<td>
+									<input type="text" name="rateio_percentual" class="form-control input-sm" readonly
+										style="text-align:center; border:none; background:transparent; box-shadow:none; color: #000; cursor: default;">
+								</td>
+								<td>
+									<input type="text" name="rateio_valor" class="form-control input-sm" readonly
+										style="text-align:right; border:none; background:transparent; box-shadow:none; color: #000; cursor: default;">
+								</td>
+							</tr>
+						</tbody>
+						<tfoot>
+							<tr style="border-top: 2px solid #ddd;">
+								<td style="text-align: right; vertical-align: middle; font-weight: bold; color: #000;">
+									TOTAIS:</td>
+								<td style="vertical-align: middle;">
+									<input type="text" name="rateio_total_percentual" id="rateio_total_percentual"
+										class="form-control input-sm" readonly
+										style="text-align:center; font-weight:bold; border: none; background: transparent; box-shadow: none; font-size: 14px;">
+								</td>
+								<td style="vertical-align: middle;">
+									<input type="text" name="rateio_total_calculado" id="rateio_total_calculado"
+										class="form-control input-sm" readonly
+										style="text-align:right; font-weight:bold; border: none; background: transparent; box-shadow: none; font-size: 14px;">
+								</td>
+							</tr>
+						</tfoot>
+					</table>
+				</div>
+			</div>
+
+			<div class="panel panel-success" id="painel_resumo">
+				<div class="panel-heading">
+					<h3 class="panel-title">Resumo da Validação</h3>
+				</div>
+				<div class="panel-body">
+
+					<div id="container_resumo_cnab">
+						<table class="table table-bordered table-condensed">
+							<thead>
+								<tr>
+									<th>Campo</th>
+									<th>Status</th>
+									<th>Obs</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>Empresa</td>
+									<td><input type="text" name="chk_empresa" class="form-control input-sm" readonly>
+									</td>
+									<td><span id="msg_empresa"></span></td>
+								</tr>
+								<tr>
+									<td>CNPJ</td>
+									<td><input type="text" name="chk_cnpj" class="form-control input-sm" readonly>
+									</td>
+									<td><span id="msg_cnpj"></span></td>
+								</tr>
+								<tr>
+									<td>Banco</td>
+									<td><input type="text" name="chk_banco" class="form-control input-sm" readonly>
+									</td>
+									<td><span id="msg_banco"></span></td>
+								</tr>
+								<tr>
+									<td>Data Crédito</td>
+									<td><input type="text" name="chk_data_cred" class="form-control input-sm" readonly>
+									</td>
+									<td><span id="msg_data_cred"></span></td>
+								</tr>
+								<tr>
+									<td>Valor</td>
+									<td><input type="text" name="chk_valor" class="form-control input-sm" readonly>
+									</td>
+									<td><span id="msg_valor"></span></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+
+					<div id="container_resumo_guia" style="display:none;">
+						<table class="table table-bordered">
+							<thead>
+								<tr>
+									<th class="col-md-4">Item de Validação</th>
+									<th class="col-md-4">Status</th>
+									<th class="col-md-4">Detalhe</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td><strong>Valor Total</strong><br><small>Soma Quadro Contas a Pagar vs
+											Guia/Outros</small></td>
+									</td>
+									<td>
+										<input type="text" name="status_guia_valor" id="status_guia_valor"
+											class="form-control" readonly style="font-weight:bold; text-align:center;">
+									</td>
+									<td id="detalhe_guia_valor" style="vertical-align: middle;"></td>
+								</tr>
+								<tr>
+									<td><strong>Data de Vencimento</strong><br><small>Todas as datas devem ser
+											iguais</small></td>
+									<td>
+										<input type="text" name="status_guia_data" id="status_guia_data"
+											class="form-control" readonly style="font-weight:bold; text-align:center;">
+									</td>
+									<td id="detalhe_guia_data" style="vertical-align: middle;"></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+
+					<hr>
+
+					<div class="row">
+						<div class="col-md-12">
+							<div class="form-group">
+								<label for="txt_justificativa">Justificativa da Validação</label>
+								<textarea class="form-control" name="txt_justificativa" id="txt_justificativa" rows="3"
+									placeholder="Descreva aqui qualquer irregularidade ou observação encontrada..."></textarea>
+							</div>
+						</div>
+					</div>
+
+					<div class="checkbox">
+						<label>
+							<input type="checkbox" name="check_ok" id="check_ok" value="sim">
+							<strong>CONFIRMO que a validação acima possui divergências conforme justificativas
+								acima.</strong>
+						</label>
+					</div>
+				</div>
+			</div>
+
+		</form>
+
+		<script type="text/javascript" src="compartilhados.js"></script>
+		<script type="text/javascript" src="zoom.js"></script>
+		<script type="text/javascript" src="strategies/cnab_bradesco.js"></script>
+
+		<!-- <script type="text/javascript" src="simulation.js"></script> -->
+		<script type="text/javascript" src="custom.js"></script>
+
+	</div>
+</body>
+
+</html>
