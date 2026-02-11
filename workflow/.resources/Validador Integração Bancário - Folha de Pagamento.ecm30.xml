@@ -28,7 +28,7 @@
     <processDefinitionVersionPK>
       <companyId>1</companyId>
       <processId>Validador Integração Financeira - Folha de Pagamento	</processId>
-      <version>42</version>
+      <version>44</version>
     </processDefinitionVersionPK>
     <versionDescription></versionDescription>
     <formId>288823</formId>
@@ -401,7 +401,7 @@
         <companyId>1</companyId>
         <processId>Validador Integração Bancário - Folha de Pagamento</processId>
         <expressionOrder>1</expressionOrder>
-        <version>42</version>
+        <version>44</version>
         <sequence>28</sequence>
       </conditionProcessStatePK>
       <condition>hAPI.getCardValue(&quot;cpTemDivergencia&quot;) == &quot;sim&quot;</condition>
@@ -415,7 +415,7 @@
         <companyId>1</companyId>
         <processId>Validador Integração Bancário - Folha de Pagamento</processId>
         <expressionOrder>2</expressionOrder>
-        <version>42</version>
+        <version>44</version>
         <sequence>28</sequence>
       </conditionProcessStatePK>
       <condition>true</condition>
