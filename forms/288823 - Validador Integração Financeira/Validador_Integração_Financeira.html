@@ -14,12 +14,13 @@
 	<div class="fluig-style-guide">
 		<form name="form" role="form">
 
+			<input type="hidden" name="wkNumState_hidden" id="wkNumState_hidden">
+
 			<input type="hidden" name="cpResponsavelEnvio" id="cpResponsavelEnvio">
 			<input type="hidden" name="cpStatusDivergencia" id="cpStatusDivergencia" value="0">
 			<input type="hidden" name="cpTemDivergencia" id="cpTemDivergencia" value="nao">
 			<input type="hidden" name="cpIdProcessoPagamento" id="cpIdProcessoPagamento">
 
-			<!-- PAINEL ENVIO EMAIL (ATIVIDADE 12) -->
 			<div class="panel panel-warning" id="painel_email_rh" style="display:none;">
 				<div class="panel-heading">
 					<h3 class="panel-title">Resumo para Envio de E-mail (RH)</h3>
@@ -58,7 +59,6 @@
 				</div>
 			</div>
 
-			<!-- DADOS SOLICITANTE -->
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">
@@ -102,7 +102,6 @@
 				</div>
 			</div>
 
-			<!-- PAINEL INFO -->
 			<div class="panel panel-primary" id="painel_info">
 				<div class="panel-heading">
 					<h3 class="panel-title"><i class="flaticon flaticon-playlist-add icon-sm"></i> Informações da
@@ -427,7 +426,6 @@
 				</div>
 			</div>
 
-			<!-- PAINEL LEITURA ARQUIVO -->
 			<div class="panel panel-info" id="painel_leitura">
 				<div class="panel-heading">
 					<h3 class="panel-title">
@@ -482,7 +480,6 @@
 				</div>
 			</div>
 
-			<!-- PAINEL ERP -->
 			<div class="panel panel-default" id="painel_erp">
 				<div class="panel-heading">
 					<h3 class="panel-title"><i class="flaticon flaticon-system-tools icon-sm"></i> Quadro Contas a
@@ -548,7 +545,6 @@
 				</div>
 			</div>
 
-			<!-- PAINEL RATEIO -->
 			<div class="panel panel-info" id="painel_rateio">
 				<div class="panel-heading">
 					<h3 class="panel-title">Rateio Financeiro</h3>
@@ -600,7 +596,6 @@
 				</div>
 			</div>
 
-			<!-- PAINEL RESUMO (ONDE A MÁGICA DE VISUALIZAÇÃO ACONTECE) -->
 			<div class="panel panel-success" id="painel_resumo">
 				<div class="panel-heading">
 					<h3 class="panel-title">Resumo da Validação</h3>
@@ -619,29 +614,33 @@
 							<tbody>
 								<tr>
 									<td>Empresa</td>
-									<td><input type="text" name="chk_empresa" class="form-control input-sm" readonly></td>
-									<!-- ALTERADO: span -> input readonly -->
-									<td><input type="text" name="msg_empresa" id="msg_empresa" class="form-control input-sm" readonly style="border:none; background:transparent; box-shadow:none; width:100%;"></td>
+									<td><input type="text" name="chk_empresa" class="form-control input-sm" readonly>
+									</td>
+									<td><span id="msg_empresa"></span></td>
 								</tr>
 								<tr>
 									<td>CNPJ</td>
-									<td><input type="text" name="chk_cnpj" class="form-control input-sm" readonly></td>
-									<td><input type="text" name="msg_cnpj" id="msg_cnpj" class="form-control input-sm" readonly style="border:none; background:transparent; box-shadow:none; width:100%;"></td>
+									<td><input type="text" name="chk_cnpj" class="form-control input-sm" readonly>
+									</td>
+									<td><span id="msg_cnpj"></span></td>
 								</tr>
 								<tr>
 									<td>Banco</td>
-									<td><input type="text" name="chk_banco" class="form-control input-sm" readonly></td>
-									<td><input type="text" name="msg_banco" id="msg_banco" class="form-control input-sm" readonly style="border:none; background:transparent; box-shadow:none; width:100%;"></td>
+									<td><input type="text" name="chk_banco" class="form-control input-sm" readonly>
+									</td>
+									<td><span id="msg_banco"></span></td>
 								</tr>
 								<tr>
 									<td>Data Crédito</td>
-									<td><input type="text" name="chk_data_cred" class="form-control input-sm" readonly></td>
-									<td><input type="text" name="msg_data_cred" id="msg_data_cred" class="form-control input-sm" readonly style="border:none; background:transparent; box-shadow:none; width:100%;"></td>
+									<td><input type="text" name="chk_data_cred" class="form-control input-sm" readonly>
+									</td>
+									<td><span id="msg_data_cred"></span></td>
 								</tr>
 								<tr>
 									<td>Valor</td>
-									<td><input type="text" name="chk_valor" class="form-control input-sm" readonly></td>
-									<td><input type="text" name="msg_valor" id="msg_valor" class="form-control input-sm" readonly style="border:none; background:transparent; box-shadow:none; width:100%;"></td>
+									<td><input type="text" name="chk_valor" class="form-control input-sm" readonly>
+									</td>
+									<td><span id="msg_valor"></span></td>
 								</tr>
 							</tbody>
 						</table>
@@ -665,10 +664,7 @@
 										<input type="text" name="status_guia_valor" id="status_guia_valor"
 											class="form-control" readonly style="font-weight:bold; text-align:center;">
 									</td>
-									<!-- ALTERADO: TD -> TD com input readonly -->
-									<td style="vertical-align: middle;">
-										<input type="text" name="detalhe_guia_valor" id="detalhe_guia_valor" class="form-control" readonly style="border:none; background:transparent; box-shadow:none; width:100%;">
-									</td>
+									<td id="detalhe_guia_valor" style="vertical-align: middle;"></td>
 								</tr>
 								<tr>
 									<td><strong>Data de Vencimento</strong><br><small>Todas as datas devem ser
@@ -677,9 +673,7 @@
 										<input type="text" name="status_guia_data" id="status_guia_data"
 											class="form-control" readonly style="font-weight:bold; text-align:center;">
 									</td>
-									<td style="vertical-align: middle;">
-										<input type="text" name="detalhe_guia_data" id="detalhe_guia_data" class="form-control" readonly style="border:none; background:transparent; box-shadow:none; width:100%;">
-									</td>
+									<td id="detalhe_guia_data" style="vertical-align: middle;"></td>
 								</tr>
 							</tbody>
 						</table>
@@ -704,6 +698,17 @@
 								acima.</strong>
 						</label>
 					</div>
+				</div>
+			</div>
+
+			<textarea name="html_resumo_congelado" id="html_resumo_congelado" style="display:none;"></textarea>
+
+			<div class="panel panel-info" id="painel_resumo_14" style="display:none;">
+				<div class="panel-heading">
+					<h3 class="panel-title"><i class="flaticon flaticon-checklist icon-sm"></i> Resumo da Solicitação
+						(Congelado)</h3>
+				</div>
+				<div class="panel-body" id="conteudo_resumo_estatico">
 				</div>
 			</div>
 
