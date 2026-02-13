@@ -33,7 +33,7 @@ $(document).ready(function () {
             limparCamposFinanceiros();
         });
 
-        // Executa ajuste inicial ao carregar a página (SEM LIMPAR DADOS)
+        // Executa ajuste inicial
         ajustarInterfacePorTipo($("#tipo_documento").val());
         controlarBotaoUpload();
 
@@ -42,11 +42,10 @@ $(document).ready(function () {
                 FLUIGC.toast({ title: 'Atenção', message: 'Selecione o Banco antes de anexar o arquivo.', type: 'warning' });
                 return;
             }
-            $("#fileUpload").click(); // Dispara o input file oculto
+            $("#fileUpload").click();
         });
 
-        // 3. RESTAURAÇÃO DE CORES/VALIDAÇÃO (CRUCIAL PARA TASK 14)
-        // Se os campos já vieram preenchidos do banco, rodamos a validação para pintar de verde/vermelho
+        // 3. RESTAURAÇÃO DE CORES/VALIDAÇÃO
         if ($("#erp_id_lan").val() && $("#erp_historico").val()) {
             console.log("Dados encontrados. Reaplicando validação visual...");
             validarDivergencias();
@@ -62,7 +61,7 @@ $(document).ready(function () {
             gerarTextoEmail();
         });
 
-        // 6. MONITORAMENTO DO ID LAN (COM VERIFICAÇÃO DE DUPLICIDADE)
+        // 6. MONITORAMENTO DO ID LAN
         $("#erp_id_lan").off("blur").on("blur", function () {
             var idDigitado = $(this).val();
             var coligada = $("#cod_empresa").val();
@@ -79,42 +78,48 @@ $(document).ready(function () {
             }
         });
 
-        $("#erp_id_lan").on("keypress", function (e) {
-            if (e.which == 13) {
-                e.preventDefault();
-                $(this).blur();
-            }
-        });
-
-        // 7. CARGA DE CARD GUIA (Se houver cards salvos, atualiza o resumo)
+        // 7. CARGA DE CARD GUIA
         if ($("input[name^='card_id_lan___']").length > 0) {
             atualizarResumoGuia();
         }
     }
 
-    // Se o campo estiver vazio (primeira vez), assume 0
+    // =========================================================================
+    // LÓGICA DO PAINEL DE RESUMO ESTÁTICO (CONGELADO)
+    // =========================================================================
+
+    // Identifica atividade atual (campo hidden criado no HTML e populado pelo displayFields)
     var atividade = $("#wkNumState_hidden").val() || 0;
-    
+
     // Verifica se já temos um resumo salvo
     var resumoSalvo = $("#html_resumo_congelado").val();
 
-    console.log(">>> Atividade Atual: " + atividade); // Para debug
-    console.log(">>> Resumo Salvo? " + (resumoSalvo ? "Sim" : "Não"));
+    // EXIBE O RESUMO APENAS SE: 
+    // - Não for Início (0) nem Correção (4)
+    // - Não for Envio Financeiro (12)
+    // - Não for Validar Divergências (14)
+    // - Tiver conteúdo salvo
+    // (Basicamente: só exibe em Modo de Consulta Histórica ou Processo Finalizado)
 
-    // LÓGICA DE EXIBIÇÃO
-    if (atividade != 0 && atividade != 4 && atividade != 12 && resumoSalvo && resumoSalvo.trim() !== "") {
-        
-        console.log(">>> MODO LEITURA: Exibindo Resumo Congelado <<<");
+    if (atividade != 0 && atividade != 4 && atividade != 12 && atividade != 14 && resumoSalvo && resumoSalvo.trim() !== "") {
 
+        console.log(">>> MODO CONSULTA: Exibindo Resumo Congelado <<<");
+
+        // 1. Exibe o painel estático
         $("#painel_resumo_14").show();
         $("#conteudo_resumo_estatico").html(resumoSalvo);
-        
-        // Oculta os painéis de edição
+
+        // POSICIONAMENTO: Move o painel de resumo para o topo (acima do painel de email se existir)
+        $("#painel_resumo_14").insertBefore("#painel_email_rh");
+
+        // 2. Oculta TODOS os painéis de formulário originais para limpar a visão
         $("#painel_info, #painel_leitura, #painel_erp, #painel_rateio, #painel_resumo").hide();
         $("#painel_multi_lancamentos, #painel_consolidado_guia, #container_resumo_guia").hide();
         $("#campos_originais_cnab, #row_cnab_inputs, #row_guia_header").hide();
+        $("#painel_email_rh").hide(); // Oculta também o painel de email na consulta histórica se desejar
 
     } else {
+        // Durante o fluxo normal (0, 4, 12, 14), o resumo fica oculto
         $("#painel_resumo_14").hide();
     }
 
@@ -1866,58 +1871,56 @@ function anexarArquivoGuia(input) {
 }
 
 // =================================================================================
-// 2. FUNÇÃO BEFORE SEND VALIDATE (Garante a gravação antes de enviar)
+// FUNÇÃO BEFORE SEND VALIDATE (Garante a gravação)
 // =================================================================================
-var beforeSendValidate = function (numState, nextState) {
+var beforeSendValidate = function(numState, nextState) {
     console.log(">>> Gerando Resumo Estático para Congelamento...");
-
-    // Gera o HTML e salva no textarea
     gerarResumoEstatico();
-
     return true;
 }
 
 // =================================================================================
-// 3. O GERADOR DE RELATÓRIO (A Mágica acontece aqui)
+// O GERADOR DE RELATÓRIO (MODIFICADO)
 // =================================================================================
 function gerarResumoEstatico() {
     var tipo = $("#tipo_documento").val();
     var html = "";
 
-    // Estilos inline básicos para garantir formatação bonita
-    var styleLabel = "font-weight:bold; color:#555;";
-    var styleVal = "color:#000;";
+    // Estilos inline para formatação
     var styleBox = "border:1px solid #ddd; padding:10px; margin-bottom:10px; border-radius:4px; background:#f9f9f9;";
+    var styleTitle = "font-size:14px; font-weight:bold; border-bottom:1px solid #ccc; margin-bottom:10px; padding-bottom:5px;";
 
     if (tipo == "cnab") {
         // --- BLOCO CNAB ---
-
-        // A. Info Solicitação
+        
+        // A. Info Solicitação (COM TIPO DE DOCUMENTO)
         html += "<div style='" + styleBox + "'>";
-        html += "<legend style='font-size:14px; font-weight:bold; border-bottom:1px solid #ccc;'>Informações da Solicitação</legend>";
+        html += "<div style='" + styleTitle + "'>Informações da Solicitação</div>";
         html += "<div class='row'>";
         html += col(4, "Empresa", $("#txt_empresa").val());
         html += col(4, "Filial", $("#txt_filial").val());
         html += col(4, "CNPJ", $("#txt_cnpj").val());
         html += "</div><div class='row'>";
+        html += col(4, "Tipo Documento", "CNAB Bancário"); // <-- Adicionado
         html += col(4, "Tipo Lançamento", $("#cnab_tipo_lancamento").val());
-        html += col(4, "Banco", $("#txt_banco").val());
-        html += col(4, "Arquivo", $("#fileNameVisual").val());
+        html += col(4, "Banco Pagamento", $("#txt_banco").val());
+        html += "</div><div class='row'>";
+        html += col(12, "Arquivo", $("#fileNameVisual").val());
         html += "</div></div>";
 
         // B. Leitura Arquivo
         html += "<div style='" + styleBox + "'>";
-        html += "<legend style='font-size:14px; font-weight:bold; border-bottom:1px solid #ccc;'>Dados Extraídos do Arquivo</legend>";
+        html += "<div style='" + styleTitle + "'>Dados Extraídos do Arquivo</div>";
         html += "<div class='row'>";
         html += col(3, "Bco/Ag/CC", $("#arq_banco").val() + " / " + $("#arq_agencia").val() + " / " + $("#arq_conta").val());
-        html += col(3, "Valor", "R$ " + $("#arq_valor").val());
+        html += col(3, "Valor", "<span style='color:blue; font-weight:bold;'>R$ " + $("#arq_valor").val() + "</span>");
         html += col(3, "Data Crédito", $("#arq_data_cred").val());
         html += col(3, "Empresa Arq", $("#arq_empresa").val());
         html += "</div></div>";
 
         // C. Dados ERP
         html += "<div style='" + styleBox + "'>";
-        html += "<legend style='font-size:14px; font-weight:bold; border-bottom:1px solid #ccc;'>Dados ERP (Contas a Pagar)</legend>";
+        html += "<div style='" + styleTitle + "'>Dados ERP (Contas a Pagar)</div>";
         html += "<div class='row'>";
         html += col(2, "IDLAN", "<strong>" + $("#erp_id_lan").val() + "</strong>");
         html += col(5, "Histórico", $("#erp_historico").val());
@@ -1925,24 +1928,47 @@ function gerarResumoEstatico() {
         html += col(2, "Vencimento", $("#erp_data_cred").val());
         html += "</div></div>";
 
-        // D. Rateio (Loop Pai x Filho)
+        // D. Rateio
         html += "<div style='" + styleBox + "'>";
-        html += "<legend style='font-size:14px; font-weight:bold; border-bottom:1px solid #ccc;'>Rateio Financeiro</legend>";
-        html += "<ul class='list-group'>";
-        $("input[name^='rateio_cc___']").each(function () {
+        html += "<div style='" + styleTitle + "'>Rateio Financeiro</div>";
+        html += "<ul class='list-group' style='margin-bottom:0;'>";
+        $("input[name^='rateio_cc___']").each(function() {
             var idx = this.name.split("___")[1];
             var cc = $(this).val();
-            var perc = $("input[name='rateio_percentual___" + idx + "']").val();
-            var val = $("input[name='rateio_valor___" + idx + "']").val();
-            html += "<li class='list-group-item' style='padding:5px;'>Centro de Custo: <b>" + cc + "</b> | Percentual: <b>" + perc + "%</b> | Valor: <b>R$ " + val + "</b></li>";
+            var perc = $("input[name='rateio_percentual___"+idx+"']").val();
+            var val = $("input[name='rateio_valor___"+idx+"']").val();
+            html += "<li class='list-group-item' style='padding:5px;'>Centro de Custo: <b>"+cc+"</b> | Percentual: <b>"+perc+"</b> | Valor: <b>R$ "+val+"</b></li>";
         });
         html += "</ul>";
-        html += "<div class='text-right'>Total: <b>R$ " + $("#rateio_total_calculado").val() + "</b> (" + $("#rateio_total_percentual").val() + "%)</div>";
+        html += "<div class='text-right' style='margin-top:5px;'>Total: <b>R$ " + $("#rateio_total_calculado").val() + "</b> ("+$("#rateio_total_percentual").val()+")</div>";
         html += "</div>";
 
-        // E. Validação e Justificativa
+        // E. Resultado da Validação (ADICIONADO PARA CNAB)
+        html += "<div style='" + styleBox + "'>";
+        html += "<div style='" + styleTitle + "'>Resultado da Validação</div>";
+        html += "<table class='table table-condensed table-bordered' style='background:white; margin-bottom:0;'>";
+        html += "<thead><tr><th>Item</th><th>Status</th><th>Observação / Detalhe</th></tr></thead><tbody>";
+        
+        // Helper para pintar linhas
+        function valRow(label, inputId, msgId) {
+            var status = $("#" + inputId).val();
+            var msg = $("#" + msgId).text();
+            var color = (status == "OK") ? "green" : (status == "ERRO" ? "red" : "#d8b100");
+            var style = "font-weight:bold; color:" + color;
+            return "<tr><td>" + label + "</td><td><span style='" + style + "'>" + status + "</span></td><td>" + msg + "</td></tr>";
+        }
+
+        html += valRow("Empresa", "chk_empresa", "msg_empresa");
+        html += valRow("CNPJ", "chk_cnpj", "msg_cnpj");
+        html += valRow("Banco", "chk_banco", "msg_banco");
+        html += valRow("Data Crédito", "chk_data_cred", "msg_data_cred");
+        html += valRow("Valor", "chk_valor", "msg_valor");
+
+        html += "</tbody></table></div>";
+
+        // F. Justificativa
         html += "<div class='alert alert-warning'>";
-        html += "<p><strong>Justificativa da Divergência:</strong> " + $("#txt_justificativa").val() + "</p>";
+        html += "<p><strong>Justificativa da Divergência:</strong> " + ($("#txt_justificativa").val() || "Nenhuma") + "</p>";
         html += "</div>";
 
     } else {
@@ -1950,60 +1976,63 @@ function gerarResumoEstatico() {
 
         // A. Info Guia
         html += "<div style='" + styleBox + "'>";
-        html += "<legend style='font-size:14px; font-weight:bold; border-bottom:1px solid #ccc;'>Informações da Guia</legend>";
+        html += "<div style='" + styleTitle + "'>Informações da Guia</div>";
         html += "<div class='row'>";
-        html += col(6, "Arquivo Comprovante", $("#fileNameGuia").val());
-        html += col(6, "Tipo da Guia", $("#guia_tipo").val());
+        html += col(4, "Tipo Documento", "Guia / Outros"); // <-- Adicionado
+        html += col(4, "Tipo da Guia", $("#guia_tipo").val());
+        html += col(4, "Arquivo", $("#fileNameGuia").val());
         html += "</div><div class='row'>";
-
-        // Formata data
+        
         var dataG = $("#guia_data_venc").val();
-        if (dataG && dataG.includes("-")) dataG = dataG.split("-").reverse().join("/");
-
+        if(dataG && dataG.includes("-")) dataG = dataG.split("-").reverse().join("/");
+        
         html += col(6, "Data Vencimento", dataG);
         html += col(6, "Valor Total", "<span style='color:blue; font-weight:bold;'>R$ " + $("#guia_valor_total").val() + "</span>");
         html += "</div></div>";
 
-        // B. Lançamentos (Tabela construída via loop)
+        // B. Lançamentos
         html += "<div style='" + styleBox + "'>";
-        html += "<legend style='font-size:14px; font-weight:bold; border-bottom:1px solid #ccc;'>Lançamentos Vinculados</legend>";
-        html += "<table class='table table-condensed table-striped table-bordered' style='background:white;'><thead><tr><th>ID LAN</th><th>Empresa</th><th>Histórico</th><th>Valor</th></tr></thead><tbody>";
-
-        $("input[name^='card_id_lan___']").each(function () {
+        html += "<div style='" + styleTitle + "'>Lançamentos Vinculados</div>";
+        html += "<table class='table table-condensed table-striped table-bordered' style='background:white; margin-bottom:0;'><thead><tr><th>ID LAN</th><th>Empresa</th><th>Histórico</th><th class='text-right'>Valor</th></tr></thead><tbody>";
+        
+        $("input[name^='card_id_lan___']").each(function() {
             var idx = this.name.split("___")[1];
             var id = $(this).val();
-            if (id) {
-                var emp = $("input[name='card_empresa___" + idx + "']").val();
-                var hist = $("input[name='card_historico___" + idx + "']").val();
-                var val = $("input[name='card_valor___" + idx + "']").val();
-                html += "<tr><td>" + id + "</td><td>" + emp + "</td><td>" + hist + "</td><td align='right'>" + val + "</td></tr>";
+            if(id) {
+                var emp = $("input[name='card_empresa___"+idx+"']").val();
+                var hist = $("input[name='card_historico___"+idx+"']").val();
+                var val = $("input[name='card_valor___"+idx+"']").val();
+                html += "<tr><td>"+id+"</td><td>"+emp+"</td><td>"+hist+"</td><td align='right'>"+val+"</td></tr>";
             }
         });
-
+        
         html += "</tbody><tfoot><tr><td colspan='3' align='right'><b>Total Consolidado:</b></td><td align='right'><b>R$ " + $("#lbl_total_consolidado").text() + "</b></td></tr></tfoot>";
         html += "</table></div>";
 
         // C. Status Validação
         var stVal = $("#status_guia_valor").val();
         var stDat = $("#status_guia_data").val();
+        var cVal = (stVal == "OK") ? "green" : "red";
+        var cDat = (stDat == "OK") ? "green" : "red";
 
-        html += "<table class='table table-bordered'>";
-        html += "<tr><td width='30%'>Validação Valor</td><td><b>" + stVal + "</b> (" + $("#detalhe_guia_valor").text() + ")</td></tr>";
-        html += "<tr><td>Validação Data</td><td><b>" + stDat + "</b> (" + $("#detalhe_guia_data").text() + ")</td></tr>";
-        html += "</table>";
+        html += "<div style='" + styleBox + "'>";
+        html += "<div style='" + styleTitle + "'>Resultado da Validação</div>";
+        html += "<table class='table table-bordered' style='background:white; margin-bottom:0;'>";
+        html += "<tr><td width='30%'>Validação Valor</td><td><b style='color:"+cVal+"'>"+stVal+"</b> ("+$("#detalhe_guia_valor").text()+")</td></tr>";
+        html += "<tr><td>Validação Data</td><td><b style='color:"+cDat+"'>"+stDat+"</b> ("+$("#detalhe_guia_data").text()+")</td></tr>";
+        html += "</table></div>";
 
         // D. Justificativa
         html += "<div class='alert alert-warning'>";
-        html += "<p><strong>Justificativa:</strong> " + $("#txt_justificativa").val() + "</p>";
+        html += "<p><strong>Justificativa:</strong> " + ($("#txt_justificativa").val() || "Nenhuma") + "</p>";
         html += "</div>";
     }
 
-    // GRAVAÇÃO FINAL NO TEXTAREA
     $("#html_resumo_congelado").val(html);
 }
 
 // Helper para criar colunas Bootstrap HTML na string
 function col(size, label, value) {
-    if (!value) value = "-";
+    if(!value) value = "-";
     return "<div class='col-md-" + size + "'><small style='color:#777'>" + label + "</small><br><strong>" + value + "</strong></div>";
 }
