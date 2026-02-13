@@ -1880,7 +1880,7 @@ var beforeSendValidate = function(numState, nextState) {
 }
 
 // =================================================================================
-// O GERADOR DE RELATÓRIO (MODIFICADO)
+// O GERADOR DE RELATÓRIO (MODIFICADO - CORREÇÃO UNDEFINED)
 // =================================================================================
 function gerarResumoEstatico() {
     var tipo = $("#tipo_documento").val();
@@ -1893,7 +1893,7 @@ function gerarResumoEstatico() {
     if (tipo == "cnab") {
         // --- BLOCO CNAB ---
         
-        // A. Info Solicitação (COM TIPO DE DOCUMENTO)
+        // A. Info Solicitação
         html += "<div style='" + styleBox + "'>";
         html += "<div style='" + styleTitle + "'>Informações da Solicitação</div>";
         html += "<div class='row'>";
@@ -1901,7 +1901,7 @@ function gerarResumoEstatico() {
         html += col(4, "Filial", $("#txt_filial").val());
         html += col(4, "CNPJ", $("#txt_cnpj").val());
         html += "</div><div class='row'>";
-        html += col(4, "Tipo Documento", "CNAB Bancário"); // <-- Adicionado
+        html += col(4, "Tipo Documento", "CNAB Bancário");
         html += col(4, "Tipo Lançamento", $("#cnab_tipo_lancamento").val());
         html += col(4, "Banco Pagamento", $("#txt_banco").val());
         html += "</div><div class='row'>";
@@ -1943,17 +1943,22 @@ function gerarResumoEstatico() {
         html += "<div class='text-right' style='margin-top:5px;'>Total: <b>R$ " + $("#rateio_total_calculado").val() + "</b> ("+$("#rateio_total_percentual").val()+")</div>";
         html += "</div>";
 
-        // E. Resultado da Validação (ADICIONADO PARA CNAB)
+        // E. Resultado da Validação (CORRIGIDO)
         html += "<div style='" + styleBox + "'>";
         html += "<div style='" + styleTitle + "'>Resultado da Validação</div>";
         html += "<table class='table table-condensed table-bordered' style='background:white; margin-bottom:0;'>";
         html += "<thead><tr><th>Item</th><th>Status</th><th>Observação / Detalhe</th></tr></thead><tbody>";
         
-        // Helper para pintar linhas
-        function valRow(label, inputId, msgId) {
-            var status = $("#" + inputId).val();
+        // --- CORREÇÃO AQUI ---
+        // Alterado para buscar por [name='...'] em vez de ID #
+        function valRow(label, inputName, msgId) {
+            var status = $("[name='" + inputName + "']").val(); // CORREÇÃO: Busca pelo name
             var msg = $("#" + msgId).text();
-            var color = (status == "OK") ? "green" : (status == "ERRO" ? "red" : "#d8b100");
+            
+            // Tratamento visual para caso venha vazio ou undefined
+            if(!status) status = "PENDENTE";
+            
+            var color = (status == "OK") ? "green" : (status == "ERRO" ? "red" : (status == "PENDENTE" ? "black" : "#d8b100"));
             var style = "font-weight:bold; color:" + color;
             return "<tr><td>" + label + "</td><td><span style='" + style + "'>" + status + "</span></td><td>" + msg + "</td></tr>";
         }
@@ -1972,13 +1977,13 @@ function gerarResumoEstatico() {
         html += "</div>";
 
     } else {
-        // --- BLOCO GUIA ---
+        // --- BLOCO GUIA --- (Mantido igual)
 
         // A. Info Guia
         html += "<div style='" + styleBox + "'>";
         html += "<div style='" + styleTitle + "'>Informações da Guia</div>";
         html += "<div class='row'>";
-        html += col(4, "Tipo Documento", "Guia / Outros"); // <-- Adicionado
+        html += col(4, "Tipo Documento", "Guia / Outros");
         html += col(4, "Tipo da Guia", $("#guia_tipo").val());
         html += col(4, "Arquivo", $("#fileNameGuia").val());
         html += "</div><div class='row'>";
@@ -2031,7 +2036,7 @@ function gerarResumoEstatico() {
     $("#html_resumo_congelado").val(html);
 }
 
-// Helper para criar colunas Bootstrap HTML na string
+// Helper colunas
 function col(size, label, value) {
     if(!value) value = "-";
     return "<div class='col-md-" + size + "'><small style='color:#777'>" + label + "</small><br><strong>" + value + "</strong></div>";
