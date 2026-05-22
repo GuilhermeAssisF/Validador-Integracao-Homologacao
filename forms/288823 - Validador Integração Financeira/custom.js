@@ -101,7 +101,7 @@ $(document).ready(function () {
     // - Tiver conteúdo salvo
     // (Basicamente: só exibe em Modo de Consulta Histórica ou Processo Finalizado)
 
-    if (atividade != 0 && atividade != 4 && atividade != 12 && atividade != 14 && resumoSalvo && resumoSalvo.trim() !== "") {
+    if (atividade != 0 && atividade != 4 && atividade != 12 && atividade != 14 && atividade != 40 && resumoSalvo && resumoSalvo.trim() !== "") {
 
         console.log(">>> MODO CONSULTA: Exibindo Resumo Congelado <<<");
 
@@ -896,98 +896,98 @@ function gerarTextoEmail() {
     $("#texto_email_resumo").val(corpo);
 }
 
-function copiarTextoEmail() {
-    var copyText = document.getElementById("texto_email_resumo");
-    copyText.select();
-    copyText.setSelectionRange(0, 99999); /* Para mobile */
-    document.execCommand("copy");
-    FLUIGC.toast({ title: 'Copiado', message: 'Texto copiado para a área de transferência.', type: 'info' });
-}
+// function copiarTextoEmail() {
+//     var copyText = document.getElementById("texto_email_resumo");
+//     copyText.select();
+//     copyText.setSelectionRange(0, 99999); /* Para mobile */
+//     document.execCommand("copy");
+//     FLUIGC.toast({ title: 'Copiado', message: 'Texto copiado para a área de transferência.', type: 'info' });
+// }
 
-// Função para copiar o Assunto
-function copiarAssuntoEmail() {
-    var copyText = document.getElementById("txt_assunto_email");
-    copyText.select();
-    copyText.setSelectionRange(0, 99999);
-    document.execCommand("copy");
-    FLUIGC.toast({ title: 'Copiado', message: 'Assunto copiado.', type: 'info' });
-}
+// // Função para copiar o Assunto
+// function copiarAssuntoEmail() {
+//     var copyText = document.getElementById("txt_assunto_email");
+//     copyText.select();
+//     copyText.setSelectionRange(0, 99999);
+//     document.execCommand("copy");
+//     FLUIGC.toast({ title: 'Copiado', message: 'Assunto copiado.', type: 'info' });
+// }
 
 // 2. Função para baixar anexo (Task 12)
-function baixarAnexoValidado() {
-    var numProcesso = $("#cpNumeroSolicitacao").val();
+// function baixarAnexoValidado() {
+//     var numProcesso = $("#cpNumeroSolicitacao").val();
 
-    // Recupera o nome original para salvar com o nome correto
-    var nomeArquivoEsperado = $("#tipo_documento").val() == "cnab"
-        ? $("#fileNameVisual").val()
-        : $("#fileNameGuia").val();
+//     // Recupera o nome original para salvar com o nome correto
+//     var nomeArquivoEsperado = $("#tipo_documento").val() == "cnab"
+//         ? $("#fileNameVisual").val()
+//         : $("#fileNameGuia").val();
 
-    if (!numProcesso || numProcesso == "0") {
-        FLUIGC.toast({ title: 'Atenção', message: 'Solicitação ainda não iniciada.', type: 'warning' });
-        return;
-    }
+//     if (!numProcesso || numProcesso == "0") {
+//         FLUIGC.toast({ title: 'Atenção', message: 'Solicitação ainda não iniciada.', type: 'warning' });
+//         return;
+//     }
 
-    var loading = FLUIGC.loading(window);
-    loading.show();
+//     var loading = FLUIGC.loading(window);
+//     loading.show();
 
-    // 1. Busca o ID do documento no Dataset
-    var c1 = DatasetFactory.createConstraint("processAttachmentPK.processInstanceId", numProcesso, numProcesso, ConstraintType.MUST);
+//     // 1. Busca o ID do documento no Dataset
+//     var c1 = DatasetFactory.createConstraint("processAttachmentPK.processInstanceId", numProcesso, numProcesso, ConstraintType.MUST);
 
-    DatasetFactory.getDataset("processAttachment", null, [c1], null, {
-        success: function (data) {
-            loading.hide();
+//     DatasetFactory.getDataset("processAttachment", null, [c1], null, {
+//         success: function (data) {
+//             loading.hide();
 
-            if (data.values && data.values.length > 0) {
-                var anexos = data.values.reverse(); // Pega o mais recente
-                var anexoAlvo = null;
+//             if (data.values && data.values.length > 0) {
+//                 var anexos = data.values.reverse(); // Pega o mais recente
+//                 var anexoAlvo = null;
 
-                for (var i = 0; i < anexos.length; i++) {
-                    var item = anexos[i];
-                    var tipo = item["documentType"];
-                    // Ignora pastas (2)
-                    if (tipo != "2" && tipo != 2) {
-                        anexoAlvo = item;
-                        break;
-                    }
-                }
+//                 for (var i = 0; i < anexos.length; i++) {
+//                     var item = anexos[i];
+//                     var tipo = item["documentType"];
+//                     // Ignora pastas (2)
+//                     if (tipo != "2" && tipo != 2) {
+//                         anexoAlvo = item;
+//                         break;
+//                     }
+//                 }
 
-                if (anexoAlvo) {
-                    var docId = anexoAlvo["processAttachmentPK.documentId"] || anexoAlvo["documentId"];
-                    var companyId = anexoAlvo["processAttachmentPK.companyId"] || anexoAlvo["companyId"] || 1;
-                    var version = anexoAlvo["version"] || 1000;
+//                 if (anexoAlvo) {
+//                     var docId = anexoAlvo["processAttachmentPK.documentId"] || anexoAlvo["documentId"];
+//                     var companyId = anexoAlvo["processAttachmentPK.companyId"] || anexoAlvo["companyId"] || 1;
+//                     var version = anexoAlvo["version"] || 1000;
 
-                    // URL base do StreamControl
-                    var urlDownloadDireto = "/webdesk/streamcontrol/" +
-                        "?WDCompanyId=" + companyId +
-                        "&WDNrDocto=" + docId +
-                        "&WDNrVersao=" + version;
+//                     // URL base do StreamControl
+//                     var urlDownloadDireto = "/webdesk/streamcontrol/" +
+//                         "?WDCompanyId=" + companyId +
+//                         "&WDNrDocto=" + docId +
+//                         "&WDNrVersao=" + version;
 
-                    // --- TRUQUE PARA FORÇAR O DOWNLOAD ---
-                    // Cria um elemento <a> temporário
-                    var link = document.createElement('a');
-                    link.href = urlDownloadDireto;
+//                     // --- TRUQUE PARA FORÇAR O DOWNLOAD ---
+//                     // Cria um elemento <a> temporário
+//                     var link = document.createElement('a');
+//                     link.href = urlDownloadDireto;
 
-                    // O atributo 'download' força o navegador a salvar em vez de abrir
-                    // Usamos o nome que estava salvo no formulário
-                    link.download = nomeArquivoEsperado || ("Anexo_Processo_" + numProcesso);
+//                     // O atributo 'download' força o navegador a salvar em vez de abrir
+//                     // Usamos o nome que estava salvo no formulário
+//                     link.download = nomeArquivoEsperado || ("Anexo_Processo_" + numProcesso);
 
-                    document.body.appendChild(link);
-                    link.click(); // Simula o clique
-                    document.body.removeChild(link); // Limpa
+//                     document.body.appendChild(link);
+//                     link.click(); // Simula o clique
+//                     document.body.removeChild(link); // Limpa
 
-                } else {
-                    FLUIGC.toast({ title: 'Aviso', message: 'Nenhum arquivo válido encontrado.', type: 'warning' });
-                }
-            } else {
-                FLUIGC.toast({ title: 'Vazio', message: 'Nenhum anexo encontrado.', type: 'warning' });
-            }
-        },
-        error: function (msg) {
-            loading.hide();
-            FLUIGC.toast({ title: 'Erro', message: 'Falha ao buscar anexo.', type: 'danger' });
-        }
-    });
-}
+//                 } else {
+//                     FLUIGC.toast({ title: 'Aviso', message: 'Nenhum arquivo válido encontrado.', type: 'warning' });
+//                 }
+//             } else {
+//                 FLUIGC.toast({ title: 'Vazio', message: 'Nenhum anexo encontrado.', type: 'warning' });
+//             }
+//         },
+//         error: function (msg) {
+//             loading.hide();
+//             FLUIGC.toast({ title: 'Erro', message: 'Falha ao buscar anexo.', type: 'danger' });
+//         }
+//     });
+// }
 
 // 1. Função para preparar o arquivo no GED (Etapa Inicial)
 function enviarArquivoParaAnexos(input) {
@@ -1873,7 +1873,7 @@ function anexarArquivoGuia(input) {
 // =================================================================================
 // FUNÇÃO BEFORE SEND VALIDATE (Garante a gravação)
 // =================================================================================
-var beforeSendValidate = function(numState, nextState) {
+var beforeSendValidate = function (numState, nextState) {
     console.log(">>> Gerando Resumo Estático para Congelamento...");
     gerarResumoEstatico();
     return true;
@@ -1892,7 +1892,7 @@ function gerarResumoEstatico() {
 
     if (tipo == "cnab") {
         // --- BLOCO CNAB ---
-        
+
         // A. Info Solicitação
         html += "<div style='" + styleBox + "'>";
         html += "<div style='" + styleTitle + "'>Informações da Solicitação</div>";
@@ -1932,15 +1932,15 @@ function gerarResumoEstatico() {
         html += "<div style='" + styleBox + "'>";
         html += "<div style='" + styleTitle + "'>Rateio Financeiro</div>";
         html += "<ul class='list-group' style='margin-bottom:0;'>";
-        $("input[name^='rateio_cc___']").each(function() {
+        $("input[name^='rateio_cc___']").each(function () {
             var idx = this.name.split("___")[1];
             var cc = $(this).val();
-            var perc = $("input[name='rateio_percentual___"+idx+"']").val();
-            var val = $("input[name='rateio_valor___"+idx+"']").val();
-            html += "<li class='list-group-item' style='padding:5px;'>Centro de Custo: <b>"+cc+"</b> | Percentual: <b>"+perc+"</b> | Valor: <b>R$ "+val+"</b></li>";
+            var perc = $("input[name='rateio_percentual___" + idx + "']").val();
+            var val = $("input[name='rateio_valor___" + idx + "']").val();
+            html += "<li class='list-group-item' style='padding:5px;'>Centro de Custo: <b>" + cc + "</b> | Percentual: <b>" + perc + "</b> | Valor: <b>R$ " + val + "</b></li>";
         });
         html += "</ul>";
-        html += "<div class='text-right' style='margin-top:5px;'>Total: <b>R$ " + $("#rateio_total_calculado").val() + "</b> ("+$("#rateio_total_percentual").val()+")</div>";
+        html += "<div class='text-right' style='margin-top:5px;'>Total: <b>R$ " + $("#rateio_total_calculado").val() + "</b> (" + $("#rateio_total_percentual").val() + ")</div>";
         html += "</div>";
 
         // E. Resultado da Validação (CORRIGIDO)
@@ -1948,16 +1948,16 @@ function gerarResumoEstatico() {
         html += "<div style='" + styleTitle + "'>Resultado da Validação</div>";
         html += "<table class='table table-condensed table-bordered' style='background:white; margin-bottom:0;'>";
         html += "<thead><tr><th>Item</th><th>Status</th><th>Observação / Detalhe</th></tr></thead><tbody>";
-        
+
         // --- CORREÇÃO AQUI ---
         // Alterado para buscar por [name='...'] em vez de ID #
         function valRow(label, inputName, msgId) {
             var status = $("[name='" + inputName + "']").val(); // CORREÇÃO: Busca pelo name
             var msg = $("#" + msgId).text();
-            
+
             // Tratamento visual para caso venha vazio ou undefined
-            if(!status) status = "PENDENTE";
-            
+            if (!status) status = "PENDENTE";
+
             var color = (status == "OK") ? "green" : (status == "ERRO" ? "red" : (status == "PENDENTE" ? "black" : "#d8b100"));
             var style = "font-weight:bold; color:" + color;
             return "<tr><td>" + label + "</td><td><span style='" + style + "'>" + status + "</span></td><td>" + msg + "</td></tr>";
@@ -1987,10 +1987,10 @@ function gerarResumoEstatico() {
         html += col(4, "Tipo da Guia", $("#guia_tipo").val());
         html += col(4, "Arquivo", $("#fileNameGuia").val());
         html += "</div><div class='row'>";
-        
+
         var dataG = $("#guia_data_venc").val();
-        if(dataG && dataG.includes("-")) dataG = dataG.split("-").reverse().join("/");
-        
+        if (dataG && dataG.includes("-")) dataG = dataG.split("-").reverse().join("/");
+
         html += col(6, "Data Vencimento", dataG);
         html += col(6, "Valor Total", "<span style='color:blue; font-weight:bold;'>R$ " + $("#guia_valor_total").val() + "</span>");
         html += "</div></div>";
@@ -1999,18 +1999,18 @@ function gerarResumoEstatico() {
         html += "<div style='" + styleBox + "'>";
         html += "<div style='" + styleTitle + "'>Lançamentos Vinculados</div>";
         html += "<table class='table table-condensed table-striped table-bordered' style='background:white; margin-bottom:0;'><thead><tr><th>ID LAN</th><th>Empresa</th><th>Histórico</th><th class='text-right'>Valor</th></tr></thead><tbody>";
-        
-        $("input[name^='card_id_lan___']").each(function() {
+
+        $("input[name^='card_id_lan___']").each(function () {
             var idx = this.name.split("___")[1];
             var id = $(this).val();
-            if(id) {
-                var emp = $("input[name='card_empresa___"+idx+"']").val();
-                var hist = $("input[name='card_historico___"+idx+"']").val();
-                var val = $("input[name='card_valor___"+idx+"']").val();
-                html += "<tr><td>"+id+"</td><td>"+emp+"</td><td>"+hist+"</td><td align='right'>"+val+"</td></tr>";
+            if (id) {
+                var emp = $("input[name='card_empresa___" + idx + "']").val();
+                var hist = $("input[name='card_historico___" + idx + "']").val();
+                var val = $("input[name='card_valor___" + idx + "']").val();
+                html += "<tr><td>" + id + "</td><td>" + emp + "</td><td>" + hist + "</td><td align='right'>" + val + "</td></tr>";
             }
         });
-        
+
         html += "</tbody><tfoot><tr><td colspan='3' align='right'><b>Total Consolidado:</b></td><td align='right'><b>R$ " + $("#lbl_total_consolidado").text() + "</b></td></tr></tfoot>";
         html += "</table></div>";
 
@@ -2023,8 +2023,8 @@ function gerarResumoEstatico() {
         html += "<div style='" + styleBox + "'>";
         html += "<div style='" + styleTitle + "'>Resultado da Validação</div>";
         html += "<table class='table table-bordered' style='background:white; margin-bottom:0;'>";
-        html += "<tr><td width='30%'>Validação Valor</td><td><b style='color:"+cVal+"'>"+stVal+"</b> ("+$("#detalhe_guia_valor").text()+")</td></tr>";
-        html += "<tr><td>Validação Data</td><td><b style='color:"+cDat+"'>"+stDat+"</b> ("+$("#detalhe_guia_data").text()+")</td></tr>";
+        html += "<tr><td width='30%'>Validação Valor</td><td><b style='color:" + cVal + "'>" + stVal + "</b> (" + $("#detalhe_guia_valor").text() + ")</td></tr>";
+        html += "<tr><td>Validação Data</td><td><b style='color:" + cDat + "'>" + stDat + "</b> (" + $("#detalhe_guia_data").text() + ")</td></tr>";
         html += "</table></div>";
 
         // D. Justificativa
@@ -2038,6 +2038,706 @@ function gerarResumoEstatico() {
 
 // Helper colunas
 function col(size, label, value) {
-    if(!value) value = "-";
+    if (!value) value = "-";
     return "<div class='col-md-" + size + "'><small style='color:#777'>" + label + "</small><br><strong>" + value + "</strong></div>";
 }
+
+// ============================================================
+// MÓDULO: MONITORAMENTO DA PASTA 'ENVIADOS' (VERSÃO DEFINITIVA)
+// ============================================================
+var MonitoramentoVAN = (function () {
+    var intervalo = null;
+
+    var pegarNumeroProcesso = function () {
+        var num = $("#num_processo_van").val();
+        if (num && num !== "0") return num;
+        num = $("#WKNumProces").val();
+        if (num && num !== "0") return num;
+        if (window.WKNumProces && window.WKNumProces != "0" && window.WKNumProces != null) return window.WKNumProces;
+        try {
+            var urlParams = new URLSearchParams(window.parent.location.search);
+            num = urlParams.get('processInstanceId');
+            if (num && num !== "0") return num;
+        } catch (e) { }
+        return null;
+    };
+
+    var salvarEstadoServidor = function (nomeArquivo, status) {
+        var numProcesso = pegarNumeroProcesso();
+        if (!numProcesso) return;
+
+        var c1 = DatasetFactory.createConstraint("acao", "SALVAR", "SALVAR", ConstraintType.MUST);
+        var c2 = DatasetFactory.createConstraint("numProcesso", numProcesso, numProcesso, ConstraintType.MUST);
+        var c3 = DatasetFactory.createConstraint("nomeArquivo", nomeArquivo, nomeArquivo, ConstraintType.MUST);
+        var c4 = DatasetFactory.createConstraint("status", status, status, ConstraintType.MUST);
+
+        DatasetFactory.getDataset("DS_ESTADO_VAN", null, [c1, c2, c3, c4], null, {});
+    };
+
+    var montarPainelSucesso = function (nomeArquivo) {
+        $("#barra_progresso_van").hide();
+        $("#painel_monitoramento_van").removeClass("panel-info").addClass("panel-success").show();
+
+        var caminhoVisor = "\\\\sotersrv38\\FileServer\\RH\\03. Dpto Pessoal\\24. BPO - Interativa\\Enviados\\";
+        var htmlVisual = '<div class="text-left" style="margin-top: 10px; padding: 0 20px;">';
+        htmlVisual += '  <p class="text-muted" style="font-size: 13px; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;">';
+        htmlVisual += '    <i class="flaticon flaticon-folder-open icon-sm" style="color: #f39c12;"></i> <b>Destino Atual:</b> ' + caminhoVisor;
+        htmlVisual += '  </p>';
+        htmlVisual += '  <ul class="list-group" style="max-width: 600px; margin: 0 auto;">';
+        htmlVisual += '    <li class="list-group-item text-muted" style="opacity: 0.5; background: #fdfdfd; border-style: dashed;"><i class="flaticon flaticon-document icon-sm"></i> <i>...outros_arquivos_anteriores.txt</i></li>';
+        htmlVisual += '    <li class="list-group-item list-group-item-success" style="font-size: 16px; border-left: 5px solid #4cae4c; padding: 15px;"><i class="flaticon flaticon-check-circle icon-md"></i> <b>' + nomeArquivo + '</b><span class="badge pull-right" style="background-color: #4cae4c; margin-top: 2px;">Na Pasta</span></li>';
+        htmlVisual += '    <li class="list-group-item text-muted" style="opacity: 0.5; background: #fdfdfd; border-style: dashed;"><i class="flaticon flaticon-document icon-sm"></i> <i>...aguardando_novos_arquivos.txt</i></li>';
+        htmlVisual += '  </ul>';
+        htmlVisual += '  <div class="text-center" style="margin-top: 20px;"><span class="text-success" style="font-size: 16px;"><b><i class="flaticon flaticon-done-all"></i> Sucesso! O robô capturou e moveu o arquivo para a pasta Enviados.</b></span></div>';
+        htmlVisual += '</div>';
+
+        $("#texto_monitoramento_van").html(htmlVisual);
+    };
+
+    var iniciar = function (nomeArquivo) {
+        salvarEstadoServidor(nomeArquivo, "PENDENTE");
+        $("#painel_monitoramento_van").show();
+        $("#texto_monitoramento_van").html("Aguardando o robô da VAN capturar o arquivo: <b>" + nomeArquivo + "</b>");
+        $("#barra_progresso_van").show();
+        setTimeout(function () { verificar(nomeArquivo); }, 3000);
+        intervalo = setInterval(function () { verificar(nomeArquivo); }, 10000);
+    };
+
+    var verificar = function (nomeArquivo) {
+        var c1 = DatasetFactory.createConstraint("nomeArquivo", nomeArquivo, nomeArquivo, ConstraintType.MUST);
+        DatasetFactory.getDataset("DS_VERIFICAR_ARQUIVO_ENVIADOS", null, [c1], null, {
+            success: function (ds) {
+                if (ds && ds.values && ds.values.length > 0) {
+                    if (ds.values[0].STATUS === "ENCONTRADO") {
+                        clearInterval(intervalo);
+                        salvarEstadoServidor(nomeArquivo, "CONCLUIDO");
+                        montarPainelSucesso(nomeArquivo);
+                    }
+                }
+            }
+        });
+    };
+
+    // ============================================================
+    // RECUPERA O ARQUIVO E RECONSTRÓI O PAINEL SUPERIOR (DEBUG)
+    // ============================================================
+    var reconstruirPainelSuperior = function (nomeArquivo, statusAtual) {
+        var pastaAlvo = (statusAtual === "CONCLUIDO") ? "Enviados" : "Enviar";
+
+        var c1 = DatasetFactory.createConstraint("nomeArquivo", nomeArquivo, nomeArquivo, ConstraintType.MUST);
+        var c2 = DatasetFactory.createConstraint("pasta", pastaAlvo, pastaAlvo, ConstraintType.MUST);
+
+        console.log("MonitoramentoVAN: Tentando ler arquivo '" + nomeArquivo + "' na pasta '" + pastaAlvo + "'...");
+
+        DatasetFactory.getDataset("DS_RESTAURAR_ARQUIVO_VAN", null, [c1, c2], null, {
+            success: function (ds) {
+                if (ds && ds.values && ds.values.length > 0) {
+
+                    // Previne o erro de letras maiúsculas/minúsculas no retorno do Java
+                    var statusDataset = ds.values[0].status || ds.values[0].STATUS;
+
+                    if (statusDataset && statusDataset.indexOf("ERRO") > -1) {
+                        console.error("MonitoramentoVAN Falhou: " + statusDataset);
+                        FLUIGC.toast({ title: 'Erro na Leitura da Rede', message: statusDataset, type: 'danger', timeout: 'slow' });
+                    } else {
+                        // Junta as linhas garantindo que pega a coluna independentemente da capitalização
+                        var conteudo = ds.values.map(function (row) {
+                            return row["conteudo"] || row["CONTEUDO"] || "";
+                        }).join("\r\n");
+
+                        console.log("MonitoramentoVAN: Arquivo lido com sucesso. Total de linhas: " + ds.values.length);
+
+                        // Invoca a sua função original
+                        if (typeof processarTextoVanAuditoria === "function") {
+                            processarTextoVanAuditoria(conteudo, nomeArquivo);
+                            console.log("MonitoramentoVAN: processarTextoVanAuditoria executada com sucesso!");
+                            FLUIGC.toast({ title: 'Painel Restaurado', message: 'Os dados do arquivo enviado foram carregados na tela.', type: 'info' });
+                        } else {
+                            console.error("MonitoramentoVAN: A função 'processarTextoVanAuditoria' não foi encontrada!");
+                            FLUIGC.toast({ title: 'Erro no Script', message: 'Função de auditoria ausente no escopo.', type: 'warning' });
+                        }
+                    }
+                } else {
+                    console.error("MonitoramentoVAN: O Dataset retornou completamente vazio.");
+                }
+            },
+            error: function (err) {
+                console.error("MonitoramentoVAN: Erro de API ao chamar DS_RESTAURAR_ARQUIVO_VAN", err);
+            }
+        });
+    };
+
+    var restaurarEstadoSeExistir = function () {
+        var numProcesso = pegarNumeroProcesso();
+        if (!numProcesso) return;
+
+        var c1 = DatasetFactory.createConstraint("acao", "LER", "LER", ConstraintType.MUST);
+        var c2 = DatasetFactory.createConstraint("numProcesso", numProcesso, numProcesso, ConstraintType.MUST);
+
+        DatasetFactory.getDataset("DS_ESTADO_VAN", null, [c1, c2], null, {
+            success: function (ds) {
+                if (ds && ds.values && ds.values.length > 0) {
+                    var arquivoSalvo = ds.values[0].ARQUIVO;
+                    var statusSalvo = ds.values[0].STATUS;
+
+                    if (arquivoSalvo !== "NAO_EXISTE" && arquivoSalvo !== "ERRO" && arquivoSalvo !== "VAZIO") {
+
+                        // 1. Bloqueia o botão e atualiza o nome do arquivo visualmente
+                        $("#btn_enviar_fileserver")
+                            .prop("disabled", true)
+                            .removeClass("btn-success")
+                            .addClass("btn-default")
+                            .html('<i class="flaticon flaticon-check"></i> Enviado à VAN');
+                        $("#fileNameVan").val(arquivoSalvo);
+
+                        // 2. RECUPERA O PAINEL DE LEITURA (Painel Acima)
+                        reconstruirPainelSuperior(arquivoSalvo, statusSalvo);
+
+                        // 3. RECUPERA O PAINEL DE MONITORAMENTO (Painel Abaixo)
+                        if (statusSalvo === "PENDENTE") {
+                            iniciar(arquivoSalvo);
+                        }
+                        else if (statusSalvo === "CONCLUIDO") {
+                            montarPainelSucesso(arquivoSalvo);
+                        }
+                    }
+                }
+            }
+        });
+    };
+
+    return {
+        iniciar: iniciar,
+        restaurarEstadoSeExistir: restaurarEstadoSeExistir
+    };
+})();
+
+// ============================================================
+// MÓDULO: LEITURA DE RETORNOS DO FILESERVER (ATUALIZADO)
+// ============================================================
+
+var RetornoFileServer = (function () {
+
+    var listarArquivos = function (callback) {
+        var loading = FLUIGC.loading(window);
+        loading.show();
+
+        try {
+            DatasetFactory.getDataset("DS_LISTAR_RETORNOS", null, [], null, {
+                success: function (ds) {
+                    loading.hide();
+                    if (ds && ds.values && ds.values.length > 0) {
+                        // Verifica se o dataset retornou a mensagem de erro que configuramos
+                        if (ds.values[0]["Nome_do_Arquivo"] === "Aviso" || ds.values[0]["Nome_do_Arquivo"] === "Erro") {
+                            callback(ds.values[0]["Tamanho"], []);
+                        } else {
+                            callback(null, ds.values);
+                        }
+                    } else {
+                        callback("Nenhum arquivo de retorno encontrado.", []);
+                    }
+                },
+                error: function (err) {
+                    loading.hide();
+                    callback("Erro ao listar arquivos: " + err, []);
+                }
+            });
+        } catch (e) {
+            loading.hide();
+            callback("Erro de execução: " + e, []);
+        }
+    };
+
+    var lerArquivo = function (nomeArquivo, callback) {
+        var loading = FLUIGC.loading(window);
+        loading.show();
+
+        var c1 = DatasetFactory.createConstraint("nomeArquivo", nomeArquivo, nomeArquivo, ConstraintType.MUST);
+
+        try {
+            DatasetFactory.getDataset("DS_LER_RETORNO", null, [c1], null, {
+                success: function (ds) {
+                    loading.hide();
+                    if (ds && ds.values && ds.values.length > 0) {
+                        // Se retornou a flag de erro na coluna status
+                        if (ds.values[0]["status"] && ds.values[0]["status"].indexOf("ERRO") > -1) {
+                            callback(ds.values[0]["status"], "");
+                        } else {
+                            // Junta as linhas do array num texto único simulando o FileReader
+                            var conteudo = ds.values.map(function (row) {
+                                return row["conteudo"] || "";
+                            }).join("\n");
+                            callback(null, conteudo);
+                        }
+                    } else {
+                        callback("Arquivo vazio ou erro na leitura.", "");
+                    }
+                },
+                error: function (err) {
+                    loading.hide();
+                    callback("Erro ao acessar dataset de leitura: " + err, "");
+                }
+            });
+        } catch (e) {
+            loading.hide();
+            callback("Erro ao ler arquivo: " + e, "");
+        }
+    };
+
+    // Abre uma Modal do Fluig para o usuário selecionar o arquivo de retorno da rede
+    var abrirModalRetornos = function () {
+        listarArquivos(function (erro, arquivos) {
+            if (erro) {
+                FLUIGC.toast({ title: 'Atenção', message: erro, type: 'warning' });
+                return;
+            }
+
+            var html = '<div class="table-responsive"><table class="table table-striped table-hover">';
+            html += '<thead><tr><th>Arquivo</th><th>Tamanho</th><th>Data</th><th>Ação</th></tr></thead><tbody>';
+
+            arquivos.forEach(function (arq) {
+                html += '<tr>';
+                // Usa os nomes exatos das colunas do DS_LISTAR_RETORNOS
+                html += '<td><i class="flaticon flaticon-document icon-sm"></i> <b>' + arq["Nome_do_Arquivo"] + '</b></td>';
+                html += '<td>' + arq["Tamanho"] + '</td>';
+                html += '<td>' + arq["Data_Modificacao"] + '</td>';
+                html += '<td><button class="btn btn-sm btn-success btn-processar-modal" data-arquivo="' + arq["Nome_do_Arquivo"] + '">Processar Retorno</button></td>';
+                html += '</tr>';
+            });
+
+            html += '</tbody></table></div>';
+
+            var modalRetorno = FLUIGC.modal({
+                title: 'Arquivos de Retorno Disponíveis (FileServer)',
+                content: html,
+                id: 'modal-retornos-fileserver',
+                size: 'large',
+                actions: [{
+                    'label': 'Fechar',
+                    'autoClose': true
+                }]
+            }, function (err, data) {
+                if (err) return;
+
+                // Dispara o clique no botão de processar dentro da modal
+                $('#modal-retornos-fileserver').on('click', '.btn-processar-modal', function () {
+                    var nomeArq = $(this).data('arquivo');
+                    modalRetorno.remove(); // Fecha a modal
+                    processarRetornoSelecionado(nomeArq);
+                });
+            });
+        });
+    };
+
+    var processarRetornoSelecionado = function (nomeArquivo) {
+        lerArquivo(nomeArquivo, function (erro, conteudo) {
+            if (erro) {
+                FLUIGC.toast({ title: 'Erro de Leitura', message: erro, type: 'danger' });
+                return;
+            }
+
+            // INTEGRAÇÃO PERFEITA: Passa o conteúdo lido na rede para a função que você já criou!
+            // Ela vai extrair, preencher a Atividade 40 e setar o arquivo como Autorizado/Aceito.
+            if (typeof processarTextoRetornoAuditoria === "function") {
+                processarTextoRetornoAuditoria(conteudo, nomeArquivo);
+            } else {
+                FLUIGC.toast({ title: 'Erro', message: 'Função de auditoria não encontrada no formulário.', type: 'danger' });
+            }
+        });
+    };
+
+    return {
+        abrirModalRetornos: abrirModalRetornos
+    };
+
+})();
+
+// ============================================================
+// VALIDADOR UNIVERSAL BRADESCO (MODAL COM SIDEBAR LATERAL)
+// ============================================================
+function abrirValidadorBradesco() {
+    var nomeArquivo = $("#fileNameVan").val() || $("#fileNameRetorno").val();
+    if (!nomeArquivo) nomeArquivo = "Nenhum arquivo processado.";
+
+    var urlBradesco = "https://wspf.banco.bradesco/wsValidadorUniversal/validadorgeral";
+    
+    // Usa CSS Flexbox para dividir a tela: Esquerda (Aviso) / Direita (Site)
+    var htmlContent = '<div style="display: flex; flex-direction: row; height: 600px; margin: -15px;">';
+    
+    // SIDEBAR LATERAL (Esquerda)
+    htmlContent += '<div style="width: 280px; background-color: #fdf3f5; border-right: 4px solid #cc092f; padding: 25px 20px; display: flex; flex-direction: column;">';
+    // htmlContent += '  <img src="https://banco.bradesco/assets/classic/geral/img/logo-bradesco-topo.png" style="max-width: 130px; margin-bottom: 25px;">'; // Descomente se quiser forçar o logo original do banco web
+    htmlContent += '  <h4 style="margin: 0 0 15px 0; color: #cc092f; font-size: 16px; line-height: 1.4;">';
+    htmlContent += '    <i class="flaticon flaticon-document icon-sm"></i> <b>Arquivo Atual</b>';
+    htmlContent += '  </h4>';
+    htmlContent += '  <div style="background: white; padding: 12px; border: 1px solid #ddd; border-radius: 4px; word-wrap: break-word; font-family: monospace; font-size: 13px; color: #333; margin-bottom: 20px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);">';
+    htmlContent +=       nomeArquivo;
+    htmlContent += '  </div>';
+    htmlContent += '  <p style="margin: 0; font-size: 13.5px; color: #555; line-height: 1.5;">';
+    htmlContent += '    Para validar a estrutura, certifique-se de que transferiu este arquivo no botão <b>"Descarregar Arquivo"</b> na tela anterior.<br><br>Em seguida, clique na área de upload ao lado e selecione-o.';
+    htmlContent += '  </p>';
+    htmlContent += '</div>';
+
+    // SITE DO BANCO (Direita - Ocupa todo o resto do espaço 'flex: 1')
+    htmlContent += '<div style="flex: 1; background: #fff;">';
+    htmlContent += '  <iframe src="' + urlBradesco + '" style="width: 100%; height: 100%; border: none; overflow: hidden;" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>';
+    htmlContent += '</div>';
+
+    htmlContent += '</div>'; // Fecha o Flexbox container
+
+    var modalValidador = FLUIGC.modal({
+        title: 'Validador Universal Bradesco - Folha de Pagamento',
+        content: htmlContent,
+        id: 'modal-validador-bradesco',
+        size: 'full', 
+        actions: [{ 'label': 'Fechar Validador', 'autoClose': true }]
+    });
+}
+
+// ============================================================
+// INICIALIZAÇÃO: Carrega lista ao abrir o formulário
+// ============================================================
+$(document).ready(function () {
+
+    // Botão para buscar retornos do FileServer
+    $("#btn_buscar_retornos").on("click", function () {
+        var filtro = $("#txt_filtro_retorno").val();
+        RetornoFileServer.listarArquivos(filtro, function (erro, arquivos) {
+            if (erro) {
+                Compartilhados.WarningToast(erro, "Atenção", "warning");
+            }
+            RetornoFileServer.renderizarTabela(arquivos, "tabela_retornos");
+        });
+    });
+});
+
+// =================================================================================
+// LÓGICA DA ATIVIDADE 40 (ENVIO VAN)
+// =================================================================================
+
+// =================================================================================
+// LÓGICA DA ATIVIDADE 40 (ENVIO E RETORNO VAN)
+// =================================================================================
+
+function iniciarPainelVan40() {
+    var tipoDoc = $("#tipo_documento").val();
+
+    if (tipoDoc !== "cnab") {
+        $("#painel_envio_van_40 .panel-body").html("<div class='alert alert-info'>Atividade não aplicável para Guias/Outros. Movimente a solicitação.</div>");
+        // Oculta os de retorno
+        $("#painel_retorno_van_40, #painel_status_geral_40").hide();
+        return;
+    }
+
+    var empresaDesc = $("#txt_empresa").val() || "";
+    var bancoDesc = $("#txt_banco").val() || "";
+
+    var isColigada14 = empresaDesc.indexOf("14") > -1 || empresaDesc.toUpperCase().indexOf("H23") > -1;
+    var isBradesco = bancoDesc.indexOf("237") > -1 || bancoDesc.toUpperCase().indexOf("BRADESCO") > -1;
+
+    if (isColigada14 && isBradesco) {
+        // Envio
+        $("#bloco_van_automatica").show();
+        $("#bloco_van_manual").hide();
+        // Retorno
+        $("#bloco_retorno_h23").show();
+        $("#bloco_retorno_manual").hide();
+    } else {
+        // Envio
+        $("#bloco_van_automatica").hide();
+        $("#bloco_van_manual").show();
+        // Retorno
+        $("#bloco_retorno_h23").hide();
+        $("#bloco_retorno_manual").show();
+    }
+}
+
+
+
+// Botão: Buscar Automático (Retorno)
+function buscarRetornoAutomatico() {
+    // Abre a modal que lista os arquivos direto da pasta do FileServer e permite leitura
+    RetornoFileServer.abrirModalRetornos();
+}
+
+function lerRetornoManual(input) {
+    if (input.files && input.files[0]) {
+        var file = input.files[0];
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            processarTextoRetornoAuditoria(e.target.result, file.name);
+        };
+        // O padrão "ISO-8859-1" garante a leitura correta dos ficheiros bancários
+        reader.readAsText(file, "ISO-8859-1");
+    }
+}
+
+// Processa o ficheiro de retorno e exibe na tela
+function processarTextoRetornoAuditoria(texto, nomeArquivo) {
+    try {
+        if (typeof BradescoStrategy === 'undefined') throw new Error("Estratégia de leitura não encontrada.");
+
+        var dados = BradescoStrategy.processar(texto);
+
+        $("#lbl_ret_empresa").text(dados.empresa);
+        $("#lbl_ret_cnpj").text(dados.cnpj);
+        $("#lbl_ret_dados_bancarios").text(dados.codigoBanco + " / " + dados.agencia + " / " + dados.conta);
+        $("#lbl_ret_data").text(dados.dataCredito);
+        $("#lbl_ret_valor").text("R$ " + dados.valor);
+        $("#lbl_ret_arquivo").text(nomeArquivo);
+        $("#fileNameRetorno").val(nomeArquivo);
+        $("#resumo_retorno_extraido").slideDown();
+
+        // ============================================================
+        // 1. GERA O RELATÓRIO MULTIPAG FIXO NA TELA AUTOMATICAMENTE
+        // ============================================================
+        if (typeof window.MultipagBradesco !== 'undefined') {
+            window.MultipagBradesco.renderizarNaTela(texto); 
+        } else {
+            console.error("Módulo MultipagBradesco não encontrado no window.");
+        }
+
+        // ============================================================
+        // 2. CONFIGURA O BOTÃO DE DOWNLOAD (Mantido visível)
+        // ============================================================
+        $("#btn_download_retorno").show().off("click").on("click", function() {
+            var blob = new Blob([texto], { type: "text/plain;charset=ISO-8859-1" });
+            var link = document.createElement("a");
+            link.href = window.URL.createObjectURL(blob);
+            link.download = nomeArquivo;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            FLUIGC.toast({ title: 'Download Concluído', message: 'Ficheiro transferido.', type: 'info' });
+        });
+
+        FLUIGC.toast({
+            title: 'Leitura Concluída',
+            message: 'Verifique os dados extraídos do retorno antes de autorizar.',
+            type: 'success'
+        });
+
+        $("input[name='flag_status_retorno'][value='aceito']").prop("checked", true);
+        $("input[name='flag_status_geral'][value='autorizado']").prop("checked", true);
+
+    } catch (err) {
+        FLUIGC.toast({ title: 'Erro na Leitura do Retorno', message: err.message, type: 'danger' });
+        $("#resumo_retorno_extraido").hide();
+        $("#painel_multipag_inline").hide().empty(); // Limpa o relatório em caso de erro
+        $("#fileNameRetorno").val("");
+        $("input[name='flag_status_retorno']").prop("checked", false);
+        $("input[name='flag_status_geral']").prop("checked", false);
+    }
+}
+
+// =================================================================================
+// FUNÇÕES DE LEITURA E AUDITORIA DA VAN (ATIVIDADE 40)
+// =================================================================================
+
+// Função 1: Acionada ao selecionar o arquivo do computador (Localizar)
+function lerArquivoVanAuditoria(inputElement) {
+    if (inputElement.files && inputElement.files[0]) {
+        var file = inputElement.files[0];
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            processarTextoVanAuditoria(e.target.result, file.name);
+        };
+        reader.readAsText(file, "ISO-8859-1");
+    }
+}
+
+// Função 2: Acionada ao clicar no botão "Puxar Anexo" (Baseado no fluig-form-attachment)
+function puxarAnexoProcessoVan() {
+    // Acessa a API nativa do Fluig que gerencia a aba "Anexos" do processo
+    if (!parent.ECM || !parent.ECM.attachmentTable) {
+        FLUIGC.toast({ title: 'Erro', message: 'Tabela de anexos não encontrada.', type: 'danger' });
+        return;
+    }
+
+    // Pega todos os anexos físicos que estão na aba do Fluig
+    var anexos = parent.ECM.attachmentTable.getData();
+    var anexoAlvo = null;
+
+    // Itera de trás pra frente para pegar sempre o anexo mais recente
+    for (var i = anexos.length - 1; i >= 0; i--) {
+        var physicalName = (anexos[i].physicalFileName || "").toLowerCase();
+        var descName = (anexos[i].description || "").toLowerCase();
+
+        // Procura por qualquer arquivo que seja .txt (ex: Itau-20250825141848-31-992725.txt)
+        if (physicalName.indexOf(".txt") > -1 || descName.indexOf(".txt") > -1) {
+            anexoAlvo = anexos[i];
+            break;
+        }
+    }
+
+    if (anexoAlvo) {
+        var docId = anexoAlvo.documentId;
+        var version = anexoAlvo.version;
+        var companyId = parent.WCMAPI.organizationId || 1;
+        var nomeArquivo = anexoAlvo.description || anexoAlvo.physicalFileName;
+
+        // Se o arquivo foi anexado agora e a solicitação ainda não foi salva (não tem ID)
+        if (!docId) {
+            FLUIGC.toast({ title: 'Aviso', message: 'O arquivo está na aba de anexos, mas não possui ID. Salve a solicitação primeiro.', type: 'warning' });
+            return;
+        }
+
+        var loading = FLUIGC.loading(window);
+        loading.show();
+
+        // URL nativa de Stream (download físico) do Fluig
+        var urlDownload = "/webdesk/streamcontrol/?WDCompanyId=" + companyId + "&WDNrDocto=" + docId + "&WDNrVersao=" + version;
+
+        // Faz um AJAX direto para baixar o texto do txt
+        $.ajax({
+            url: urlDownload,
+            type: 'GET',
+            beforeSend: function (jqXHR) {
+                // Força a leitura na codificação correta de acentuação para CNAB
+                jqXHR.overrideMimeType('text/plain; charset=iso-8859-1');
+            },
+            success: function (conteudoTexto) {
+                loading.hide();
+                // Envia o texto lido para a auditoria
+                processarTextoVanAuditoria(conteudoTexto, nomeArquivo);
+            },
+            error: function (err) {
+                loading.hide();
+                console.error("Erro ao ler Stream do anexo:", err);
+                FLUIGC.toast({ title: 'Erro', message: 'Falha ao baixar o conteúdo do arquivo no servidor.', type: 'danger' });
+            }
+        });
+
+    } else {
+        FLUIGC.toast({ title: 'Atenção', message: 'Nenhum arquivo .txt foi encontrado na aba de Anexos do Fluig.', type: 'warning' });
+    }
+}
+
+var conteudoArquivoParaEnvio = "";
+
+// Função 3: Centraliza a inteligência de validação
+function processarTextoVanAuditoria(texto, nomeArquivo) {
+    try {
+        // ============================================================
+        // 1. VALIDAÇÃO DE REGRA DE NEGÓCIO: NOME DO ARQUIVO
+        // ============================================================
+        // Pega os 3 primeiros caracteres e joga para maiúsculo para garantir a validação
+        if (nomeArquivo.substring(0, 3).toUpperCase() !== "H23") {
+            throw new Error("O nome do arquivo deve começar obrigatoriamente com 'H23'. Por favor, renomeie o arquivo e tente novamente.");
+        }
+
+        if (typeof BradescoStrategy === 'undefined') {
+            throw new Error("Estratégia de leitura (cnab_bradesco.js) não encontrada.");
+        }
+
+        conteudoArquivoParaEnvio = texto;
+
+        // Processa o conteúdo text usando o seu Strategy
+        var dados = BradescoStrategy.processar(texto);
+
+        // Preenche a tabela visual
+        $("#lbl_van_empresa").text(dados.empresa);
+        $("#lbl_van_cnpj").text(dados.cnpj);
+        $("#lbl_van_dados_bancarios").text(dados.codigoBanco + " / " + dados.agencia + " / " + dados.conta);
+        $("#lbl_van_convenio").text(dados.convenio);
+        $("#lbl_van_data").text(dados.dataCredito);
+        $("#lbl_van_valor").text("R$ " + dados.valor);
+
+        // A MÁGICA: Atualiza o campo com o nome do arquivo para liberar a validação do processo
+        $("#fileNameVan").val(nomeArquivo);
+
+        // Exibe o resumo
+        $("#resumo_van_extraido").slideDown();
+
+        FLUIGC.toast({
+            title: 'Sucesso',
+            message: 'Arquivo (' + nomeArquivo + ') puxado e processado com sucesso!',
+            type: 'success'
+        });
+
+    } catch (err) {
+        // O aviso de erro vai estourar aqui na tela do usuário (em vermelho)
+        FLUIGC.toast({ title: 'Atenção', message: err.message, type: 'danger', timeout: 'slow' });
+        
+        // Esconde o painel e limpa o nome do arquivo para bloquear o botão de envio
+        $("#resumo_van_extraido").hide();
+        $("#fileNameVan").val(""); 
+        conteudoArquivoParaEnvio = "";
+    }
+}
+
+$(document).ready(function () {
+    // Substitua o evento antigo do botão por este:
+    $("#btn_enviar_fileserver").off("click").on("click", function () {
+        var nomeArquivo = $("#fileNameVan").val();
+
+        if (!nomeArquivo || !conteudoArquivoParaEnvio) {
+            FLUIGC.toast({ title: 'Atenção', message: 'Nenhum arquivo processado. Faça a leitura ou puxe o anexo primeiro.', type: 'warning' });
+            return;
+        }
+
+        // Converte o conteúdo para Base64 (btoa nativo do navegador)
+        var b64Content = window.btoa(conteudoArquivoParaEnvio);
+
+        // Feedback visual de carregamento
+        var loading = FLUIGC.loading(window);
+        loading.show();
+
+        // Prepara as constraints para o Dataset
+        var c1 = DatasetFactory.createConstraint("nomeArquivo", nomeArquivo, nomeArquivo, ConstraintType.MUST);
+        var c2 = DatasetFactory.createConstraint("conteudoB64", b64Content, b64Content, ConstraintType.MUST);
+
+        // Chama o Dataset que criamos no Passo 2
+        DatasetFactory.getDataset("DS_ENVIAR_REMESSA_VAN", null, [c1, c2], null, {
+            success: function (data) {
+                loading.hide();
+                if (data && data.values && data.values.length > 0) {
+                    var status = data.values[0].STATUS;
+                    var msg = data.values[0].MENSAGEM;
+
+                    if (status === "OK") {
+                        FLUIGC.toast({ title: 'Sucesso', message: msg, type: 'success' });
+
+                        // Marca a flag de Processamento automaticamente
+                        $("input[name='flag_status_geral'][value='processamento']").prop("checked", true);
+
+                        // Altera o botão para evitar reenvio
+                        $("#btn_enviar_fileserver")
+                            .prop("disabled", true)
+                            .removeClass("btn-success")
+                            .addClass("btn-default")
+                            .html('<i class="flaticon flaticon-check"></i> Enviado à VAN');
+
+                        MonitoramentoVAN.iniciar(nomeArquivo);
+
+                    } else {
+                        FLUIGC.toast({ title: 'Erro de Permissão/Servidor', message: msg, type: 'danger' });
+                    }
+                }
+            },
+            error: function (err) {
+                loading.hide();
+                FLUIGC.toast({ title: 'Erro de Conexão', message: 'Falha ao comunicar com o servidor do Fluig.', type: 'danger' });
+            }
+        });
+    });
+});
+
+// ============================================================
+// INICIALIZAÇÃO AUTOMÁTICA AO CARREGAR A PÁGINA (F5)
+// ============================================================
+$(window).on('load', function () {
+    console.log("Gatilho de Janela carregado. A aguardar o Fluig...");
+
+    // Aguarda 1.5s para garantir que os inputs ocultos como WKNumProces já existem no HTML
+    setTimeout(function () {
+        if (typeof MonitoramentoVAN !== 'undefined') {
+            console.log("A iniciar tentativa de restauração da VAN...");
+            MonitoramentoVAN.restaurarEstadoSeExistir();
+        } else {
+            console.warn("Módulo MonitoramentoVAN não foi carregado corretamente.");
+        }
+    }, 1500);
+});

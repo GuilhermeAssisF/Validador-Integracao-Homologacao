@@ -4,7 +4,6 @@
 	<link type="text/css" rel="stylesheet" href="/style-guide/css/fluig-style-guide.min.css" />
 	<script type="text/javascript" src="/portal/resources/js/jquery/jquery.js"></script>
 	<script type="text/javascript" src="/portal/resources/js/jquery/jquery-ui.min.js"></script>
-
 	<script type="text/javascript" src="/portal/resources/js/mustache/mustache-min.js"></script>
 	<script type="text/javascript" src="/style-guide/js/fluig-style-guide.min.js" charset="utf-8"></script>
 	<script type="text/javascript" src="/webdesk/vcXMLRPC.js" charset="utf-8"></script>
@@ -15,28 +14,29 @@
 		<form name="form" role="form">
 
 			<input type="hidden" name="wkNumState_hidden" id="wkNumState_hidden">
-
 			<input type="hidden" name="cpResponsavelEnvio" id="cpResponsavelEnvio">
 			<input type="hidden" name="cpStatusDivergencia" id="cpStatusDivergencia" value="0">
 			<input type="hidden" name="cpTemDivergencia" id="cpTemDivergencia" value="nao">
 			<input type="hidden" name="cpIdProcessoPagamento" id="cpIdProcessoPagamento">
+			<input type="hidden" name="status_retorno_van" id="status_retorno_van" value="pendente">
 
 			<div class="panel panel-warning" id="painel_email_rh" style="display:none;">
 				<div class="panel-heading">
-					<h3 class="panel-title">Resumo para Envio de E-mail (RH)</h3>
+					<h3 class="panel-title"><i class="flaticon flaticon-email icon-sm"></i> Envio de E-mail Automático
+						(RH)</h3>
 				</div>
 				<div class="panel-body">
+
+					<div class="alert alert-info" role="alert">
+						<strong>Atenção:</strong> Revise as informações abaixo. Ao movimentar esta solicitação, este
+						e-mail será disparado <b>automaticamente</b> para o solicitante, contendo o arquivo de pagamento
+						em anexo.
+					</div>
+
 					<div class="form-group">
 						<label for="txt_assunto_email">Assunto do E-mail</label>
-						<div class="input-group">
-							<input type="text" class="form-control" name="txt_assunto_email" id="txt_assunto_email"
-								readonly>
-							<span class="input-group-btn">
-								<button class="btn btn-default" type="button" onclick="copiarAssuntoEmail()">
-									<i class="flaticon flaticon-content-copy"></i> Copiar Assunto
-								</button>
-							</span>
-						</div>
+						<input type="text" class="form-control" name="txt_assunto_email" id="txt_assunto_email"
+							readonly>
 					</div>
 
 					<div class="form-group">
@@ -45,17 +45,6 @@
 							readonly></textarea>
 					</div>
 
-					<div class="row">
-						<div class="col-md-12">
-							<button type="button" class="btn btn-primary" onclick="copiarTextoEmail()">
-								<i class="flaticon flaticon-content-copy"></i> Copiar Corpo do E-mail
-							</button>
-							<button type="button" id="btn_copiar_anexo" class="btn btn-info"
-								onclick="baixarAnexoValidado()">
-								<i class="flaticon flaticon-attachment"></i> Baixar Arquivo
-							</button>
-						</div>
-					</div>
 				</div>
 			</div>
 
@@ -701,6 +690,197 @@
 				</div>
 			</div>
 
+			<div class="panel panel-success" id="painel_envio_van_40" style="display:none;">
+				<div class="panel-heading">
+					<h3 class="panel-title"><i class="flaticon flaticon-cloud-upload icon-sm"></i> Atividade 40: Envio
+						Financeiro (Arquivo VAN)</h3>
+				</div>
+				<div class="panel-body">
+					<div id="bloco_van_automatica" style="display:none;">
+						<div class="alert alert-info">
+							<strong>Integração VAN - H23 (Bradesco)</strong>: Selecione o arquivo de remessa VAN.
+						</div>
+						<div class="form-group">
+							<label>Arquivo VAN (.txt)</label>
+							<div class="input-group col-md-8">
+								<input type="text" class="form-control" id="fileNameVan" name="fileNameVan" readonly
+									placeholder="Selecione ou puxe o arquivo de remessa...">
+								<span class="input-group-btn">
+									<button class="btn btn-default" type="button" onclick="puxarAnexoProcessoVan();"
+										title="Puxar arquivo anexado no Início">
+										<i class="flaticon flaticon-attachment"></i> Puxar Anexo
+									</button>
+									<button class="btn btn-primary" type="button" onclick="$('#fileUploadVan').click();"
+										title="Procurar no computador">
+										<i class="flaticon flaticon-file-upload"></i> Localizar
+									</button>
+								</span>
+							</div>
+							<input type="file" id="fileUploadVan" name="fileUploadVan" accept=".txt"
+								style="display:none" onchange="lerArquivoVanAuditoria(this)">
+						</div>
+						<div id="resumo_van_extraido" style="display:none; margin-top: 20px;">
+							<div class="panel panel-default">
+								<div class="panel-heading"><strong>Dados Extraídos para Auditoria</strong></div>
+								<table class="table table-bordered table-condensed" style="margin-bottom: 0;">
+									<tbody>
+										<tr>
+											<th class="active" width="20%">Empresa</th>
+											<td id="lbl_van_empresa" width="30%"></td>
+											<th class="active" width="20%">CNPJ</th>
+											<td id="lbl_van_cnpj" width="30%"></td>
+										</tr>
+										<tr>
+											<th class="active">Banco/Ag/Conta</th>
+											<td id="lbl_van_dados_bancarios"></td>
+											<th class="active">Convênio</th>
+											<td id="lbl_van_convenio"></td>
+										</tr>
+										<tr>
+											<th class="active">Data Crédito</th>
+											<td id="lbl_van_data"></td>
+											<th class="active">Valor Total</th>
+											<td id="lbl_van_valor" style="color:blue; font-weight:bold;"></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<button type="button" id="btn_enviar_fileserver" class="btn btn-success btn-lg">
+								<i class="flaticon flaticon-send"></i> Enviar para File Server
+							</button>
+						</div>
+					</div>
+
+					<div id="bloco_van_manual" style="display:none;">
+						<div class="alert alert-warning" style="margin-bottom: 0;">
+							<i class="flaticon flaticon-warning icon-sm"></i>
+							<strong>Atenção:</strong> Sem integração VAN Bradesco para este cenário. Favor colocar o
+							arquivo diretamente no banco e registrar o andamento no rodapé.
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="panel panel-info" id="painel_monitoramento_van" style="display: none; margin-top: 15px;">
+				<div class="panel-heading">
+					<h3 class="panel-title"><i class="flaticon flaticon-time icon-sm"></i> Monitoramento do Robô (VAN)
+					</h3>
+				</div>
+				<div class="panel-body text-center">
+					<h4 id="texto_monitoramento_van">Aguardando envio do arquivo...</h4>
+
+					<div class="progress progress-striped active" id="barra_progresso_van"
+						style="display: none; margin-top: 15px;">
+						<div class="progress-bar progress-bar-info" role="progressbar" style="width: 100%">
+							Aguardando processamento na pasta 'Enviados'... (verificando a cada 10s)
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="panel panel-info" id="painel_retorno_van_40" style="display:none;">
+				<div class="panel-heading">
+					<h3 class="panel-title"><i class="flaticon flaticon-assignment-turned-in icon-sm"></i> Atividade 40:
+						Processamento do Retorno</h3>
+				</div>
+				<div class="panel-body">
+					<div id="bloco_retorno_h23" style="display:none;">
+						<div class="row">
+							<div class="col-md-12">
+								<p><strong>Retorno VAN - H23 (Bradesco):</strong> Escolha como deseja processar o
+									arquivo de retorno (.RET / .TXT).</p>
+								<button type="button" class="btn btn-primary" onclick="buscarRetornoAutomatico()"><i
+										class="flaticon flaticon-search"></i> Buscar Automático</button>
+								<button type="button" class="btn btn-default"
+									onclick="$('#fileUploadRetorno').click()"><i
+										class="flaticon flaticon-file-upload"></i> Upar Manual</button>
+								<button type="button" class="btn btn-default" id="btn_download_retorno"
+									style="display:none; margin-left: 5px;">
+									<i class="flaticon flaticon-download icon-sm"></i> Baixar Arquivo
+								</button>
+								<button type="button" class="btn"
+									style="background-color: #cc092f; color: white; border: 1px solid #a80525;"
+									onclick="abrirValidadorBradesco()">
+									<i class="flaticon flaticon-verified-user icon-sm" style="color: white;"></i>
+									Validador Bradesco
+								</button>
+								<button type="button" class="btn btn-info" id="btn_validador_multipag"
+									style="display:none; margin-left: 5px;">
+									<i class="flaticon flaticon-text-format icon-sm"></i> Ver Relatório Multipag
+								</button>
+								<input type="file" name="fileUploadRetorno" id="fileUploadRetorno" accept=".ret,.txt"
+									style="display:none" onchange="lerRetornoManual(this)">
+								<input type="hidden" name="fileNameRetorno" id="fileNameRetorno">
+							</div>
+						</div>
+
+						<div id="resumo_retorno_extraido" style="display:none; margin-top: 15px;">
+							<div class="panel panel-default">
+								<div class="panel-heading"><strong>Dados Extraídos do Arquivo de Retorno</strong></div>
+								<table class="table table-bordered table-condensed" style="margin-bottom: 0;">
+									<tbody>
+										<tr>
+											<th class="active" width="20%">Empresa</th>
+											<td id="lbl_ret_empresa" width="30%"></td>
+											<th class="active" width="20%">CNPJ</th>
+											<td id="lbl_ret_cnpj" width="30%"></td>
+										</tr>
+										<tr>
+											<th class="active">Banco/Ag/Conta</th>
+											<td id="lbl_ret_dados_bancarios"></td>
+											<th class="active">Data Crédito</th>
+											<td id="lbl_ret_data"></td>
+										</tr>
+										<tr>
+											<th class="active">Valor Total</th>
+											<td id="lbl_ret_valor" style="color:blue; font-weight:bold;"></td>
+											<th class="active">Arquivo Lido</th>
+											<td id="lbl_ret_arquivo"></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+
+						<div id="painel_multipag_inline" style="display:none; margin-top: 15px;"></div>
+					</div>
+
+					<div id="bloco_retorno_manual" style="display:none;">
+						<div class="alert alert-warning">
+							<i class="flaticon flaticon-warning icon-sm"></i>
+							<strong>Atenção:</strong> Sem integração VAN Bradesco para este cenário. Aguarde o retorno
+							no sistema do banco e preencha as flags abaixo.
+						</div>
+					</div>
+
+					<hr>
+
+					<div class="row">
+						<div class="col-md-12">
+							<label>Status da Leitura do Retorno do Banco:</label><br>
+							<label class="radio-inline"><input type="radio" name="flag_status_retorno" value="aceito">
+								<span class="label label-success" style="font-size: 13px;">Aceito</span></label>
+							<label class="radio-inline"><input type="radio" name="flag_status_retorno"
+									value="rejeitado"> <span class="label label-danger"
+									style="font-size: 13px;">Rejeitado</span></label>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="panel panel-default" id="painel_status_geral_40"
+				style="display:none; background-color: #f5f5f5;">
+				<div class="panel-body text-center">
+					<h4 style="margin-top:0; color: #333;">Status Geral da Integração Financeira</h4>
+					<label class="radio-inline"><input type="radio" name="flag_status_geral" value="enviado">
+						<strong>Arquivo Enviado</strong></label>
+					<label class="radio-inline"><input type="radio" name="flag_status_geral" value="processamento">
+						<strong>Em Processamento</strong></label>
+					<label class="radio-inline"><input type="radio" name="flag_status_geral" value="autorizado">
+						<strong>Autorizado</strong></label>
+				</div>
+			</div>
+
 			<textarea name="html_resumo_congelado" id="html_resumo_congelado" style="display:none;"></textarea>
 
 			<div class="panel panel-info" id="painel_resumo_14" style="display:none;">
@@ -717,6 +897,7 @@
 		<script type="text/javascript" src="compartilhados.js"></script>
 		<script type="text/javascript" src="zoom.js"></script>
 		<script type="text/javascript" src="strategies/cnab_bradesco.js"></script>
+		<script type="text/javascript" src="multipag_bradesco.js"></script>
 
 		<!-- <script type="text/javascript" src="simulation.js"></script> -->
 		<script type="text/javascript" src="custom.js"></script>
