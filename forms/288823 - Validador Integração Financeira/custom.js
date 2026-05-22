@@ -2374,7 +2374,7 @@ function abrirValidadorBradesco() {
     htmlContent +=       nomeArquivo;
     htmlContent += '  </div>';
     htmlContent += '  <p style="margin: 0; font-size: 13.5px; color: #555; line-height: 1.5;">';
-    htmlContent += '    Para validar a estrutura, certifique-se de que transferiu este arquivo no botão <b>"Descarregar Arquivo"</b> na tela anterior.<br><br>Em seguida, clique na área de upload ao lado e selecione-o.';
+    htmlContent += '    Para validar a estrutura, certifique-se de que transferiu este arquivo no botão <b>"Baixar Arquivo"</b> na tela anterior.<br><br>Em seguida, clique na área de upload ao lado e selecione-o.';
     htmlContent += '  </p>';
     htmlContent += '</div>';
 
