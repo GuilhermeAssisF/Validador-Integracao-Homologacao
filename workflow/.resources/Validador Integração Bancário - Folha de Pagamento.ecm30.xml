@@ -1,0 +1,1085 @@
+<list>
+  <ProcessDefinition>
+    <processDefinitionPK>
+      <companyId>1</companyId>
+      <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+    </processDefinitionPK>
+    <processDescription>Validador Integração Financeira - Folha de Pagamento	</processDescription>
+    <instruction></instruction>
+    <active>true</active>
+    <publicProcess>false</publicProcess>
+    <volumeId>Default</volumeId>
+    <categoryId>Financeiro</categoryId>
+    <managerEngineAllocationId></managerEngineAllocationId>
+    <snapshotFrequency>0</snapshotFrequency>
+    <baseDay>0</baseDay>
+    <baseMonth>0</baseMonth>
+    <periodId>Default</periodId>
+    <uniqueCardVersion>false</uniqueCardVersion>
+    <keyWord></keyWord>
+    <complementsLevel>1</complementsLevel>
+    <notifyRequisitionerComplements>true</notifyRequisitionerComplements>
+    <notifyManagerComplements>false</notifyManagerComplements>
+    <deadlineTime>0</deadlineTime>
+    <warningDeadlineTime>0</warningDeadlineTime>
+    <notifyAuthorityComplements>true</notifyAuthorityComplements>
+  </ProcessDefinition>
+  <ProcessDefinitionVersion>
+    <processDefinitionVersionPK>
+      <companyId>1</companyId>
+      <processId>Validador Integração Financeira - Folha de Pagamento	</processId>
+      <version>54</version>
+    </processDefinitionVersionPK>
+    <versionDescription></versionDescription>
+    <formId>288823</formId>
+    <editionMode>true</editionMode>
+    <updateAttachmentsVersion>false</updateAttachmentsVersion>
+    <controlsAttachmentsSecurity>false</controlsAttachmentsSecurity>
+    <active>true</active>
+    <blockedVersion>false</blockedVersion>
+    <counterSign>false</counterSign>
+    <openInstances>0</openInstances>
+    <bpmnVersion>2</bpmnVersion>
+    <processStates/>
+    <favorito>false</favorito>
+    <inheritFormSecurity>false</inheritFormSecurity>
+    <mobileReady>false</mobileReady>
+  </ProcessDefinitionVersion>
+  <list>
+    <ProcessState>
+      <processStatePK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>1</version>
+        <sequence>4</sequence>
+      </processStatePK>
+      <stateName>Início</stateName>
+      <stateDescription>Início</stateDescription>
+      <instruction></instruction>
+      <deadlineTime>0</deadlineTime>
+      <joint>false</joint>
+      <agreementPercentage>0</agreementPercentage>
+      <engineAllocationId>Papel</engineAllocationId>
+      <engineAllocationConfiguration>&lt;AssignmentController&gt;&lt;Role&gt;BPO.0008&lt;/Role&gt;&lt;/AssignmentController&gt;</engineAllocationConfiguration>
+      <selectColleague>1</selectColleague>
+      <initialState>true</initialState>
+      <notifyAuthorityDelay>true</notifyAuthorityDelay>
+      <notifyRequisitionerDelay>false</notifyRequisitionerDelay>
+      <allowanceAuthorityTime>3600</allowanceAuthorityTime>
+      <frequenceAuthorityTime>3600</frequenceAuthorityTime>
+      <allowanceRequisitionerTime>0</allowanceRequisitionerTime>
+      <frequenceRequisitionerTime>0</frequenceRequisitionerTime>
+      <transferAttachments>false</transferAttachments>
+      <subProcessId></subProcessId>
+      <formFolder>0</formFolder>
+      <notifyAuthorityFollowUp>false</notifyAuthorityFollowUp>
+      <notifyRequisitionerFollowUp>false</notifyRequisitionerFollowUp>
+      <automatic>false</automatic>
+      <positionX>90</positionX>
+      <positionY>211</positionY>
+      <forecastedEffortType>0</forecastedEffortType>
+      <forecastedEffort>0</forecastedEffort>
+      <notifyManagerFollowUp>false</notifyManagerFollowUp>
+      <notifyManagerDelay>false</notifyManagerDelay>
+      <allowanceManagerTime>0</allowanceManagerTime>
+      <frequenceManagerTime>0</frequenceManagerTime>
+      <inhibitTransfer>false</inhibitTransfer>
+      <periodId></periodId>
+      <stateType>0</stateType>
+      <bpmnType>10</bpmnType>
+      <signalId>0</signalId>
+      <counterSign>false</counterSign>
+      <openInstances>0</openInstances>
+      <noticeExpirationAuthorityTime>0</noticeExpirationAuthorityTime>
+      <noticeExpirationRequisitionerTime>0</noticeExpirationRequisitionerTime>
+      <noticeExpirationManagerTime>0</noticeExpirationManagerTime>
+      <destinationStates/>
+      <digitalSignature>false</digitalSignature>
+    </ProcessState>
+    <ProcessState>
+      <processStatePK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>1</version>
+        <sequence>12</sequence>
+      </processStatePK>
+      <stateName>Envio para o RH</stateName>
+      <stateDescription>Envio para o RH</stateDescription>
+      <instruction></instruction>
+      <deadlineTime>120</deadlineTime>
+      <deadlineFieldName></deadlineFieldName>
+      <joint>false</joint>
+      <agreementPercentage>0</agreementPercentage>
+      <engineAllocationId>Pool Papel</engineAllocationId>
+      <engineAllocationConfiguration>&lt;AssignmentController&gt;&lt;Role&gt;BPO.0008&lt;/Role&gt;&lt;/AssignmentController&gt;</engineAllocationConfiguration>
+      <selectColleague>1</selectColleague>
+      <initialState>false</initialState>
+      <notifyAuthorityDelay>true</notifyAuthorityDelay>
+      <notifyRequisitionerDelay>false</notifyRequisitionerDelay>
+      <allowanceAuthorityTime>3600</allowanceAuthorityTime>
+      <frequenceAuthorityTime>3600</frequenceAuthorityTime>
+      <allowanceRequisitionerTime>0</allowanceRequisitionerTime>
+      <frequenceRequisitionerTime>0</frequenceRequisitionerTime>
+      <transferAttachments>false</transferAttachments>
+      <subProcessId></subProcessId>
+      <formFolder>0</formFolder>
+      <notifyAuthorityFollowUp>true</notifyAuthorityFollowUp>
+      <notifyRequisitionerFollowUp>false</notifyRequisitionerFollowUp>
+      <automatic>false</automatic>
+      <positionX>300</positionX>
+      <positionY>191</positionY>
+      <forecastedEffortType>0</forecastedEffortType>
+      <forecastedEffort>0</forecastedEffort>
+      <notifyManagerFollowUp>false</notifyManagerFollowUp>
+      <notifyManagerDelay>false</notifyManagerDelay>
+      <allowanceManagerTime>0</allowanceManagerTime>
+      <frequenceManagerTime>0</frequenceManagerTime>
+      <inhibitTransfer>false</inhibitTransfer>
+      <periodId></periodId>
+      <stateType>0</stateType>
+      <bpmnType>80</bpmnType>
+      <signalId>0</signalId>
+      <counterSign>false</counterSign>
+      <openInstances>0</openInstances>
+      <noticeExpirationAuthorityTime>0</noticeExpirationAuthorityTime>
+      <noticeExpirationRequisitionerTime>0</noticeExpirationRequisitionerTime>
+      <noticeExpirationManagerTime>0</noticeExpirationManagerTime>
+      <destinationStates/>
+      <digitalSignature>false</digitalSignature>
+      <executionType>0</executionType>
+    </ProcessState>
+    <ProcessState>
+      <processStatePK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>1</version>
+        <sequence>14</sequence>
+      </processStatePK>
+      <stateName>Validar Divergências</stateName>
+      <stateDescription>Validar Divergências</stateDescription>
+      <instruction></instruction>
+      <deadlineTime>0</deadlineTime>
+      <deadlineFieldName></deadlineFieldName>
+      <joint>false</joint>
+      <agreementPercentage>0</agreementPercentage>
+      <engineAllocationId>Usuário</engineAllocationId>
+      <engineAllocationConfiguration>&lt;AssignmentController&gt;&lt;User&gt;soter_ti&lt;/User&gt;&lt;/AssignmentController&gt;</engineAllocationConfiguration>
+      <selectColleague>1</selectColleague>
+      <initialState>false</initialState>
+      <notifyAuthorityDelay>true</notifyAuthorityDelay>
+      <notifyRequisitionerDelay>false</notifyRequisitionerDelay>
+      <allowanceAuthorityTime>3600</allowanceAuthorityTime>
+      <frequenceAuthorityTime>3600</frequenceAuthorityTime>
+      <allowanceRequisitionerTime>0</allowanceRequisitionerTime>
+      <frequenceRequisitionerTime>0</frequenceRequisitionerTime>
+      <transferAttachments>false</transferAttachments>
+      <subProcessId></subProcessId>
+      <formFolder>0</formFolder>
+      <notifyAuthorityFollowUp>true</notifyAuthorityFollowUp>
+      <notifyRequisitionerFollowUp>false</notifyRequisitionerFollowUp>
+      <automatic>false</automatic>
+      <positionX>180</positionX>
+      <positionY>20</positionY>
+      <forecastedEffortType>0</forecastedEffortType>
+      <forecastedEffort>0</forecastedEffort>
+      <notifyManagerFollowUp>false</notifyManagerFollowUp>
+      <notifyManagerDelay>false</notifyManagerDelay>
+      <allowanceManagerTime>0</allowanceManagerTime>
+      <frequenceManagerTime>0</frequenceManagerTime>
+      <inhibitTransfer>false</inhibitTransfer>
+      <periodId></periodId>
+      <stateType>0</stateType>
+      <bpmnType>80</bpmnType>
+      <signalId>0</signalId>
+      <counterSign>false</counterSign>
+      <openInstances>0</openInstances>
+      <noticeExpirationAuthorityTime>0</noticeExpirationAuthorityTime>
+      <noticeExpirationRequisitionerTime>0</noticeExpirationRequisitionerTime>
+      <noticeExpirationManagerTime>0</noticeExpirationManagerTime>
+      <destinationStates/>
+      <digitalSignature>false</digitalSignature>
+      <executionType>0</executionType>
+    </ProcessState>
+    <ProcessState>
+      <processStatePK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>1</version>
+        <sequence>32</sequence>
+      </processStatePK>
+      <stateName>Integrar Financeiro</stateName>
+      <stateDescription>Integrar Financeiro</stateDescription>
+      <instruction></instruction>
+      <deadlineTime>0</deadlineTime>
+      <deadlineFieldName></deadlineFieldName>
+      <joint>false</joint>
+      <agreementPercentage>0</agreementPercentage>
+      <selectColleague>1</selectColleague>
+      <initialState>false</initialState>
+      <notifyAuthorityDelay>true</notifyAuthorityDelay>
+      <notifyRequisitionerDelay>false</notifyRequisitionerDelay>
+      <allowanceAuthorityTime>3600</allowanceAuthorityTime>
+      <frequenceAuthorityTime>3600</frequenceAuthorityTime>
+      <allowanceRequisitionerTime>0</allowanceRequisitionerTime>
+      <frequenceRequisitionerTime>0</frequenceRequisitionerTime>
+      <transferAttachments>false</transferAttachments>
+      <subProcessId></subProcessId>
+      <formFolder>0</formFolder>
+      <notifyAuthorityFollowUp>true</notifyAuthorityFollowUp>
+      <notifyRequisitionerFollowUp>false</notifyRequisitionerFollowUp>
+      <automatic>false</automatic>
+      <positionX>917</positionX>
+      <positionY>320</positionY>
+      <forecastedEffortType>0</forecastedEffortType>
+      <forecastedEffort>0</forecastedEffort>
+      <notifyManagerFollowUp>false</notifyManagerFollowUp>
+      <notifyManagerDelay>false</notifyManagerDelay>
+      <allowanceManagerTime>0</allowanceManagerTime>
+      <frequenceManagerTime>0</frequenceManagerTime>
+      <inhibitTransfer>false</inhibitTransfer>
+      <periodId></periodId>
+      <stateType>0</stateType>
+      <bpmnType>82</bpmnType>
+      <signalId>0</signalId>
+      <counterSign>false</counterSign>
+      <openInstances>0</openInstances>
+      <noticeExpirationAuthorityTime>0</noticeExpirationAuthorityTime>
+      <noticeExpirationRequisitionerTime>0</noticeExpirationRequisitionerTime>
+      <noticeExpirationManagerTime>0</noticeExpirationManagerTime>
+      <destinationStates/>
+      <digitalSignature>false</digitalSignature>
+      <executionType>1</executionType>
+    </ProcessState>
+    <ProcessState>
+      <processStatePK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>1</version>
+        <sequence>40</sequence>
+      </processStatePK>
+      <stateName>Envio Financeiro (Arquivo)</stateName>
+      <stateDescription>Envio Financeiro (Arquivo)</stateDescription>
+      <instruction></instruction>
+      <deadlineTime>0</deadlineTime>
+      <deadlineFieldName></deadlineFieldName>
+      <joint>false</joint>
+      <agreementPercentage>0</agreementPercentage>
+      <engineAllocationId>Pool Papel</engineAllocationId>
+      <engineAllocationConfiguration>&lt;AssignmentController&gt;&lt;Role&gt;DRH.0007&lt;/Role&gt;&lt;/AssignmentController&gt;</engineAllocationConfiguration>
+      <selectColleague>1</selectColleague>
+      <initialState>false</initialState>
+      <notifyAuthorityDelay>true</notifyAuthorityDelay>
+      <notifyRequisitionerDelay>false</notifyRequisitionerDelay>
+      <allowanceAuthorityTime>3600</allowanceAuthorityTime>
+      <frequenceAuthorityTime>3600</frequenceAuthorityTime>
+      <allowanceRequisitionerTime>0</allowanceRequisitionerTime>
+      <frequenceRequisitionerTime>0</frequenceRequisitionerTime>
+      <transferAttachments>false</transferAttachments>
+      <subProcessId></subProcessId>
+      <formFolder>0</formFolder>
+      <notifyAuthorityFollowUp>true</notifyAuthorityFollowUp>
+      <notifyRequisitionerFollowUp>false</notifyRequisitionerFollowUp>
+      <automatic>false</automatic>
+      <positionX>540</positionX>
+      <positionY>174</positionY>
+      <forecastedEffortType>0</forecastedEffortType>
+      <forecastedEffort>0</forecastedEffort>
+      <notifyManagerFollowUp>false</notifyManagerFollowUp>
+      <notifyManagerDelay>false</notifyManagerDelay>
+      <allowanceManagerTime>0</allowanceManagerTime>
+      <frequenceManagerTime>0</frequenceManagerTime>
+      <inhibitTransfer>false</inhibitTransfer>
+      <periodId></periodId>
+      <stateType>0</stateType>
+      <bpmnType>80</bpmnType>
+      <signalId>0</signalId>
+      <counterSign>false</counterSign>
+      <openInstances>0</openInstances>
+      <noticeExpirationAuthorityTime>0</noticeExpirationAuthorityTime>
+      <noticeExpirationRequisitionerTime>0</noticeExpirationRequisitionerTime>
+      <noticeExpirationManagerTime>0</noticeExpirationManagerTime>
+      <destinationStates/>
+      <digitalSignature>false</digitalSignature>
+      <executionType>0</executionType>
+    </ProcessState>
+    <ProcessState>
+      <processStatePK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>1</version>
+        <sequence>35</sequence>
+      </processStatePK>
+      <stateName>Intermediário</stateName>
+      <stateDescription>Intermediário</stateDescription>
+      <instruction>Evento intermediário do processo</instruction>
+      <deadlineTime>0</deadlineTime>
+      <joint>false</joint>
+      <agreementPercentage>0</agreementPercentage>
+      <engineAllocationId></engineAllocationId>
+      <engineAllocationConfiguration></engineAllocationConfiguration>
+      <selectColleague>0</selectColleague>
+      <initialState>false</initialState>
+      <notifyAuthorityDelay>true</notifyAuthorityDelay>
+      <notifyRequisitionerDelay>false</notifyRequisitionerDelay>
+      <allowanceAuthorityTime>1</allowanceAuthorityTime>
+      <frequenceAuthorityTime>1</frequenceAuthorityTime>
+      <allowanceRequisitionerTime>0</allowanceRequisitionerTime>
+      <frequenceRequisitionerTime>0</frequenceRequisitionerTime>
+      <transferAttachments>false</transferAttachments>
+      <subProcessId></subProcessId>
+      <formFolder>0</formFolder>
+      <notifyAuthorityFollowUp>true</notifyAuthorityFollowUp>
+      <notifyRequisitionerFollowUp>false</notifyRequisitionerFollowUp>
+      <automatic>false</automatic>
+      <positionX>1009</positionX>
+      <positionY>310</positionY>
+      <forecastedEffortType>0</forecastedEffortType>
+      <forecastedEffort>0</forecastedEffort>
+      <notifyManagerFollowUp>false</notifyManagerFollowUp>
+      <notifyManagerDelay>false</notifyManagerDelay>
+      <frequenceManagerTime>0</frequenceManagerTime>
+      <inhibitTransfer>false</inhibitTransfer>
+      <periodId></periodId>
+      <stateType>0</stateType>
+      <bpmnType>43</bpmnType>
+      <signalId>0</signalId>
+      <counterSign>false</counterSign>
+      <openInstances>0</openInstances>
+      <destinationStates/>
+      <digitalSignature>false</digitalSignature>
+      <parentSequence>32</parentSequence>
+    </ProcessState>
+    <ProcessState>
+      <processStatePK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>1</version>
+        <sequence>24</sequence>
+      </processStatePK>
+      <stateName>Join</stateName>
+      <stateDescription>Join</stateDescription>
+      <joint>false</joint>
+      <initialState>false</initialState>
+      <transferAttachments>false</transferAttachments>
+      <subProcessId></subProcessId>
+      <formFolder>0</formFolder>
+      <automatic>false</automatic>
+      <positionX>940</positionX>
+      <positionY>174</positionY>
+      <inhibitTransfer>false</inhibitTransfer>
+      <stateType>4</stateType>
+      <bpmnType>127</bpmnType>
+      <signalId>0</signalId>
+      <openInstances>0</openInstances>
+      <destinationStates/>
+      <digitalSignature>false</digitalSignature>
+    </ProcessState>
+    <ProcessState>
+      <processStatePK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>1</version>
+        <sequence>28</sequence>
+      </processStatePK>
+      <stateName>Inclusivo</stateName>
+      <stateDescription>Inclusivo</stateDescription>
+      <joint>false</joint>
+      <initialState>false</initialState>
+      <transferAttachments>false</transferAttachments>
+      <subProcessId></subProcessId>
+      <formFolder>0</formFolder>
+      <automatic>false</automatic>
+      <positionX>200</positionX>
+      <positionY>175</positionY>
+      <inhibitTransfer>false</inhibitTransfer>
+      <stateType>3</stateType>
+      <bpmnType>121</bpmnType>
+      <signalId>0</signalId>
+      <openInstances>0</openInstances>
+      <destinationStates/>
+      <digitalSignature>false</digitalSignature>
+    </ProcessState>
+    <ProcessState>
+      <processStatePK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>1</version>
+        <sequence>47</sequence>
+      </processStatePK>
+      <stateName>Exclusivo</stateName>
+      <stateDescription>Exclusivo</stateDescription>
+      <joint>false</joint>
+      <initialState>false</initialState>
+      <transferAttachments>false</transferAttachments>
+      <subProcessId></subProcessId>
+      <formFolder>0</formFolder>
+      <automatic>true</automatic>
+      <positionX>810</positionX>
+      <positionY>166</positionY>
+      <inhibitTransfer>false</inhibitTransfer>
+      <stateType>1</stateType>
+      <bpmnType>120</bpmnType>
+      <signalId>0</signalId>
+      <openInstances>0</openInstances>
+      <destinationStates/>
+      <digitalSignature>false</digitalSignature>
+    </ProcessState>
+    <ProcessState>
+      <processStatePK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>1</version>
+        <sequence>9</sequence>
+      </processStatePK>
+      <stateName>Fim</stateName>
+      <stateDescription>Fim</stateDescription>
+      <instruction>Atividade final do processo</instruction>
+      <deadlineTime>0</deadlineTime>
+      <joint>false</joint>
+      <agreementPercentage>0</agreementPercentage>
+      <engineAllocationId></engineAllocationId>
+      <engineAllocationConfiguration></engineAllocationConfiguration>
+      <selectColleague>0</selectColleague>
+      <initialState>false</initialState>
+      <notifyAuthorityDelay>true</notifyAuthorityDelay>
+      <notifyRequisitionerDelay>false</notifyRequisitionerDelay>
+      <allowanceAuthorityTime>0</allowanceAuthorityTime>
+      <frequenceAuthorityTime>1</frequenceAuthorityTime>
+      <allowanceRequisitionerTime>0</allowanceRequisitionerTime>
+      <frequenceRequisitionerTime>0</frequenceRequisitionerTime>
+      <transferAttachments>false</transferAttachments>
+      <subProcessId></subProcessId>
+      <formFolder>0</formFolder>
+      <notifyAuthorityFollowUp>false</notifyAuthorityFollowUp>
+      <notifyRequisitionerFollowUp>false</notifyRequisitionerFollowUp>
+      <automatic>false</automatic>
+      <positionX>1140</positionX>
+      <positionY>202</positionY>
+      <forecastedEffortType>0</forecastedEffortType>
+      <forecastedEffort>0</forecastedEffort>
+      <notifyManagerFollowUp>false</notifyManagerFollowUp>
+      <notifyManagerDelay>false</notifyManagerDelay>
+      <allowanceManagerTime>0</allowanceManagerTime>
+      <frequenceManagerTime>0</frequenceManagerTime>
+      <inhibitTransfer>false</inhibitTransfer>
+      <periodId></periodId>
+      <stateType>6</stateType>
+      <bpmnType>60</bpmnType>
+      <signalId>0</signalId>
+      <counterSign>false</counterSign>
+      <openInstances>0</openInstances>
+      <destinationStates/>
+      <digitalSignature>false</digitalSignature>
+    </ProcessState>
+  </list>
+  <list>
+    <ConditionProcessState>
+      <conditionProcessStatePK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <expressionOrder>1</expressionOrder>
+        <version>54</version>
+        <sequence>28</sequence>
+      </conditionProcessStatePK>
+      <condition>hAPI.getCardValue(&quot;cpTemDivergencia&quot;) == &quot;sim&quot;</condition>
+      <destinationSequenceId>14</destinationSequenceId>
+      <engineAllocationConfiguration>&lt;AssignmentController&gt;&lt;User&gt;soter_ti&lt;/User&gt;&lt;/AssignmentController&gt;</engineAllocationConfiguration>
+      <engineAllocationId>Usuário</engineAllocationId>
+      <conditionType>0</conditionType>
+    </ConditionProcessState>
+    <ConditionProcessState>
+      <conditionProcessStatePK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <expressionOrder>2</expressionOrder>
+        <version>54</version>
+        <sequence>28</sequence>
+      </conditionProcessStatePK>
+      <condition>true</condition>
+      <destinationSequenceId>12</destinationSequenceId>
+      <engineAllocationConfiguration>&lt;AssignmentController&gt;&lt;Role&gt;BPO.0008&lt;/Role&gt;&lt;/AssignmentController&gt;</engineAllocationConfiguration>
+      <engineAllocationId>Pool Papel</engineAllocationId>
+      <conditionType>0</conditionType>
+    </ConditionProcessState>
+    <ConditionProcessState>
+      <conditionProcessStatePK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <expressionOrder>1</expressionOrder>
+        <version>54</version>
+        <sequence>47</sequence>
+      </conditionProcessStatePK>
+      <condition>hAPI.getCardValue(&quot;status_retorno_van&quot;) == &quot;aprovado&quot;</condition>
+      <destinationSequenceId>32</destinationSequenceId>
+      <engineAllocationConfiguration>&lt;AssignmentController&gt;&lt;User&gt;soter_ti&lt;/User&gt;&lt;/AssignmentController&gt;</engineAllocationConfiguration>
+      <engineAllocationId>Usuário</engineAllocationId>
+      <conditionType>0</conditionType>
+    </ConditionProcessState>
+  </list>
+  <list>
+    <ProcessLink>
+      <processLinkPK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>1</version>
+        <linkSequence>25</linkSequence>
+      </processLinkPK>
+      <actionLabel></actionLabel>
+      <returnPermited>false</returnPermited>
+      <initialStateSequence>14</initialStateSequence>
+      <finalStateSequence>24</finalStateSequence>
+      <returnLabel></returnLabel>
+      <name></name>
+      <automaticLink>false</automaticLink>
+      <defaultLink>false</defaultLink>
+      <type>0</type>
+    </ProcessLink>
+    <ProcessLink>
+      <processLinkPK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>1</version>
+        <linkSequence>27</linkSequence>
+      </processLinkPK>
+      <actionLabel></actionLabel>
+      <returnPermited>false</returnPermited>
+      <initialStateSequence>24</initialStateSequence>
+      <finalStateSequence>9</finalStateSequence>
+      <returnLabel></returnLabel>
+      <name></name>
+      <automaticLink>false</automaticLink>
+      <defaultLink>false</defaultLink>
+      <type>0</type>
+    </ProcessLink>
+    <ProcessLink>
+      <processLinkPK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>1</version>
+        <linkSequence>29</linkSequence>
+      </processLinkPK>
+      <actionLabel></actionLabel>
+      <returnPermited>false</returnPermited>
+      <initialStateSequence>4</initialStateSequence>
+      <finalStateSequence>28</finalStateSequence>
+      <returnLabel></returnLabel>
+      <name></name>
+      <automaticLink>false</automaticLink>
+      <defaultLink>false</defaultLink>
+      <type>0</type>
+    </ProcessLink>
+    <ProcessLink>
+      <processLinkPK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>1</version>
+        <linkSequence>30</linkSequence>
+      </processLinkPK>
+      <actionLabel></actionLabel>
+      <returnPermited>false</returnPermited>
+      <initialStateSequence>28</initialStateSequence>
+      <finalStateSequence>14</finalStateSequence>
+      <returnLabel></returnLabel>
+      <name></name>
+      <automaticLink>false</automaticLink>
+      <defaultLink>false</defaultLink>
+      <type>0</type>
+    </ProcessLink>
+    <ProcessLink>
+      <processLinkPK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>1</version>
+        <linkSequence>31</linkSequence>
+      </processLinkPK>
+      <actionLabel></actionLabel>
+      <returnPermited>false</returnPermited>
+      <initialStateSequence>28</initialStateSequence>
+      <finalStateSequence>12</finalStateSequence>
+      <returnLabel></returnLabel>
+      <name></name>
+      <automaticLink>false</automaticLink>
+      <defaultLink>false</defaultLink>
+      <type>0</type>
+      <movementTitle></movementTitle>
+      <movementDescription></movementDescription>
+      <movementAccessLinkDescription></movementAccessLinkDescription>
+    </ProcessLink>
+    <ProcessLink>
+      <processLinkPK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>1</version>
+        <linkSequence>34</linkSequence>
+      </processLinkPK>
+      <actionLabel></actionLabel>
+      <returnPermited>false</returnPermited>
+      <initialStateSequence>32</initialStateSequence>
+      <finalStateSequence>24</finalStateSequence>
+      <returnLabel></returnLabel>
+      <name></name>
+      <automaticLink>false</automaticLink>
+      <defaultLink>false</defaultLink>
+      <type>0</type>
+    </ProcessLink>
+    <ProcessLink>
+      <processLinkPK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>1</version>
+        <linkSequence>36</linkSequence>
+      </processLinkPK>
+      <actionLabel></actionLabel>
+      <returnPermited>false</returnPermited>
+      <initialStateSequence>35</initialStateSequence>
+      <finalStateSequence>24</finalStateSequence>
+      <returnLabel></returnLabel>
+      <name></name>
+      <automaticLink>false</automaticLink>
+      <defaultLink>false</defaultLink>
+      <type>0</type>
+    </ProcessLink>
+    <ProcessLink>
+      <processLinkPK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>1</version>
+        <linkSequence>49</linkSequence>
+      </processLinkPK>
+      <actionLabel></actionLabel>
+      <returnPermited>false</returnPermited>
+      <initialStateSequence>47</initialStateSequence>
+      <finalStateSequence>24</finalStateSequence>
+      <returnLabel></returnLabel>
+      <name></name>
+      <automaticLink>false</automaticLink>
+      <defaultLink>true</defaultLink>
+      <type>0</type>
+    </ProcessLink>
+    <ProcessLink>
+      <processLinkPK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>1</version>
+        <linkSequence>50</linkSequence>
+      </processLinkPK>
+      <actionLabel></actionLabel>
+      <returnPermited>false</returnPermited>
+      <initialStateSequence>47</initialStateSequence>
+      <finalStateSequence>32</finalStateSequence>
+      <returnLabel></returnLabel>
+      <name></name>
+      <automaticLink>false</automaticLink>
+      <defaultLink>false</defaultLink>
+      <type>0</type>
+    </ProcessLink>
+    <ProcessLink>
+      <processLinkPK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>1</version>
+        <linkSequence>51</linkSequence>
+      </processLinkPK>
+      <actionLabel></actionLabel>
+      <returnPermited>false</returnPermited>
+      <initialStateSequence>12</initialStateSequence>
+      <finalStateSequence>40</finalStateSequence>
+      <returnLabel></returnLabel>
+      <name></name>
+      <automaticLink>false</automaticLink>
+      <defaultLink>false</defaultLink>
+      <type>0</type>
+    </ProcessLink>
+    <ProcessLink>
+      <processLinkPK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>1</version>
+        <linkSequence>52</linkSequence>
+      </processLinkPK>
+      <actionLabel></actionLabel>
+      <returnPermited>false</returnPermited>
+      <initialStateSequence>40</initialStateSequence>
+      <finalStateSequence>47</finalStateSequence>
+      <returnLabel></returnLabel>
+      <name></name>
+      <automaticLink>false</automaticLink>
+      <defaultLink>false</defaultLink>
+      <type>0</type>
+    </ProcessLink>
+  </list>
+  <list/>
+  <list>
+    <WorkflowProcessEvent>
+      <workflowProcessEventPK>
+        <companyId>1</companyId>
+        <eventId>afterTaskComplete</eventId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>1</version>
+      </workflowProcessEventPK>
+      <eventDescription>function afterTaskComplete(colleagueId, nextSequenceId, userList) {&#xd;
+    var atividade = getValue(&quot;WKNumState&quot;);&#xd;
+&#xd;
+    // Se for a atividade de envio (12)&#xd;
+    if (atividade == 12) {&#xd;
+        // Grava o responsável (sua lógica original mantida)&#xd;
+        var usuario = getValue(&quot;WKUser&quot;);&#xd;
+        hAPI.setCardValue(&quot;cpResponsavelEnvio&quot;, usuario);&#xd;
+&#xd;
+        try {&#xd;
+            log.info(&quot;### INICIANDO ENVIO DE E-MAIL AUTOMÁTICO - TASK 12 ###&quot;);&#xd;
+&#xd;
+            // 1. Coleta os dados que já foram gerados no formulário pelo custom.js&#xd;
+            var assunto = hAPI.getCardValue(&quot;txt_assunto_email&quot;);&#xd;
+            var corpoTexto = hAPI.getCardValue(&quot;texto_email_resumo&quot;);&#xd;
+&#xd;
+            // Substitui quebras de linha (\n) por tag HTML (&lt;br&gt;) para o e-mail não perder a formatação&#xd;
+            var corpoHtml = new java.lang.String(corpoTexto).replaceAll(&quot;\n&quot;, &quot;&lt;br&gt;&quot;);&#xd;
+&#xd;
+            // 2. Prepara os parâmetros que serão injetados no Template HTML&#xd;
+            var parametros = new java.util.HashMap();&#xd;
+            parametros.put(&quot;subject&quot;, assunto); // Sobrescreve o assunto padrão do Fluig&#xd;
+            parametros.put(&quot;CORPO_EMAIL&quot;, corpoHtml);&#xd;
+&#xd;
+            // 3. Define os destinatários&#xd;
+            var destinatarios = new java.util.ArrayList();&#xd;
+&#xd;
+            // Pega o e-mail do solicitante original do formulário&#xd;
+            // var emailSolicitante = hAPI.getCardValue(&quot;cpEmailSolicitante&quot;);&#xd;
+            // if(emailSolicitante != null &amp;&amp; emailSolicitante != &quot;&quot;) {&#xd;
+            //     destinatarios.add(emailSolicitante);&#xd;
+            // }&#xd;
+&#xd;
+            // Se quiser enviar para uma cópia fixa, descomente a linha abaixo:&#xd;
+            destinatarios.add(&quot;assisguilhermefernandes@gmail.com&quot;);&#xd;
+&#xd;
+            // 4. Captura todos os anexos físicos do processo (A Guia ou o CNAB)&#xd;
+            var anexos = new java.util.ArrayList();&#xd;
+            var docs = hAPI.listAttachments();&#xd;
+&#xd;
+            for (var i = 0; i &lt; docs.size(); i++) {&#xd;
+                var doc = docs.get(i);&#xd;
+&#xd;
+                // Ignora anexos do tipo pasta (documentType == 2)&#xd;
+                if (doc.getDocumentType() != &quot;2&quot;) {&#xd;
+                    var anexo = new java.util.HashMap();&#xd;
+                    anexo.put(&quot;processAttachmentPK.attachmentSequence&quot;, doc.getDocumentId());&#xd;
+                    anexos.add(anexo);&#xd;
+                }&#xd;
+            }&#xd;
+&#xd;
+            // 5. Executa o disparo do E-mail&#xd;
+            // Parâmetros: remetente, id_do_template, parametros_html, destinatarios, anexos&#xd;
+            // Teste provisório: Dispara sem o array de anexos&#xd;
+            notifier.notify(&quot;admin&quot;, &quot;tpl_envio_financeiro&quot;, parametros, destinatarios, &quot;text/html&quot;);&#xd;
+&#xd;
+            log.info(&quot;### E-MAIL ENVIADO COM SUCESSO ###&quot;);&#xd;
+&#xd;
+        } catch (e) {&#xd;
+            log.error(&quot;### ERRO AO ENVIAR E-MAIL AUTOMÁTICO (Task 12): &quot; + e);&#xd;
+        }&#xd;
+    }&#xd;
+}</eventDescription>
+    </WorkflowProcessEvent>
+    <WorkflowProcessEvent>
+      <workflowProcessEventPK>
+        <companyId>1</companyId>
+        <eventId>afterProcessCreate</eventId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>1</version>
+      </workflowProcessEventPK>
+      <eventDescription>function afterProcessCreate(processId) {&#xd;
+    var codColigada = hAPI.getCardValue(&quot;cod_empresa&quot;);&#xd;
+    var codFilial = hAPI.getCardValue(&quot;cod_filial&quot;);&#xd;
+    var idLan = hAPI.getCardValue(&quot;erp_id_lan&quot;);&#xd;
+&#xd;
+    // Verifica se tem os dados para não gravar registros vazios&#xd;
+    if (codColigada != &quot;&quot; &amp;&amp; codFilial != &quot;&quot; &amp;&amp; idLan != &quot;&quot;) {&#xd;
+        log.info(&quot;### REGISTRANDO DUPLICIDADE: Processo &quot; + processId);&#xd;
+        &#xd;
+        // Manda o Dataset Gravar&#xd;
+        var cOp = DatasetFactory.createConstraint(&quot;OPERACAO&quot;, &quot;GRAVAR&quot;, &quot;GRAVAR&quot;, ConstraintType.MUST);&#xd;
+        var c1 = DatasetFactory.createConstraint(&quot;COD_COLIGADA&quot;, codColigada, codColigada, ConstraintType.MUST);&#xd;
+        var c2 = DatasetFactory.createConstraint(&quot;COD_FILIAL&quot;, codFilial, codFilial, ConstraintType.MUST);&#xd;
+        var c3 = DatasetFactory.createConstraint(&quot;ID_LAN&quot;, idLan, idLan, ConstraintType.MUST);&#xd;
+        var c4 = DatasetFactory.createConstraint(&quot;SOLICITACAO&quot;, processId + &quot;&quot;, processId + &quot;&quot;, ConstraintType.MUST);&#xd;
+        &#xd;
+        DatasetFactory.getDataset(&quot;DS_VERIFICAR_DUPLICIDADE&quot;, null, [cOp, c1, c2, c3, c4], null);&#xd;
+    }&#xd;
+}</eventDescription>
+    </WorkflowProcessEvent>
+    <WorkflowProcessEvent>
+      <workflowProcessEventPK>
+        <companyId>1</companyId>
+        <eventId>servicetask32</eventId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>1</version>
+      </workflowProcessEventPK>
+      <eventDescription>function servicetask32(attempt, message) {
+    log.info(&quot;### SERVICE TASK: Iniciando Integracao ###&quot;);
+
+    try {
+        // Verifica duplicidade para evitar reprocessamento
+        var idJaGerado = hAPI.getCardValue(&quot;cpIdProcessoPagamento&quot;);
+        if (idJaGerado != null &amp;&amp; idJaGerado != &quot;&quot; &amp;&amp; idJaGerado.length &gt; 3) {
+            log.info(&quot;### AUTOMACAO: Processos já gerados. Fim.&quot;);
+            return;
+        }
+
+        // --- RECUPERAÇÃO SEGURA DO USUÁRIO ---
+        var matriculaSolicitante = hAPI.getCardValue(&quot;cpResponsavelEnvio&quot;);
+        
+        // Se veio vazio ou null, usa o fallback para não travar
+        if (matriculaSolicitante == null || matriculaSolicitante == &quot;&quot; || matriculaSolicitante == &quot;null&quot;) {
+            log.warn(&quot;### ATENCAO: Usuário de envio não identificado. Usando fallback: soter_ti&quot;);
+            matriculaSolicitante = &quot;soter_ti&quot;; // Usuário de segurança
+        }
+
+        var dadosComuns = getDadosComuns(matriculaSolicitante);
+        var tipoDoc = hAPI.getCardValue(&quot;tipo_documento&quot;);
+        var idsProcessosGerados = [];
+
+        if (tipoDoc == &quot;cnab&quot;) {
+            var coligada = hAPI.getCardValue(&quot;cod_empresa&quot;);
+            var idLan = hAPI.getCardValue(&quot;erp_id_lan&quot;);
+            
+            if (validarDados(coligada, idLan)) {
+                var id = iniciarProcessoPagamento(coligada, idLan, dadosComuns, matriculaSolicitante);
+                idsProcessosGerados.push(id);
+            }
+        } 
+        else if (tipoDoc == &quot;guia_outros&quot;) {
+            // Em service task, pegamos Pai x Filho via getCardData para garantir
+            var mapa = hAPI.getCardData(getValue(&quot;WKNumProces&quot;));
+            var it = mapa.keySet().iterator();
+
+            while (it.hasNext()) {
+                var key = it.next();
+                if (key.indexOf(&quot;card_id_lan___&quot;) &gt; -1) {
+                    var index = key.split(&quot;___&quot;)[1];
+                    var idLanItem = mapa.get(&quot;card_id_lan___&quot; + index);
+                    var coligadaItem = mapa.get(&quot;card_cod_coligada___&quot; + index);
+
+                    if (validarDados(coligadaItem, idLanItem)) {
+                        var id = iniciarProcessoPagamento(coligadaItem, idLanItem, dadosComuns, matriculaSolicitante);
+                        idsProcessosGerados.push(id);
+                        
+                        try { hAPI.setCardValue(&quot;card_id_processo___&quot; + index, id + &quot;&quot;); } catch(e){}
+                    }
+                }
+            }
+        }
+
+        if (idsProcessosGerados.length &gt; 0) {
+            hAPI.setCardValue(&quot;cpIdProcessoPagamento&quot;, idsProcessosGerados.join(&quot;, &quot;));
+        } else {
+            // Se não gerou nada, lançamos erro para aparecer no log/monitoramento
+            throw &quot;Nenhum processo foi gerado. Verifique se os dados do formulário estão preenchidos corretamente (IDs e Coligadas).&quot;;
+        }
+
+    } catch (e) {
+        log.error(&quot;ERRO SERVICE TASK: &quot; + e);
+        throw e;
+    }
+}
+
+// --- FUNÇÕES AUXILIARES ---
+
+function iniciarProcessoPagamento(coligada, idLan, dadosComuns, userDestino) {
+    var formData = new java.util.HashMap();
+    formData.put(&quot;numColigada&quot;, coligada);
+    formData.put(&quot;idlan&quot;, idLan);
+    formData.put(&quot;txtColigada&quot;, coligada); 
+    formData.put(&quot;cpDataAbertura&quot;, dadosComuns.data);
+    formData.put(&quot;cpMatriculaSolicitante&quot;, dadosComuns.matricula);
+    formData.put(&quot;cpSolicitanteNome&quot;, dadosComuns.nome);
+    formData.put(&quot;obs_integracao&quot;, &quot;Gerado auto via Validador #&quot; + getValue(&quot;WKNumProces&quot;));
+
+    var usuarios = new java.util.ArrayList();
+    usuarios.add(userDestino);
+
+    var retorno = hAPI.startProcess(&quot;FLUIG-0010&quot;, 0, usuarios, &quot;Iniciado via Validador&quot;, true, formData, false);
+    return retorno.get(&quot;iProcess&quot;);
+}
+
+function validarDados(coligada, idLan) {
+    return (coligada != null &amp;&amp; coligada != &quot;&quot; &amp;&amp; idLan != null &amp;&amp; idLan != &quot;&quot;);
+}
+
+function getDadosComuns(matricula) {
+    var nome = &quot;Sistema&quot;;
+    try {
+        var c1 = DatasetFactory.createConstraint(&quot;colleaguePK.colleagueId&quot;, matricula, matricula, ConstraintType.MUST);
+        var ds = DatasetFactory.getDataset(&quot;colleague&quot;, [&quot;colleagueName&quot;], [c1], null);
+        if (ds.rowsCount &gt; 0) nome = ds.getValue(0, &quot;colleagueName&quot;);
+    } catch (e) {}
+    
+    // --- CORREÇÃO AQUI (Removido padStart) ---
+    var dt = new Date();
+    var dia = dt.getDate();
+    var mes = dt.getMonth() + 1;
+    var ano = dt.getFullYear();
+    
+    // Formatação manual compatível com Rhino (Java 1.6/1.7 style)
+    var diaFmt = (dia &lt; 10) ? &quot;0&quot; + dia : dia;
+    var mesFmt = (mes &lt; 10) ? &quot;0&quot; + mes : mes;
+    
+    return { 
+        matricula: matricula, 
+        nome: nome, 
+        data: diaFmt + &quot;/&quot; + mesFmt + &quot;/&quot; + ano 
+    };
+}</eventDescription>
+    </WorkflowProcessEvent>
+    <WorkflowProcessEvent>
+      <workflowProcessEventPK>
+        <companyId>1</companyId>
+        <eventId>afterTaskCreate</eventId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>1</version>
+      </workflowProcessEventPK>
+      <eventDescription>function afterTaskCreate(colleagueId) {&#xd;
+    var atividade = parseInt(getValue(&quot;WKNumState&quot;));&#xd;
+    var ATIVIDADE_FINANCEIRO = 12; &#xd;
+&#xd;
+    if (atividade == ATIVIDADE_FINANCEIRO) {&#xd;
+        var nrProcesso = getValue(&quot;WKNumProces&quot;);&#xd;
+        var thread = 0; &#xd;
+        &#xd;
+        // CORREÇÃO PRINCIPAL: &#xd;
+        // Pega o primeiro usuário da lista de responsáveis que recebeu a tarefa 12&#xd;
+        var responsavelDestino = colleagueId.get(0); &#xd;
+&#xd;
+        var dataTexto = &quot;&quot;;&#xd;
+        var tipoDoc = hAPI.getCardValue(&quot;tipo_documento&quot;);&#xd;
+        &#xd;
+        // Busca a data conforme o tipo&#xd;
+        if (tipoDoc == &quot;cnab&quot;) {&#xd;
+            dataTexto = hAPI.getCardValue(&quot;arq_data_cred&quot;); &#xd;
+        } else {&#xd;
+            // Tratamento para data da guia (YYYY-MM-DD ou DD/MM/YYYY)&#xd;
+            var dataGuia = hAPI.getCardValue(&quot;guia_data_venc&quot;);&#xd;
+            if (dataGuia &amp;&amp; dataGuia.indexOf(&quot;-&quot;) &gt; -1) {&#xd;
+                var partes = dataGuia.split(&quot;-&quot;);&#xd;
+                dataTexto = partes[2] + &quot;/&quot; + partes[1] + &quot;/&quot; + partes[0];&#xd;
+            } else {&#xd;
+                dataTexto = dataGuia;&#xd;
+            }&#xd;
+        }&#xd;
+&#xd;
+        if (dataTexto &amp;&amp; dataTexto != &quot;&quot;) {&#xd;
+            try {&#xd;
+                var prazoDate = converterParaData(dataTexto);&#xd;
+                &#xd;
+                // Define 10:00 da manhã&#xd;
+                prazoDate.setHours(10);&#xd;
+                prazoDate.setMinutes(0);&#xd;
+                prazoDate.setSeconds(0);&#xd;
+&#xd;
+                // Define o prazo para o RESPONSÁVEL DE DESTINO&#xd;
+                hAPI.setDueDate(nrProcesso, thread, responsavelDestino, prazoDate, 0);&#xd;
+                &#xd;
+                log.info(&quot;### VALIDADOR FINANCEIRO: Prazo definido para &quot; + prazoDate + &quot; | Responsavel: &quot; + responsavelDestino);&#xd;
+            } catch (e) {&#xd;
+                log.error(&quot;### VALIDADOR FINANCEIRO: Erro ao definir data: &quot; + e);&#xd;
+            }&#xd;
+        } else {&#xd;
+            log.warn(&quot;### VALIDADOR FINANCEIRO: Data para prazo vazia. Atividade 12 ficará sem prazo calculado.&quot;);&#xd;
+        }&#xd;
+    }&#xd;
+}&#xd;
+&#xd;
+function converterParaData(dataStr) {&#xd;
+    if (!dataStr) return new Date();&#xd;
+    var partes = dataStr.split(&quot;/&quot;);&#xd;
+    return new Date(partes[2], partes[1] - 1, partes[0]);&#xd;
+}</eventDescription>
+    </WorkflowProcessEvent>
+  </list>
+  <list/>
+  <list>
+    <SwimLane>
+      <color>FFFFFF</color>
+      <height>411</height>
+      <width>1211</width>
+      <positionX>10</positionX>
+      <positionY>10</positionY>
+      <stateName>Pool</stateName>
+      <type>1</type>
+      <parentSequence>0</parentSequence>
+      <swimLanePK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>1</version>
+        <sequence>1</sequence>
+      </swimLanePK>
+    </SwimLane>
+    <SwimLane>
+      <color>C0C0C0</color>
+      <height>205</height>
+      <width>1181</width>
+      <positionX>40</positionX>
+      <positionY>10</positionY>
+      <stateName>Assignee</stateName>
+      <type>2</type>
+      <parentSequence>1</parentSequence>
+      <swimLanePK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>1</version>
+        <sequence>2</sequence>
+      </swimLanePK>
+    </SwimLane>
+    <SwimLane>
+      <color>9F9F9F</color>
+      <height>206</height>
+      <width>1181</width>
+      <positionX>40</positionX>
+      <positionY>215</positionY>
+      <stateName>Reporter</stateName>
+      <type>2</type>
+      <parentSequence>1</parentSequence>
+      <swimLanePK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>1</version>
+        <sequence>3</sequence>
+      </swimLanePK>
+    </SwimLane>
+  </list>
+  <list/>
+  <list/>
+  <list>
+    <ProcessLinkBend>
+      <processLinkBendPK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>54</version>
+        <linkSequence>25</linkSequence>
+        <bendSequence>1</bendSequence>
+      </processLinkBendPK>
+      <positionX>969</positionX>
+      <positionY>58</positionY>
+    </ProcessLinkBend>
+  </list>
+  <list/>
+  <list/>
+  <list/>
+  <list>
+    <ProcessStateService>
+      <companyId>1</companyId>
+      <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+      <version>1</version>
+      <sequence>32</sequence>
+      <attempts>0</attempts>
+      <sucessFullMessage>Integração executada com sucesso</sucessFullMessage>
+      <serviceName>ECMWorkflowEngineService</serviceName>
+      <frequency>1</frequency>
+      <frequencyType>0</frequencyType>
+    </ProcessStateService>
+  </list>
+  <list/>
+  <list/>
+  <list/>
+  <list/>
+</list>
