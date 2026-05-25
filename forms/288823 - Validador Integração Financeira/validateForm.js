@@ -78,10 +78,31 @@ function validateForm(form) {
             // Pega as marcações do usuário
             var statusGeral = form.getValue("flag_status_geral");
             var statusRetorno = form.getValue("flag_status_retorno");
+            var statusAprovacao40 = form.getValue("flag_aprovacao_40");
+            var parecerAprovacao40 = form.getValue("txt_parecer_aprovacao_40");
+
+            // Garante persistência do campo usado no gateway.
+            if (statusAprovacao40 == "aprovado") {
+                form.setValue("status_retorno_van", "aprovado");
+            } else if (statusAprovacao40 == "rejeitado") {
+                form.setValue("status_retorno_van", "rejeitado");
+            } else {
+                form.setValue("status_retorno_van", "pendente");
+            }
 
             // 1. O Status Geral é sempre obrigatório
             if (statusGeral == null || statusGeral == "") {
                 throw "Atenção: É obrigatório informar o 'Status Geral da Integração' no rodapé (Enviado, Em Processamento ou Autorizado) antes de salvar.";
+            }
+
+            if (statusRetorno == "aceito" || statusRetorno == "rejeitado") {
+                if (statusAprovacao40 == null || statusAprovacao40 == "") {
+                    throw "Atenção: O painel 'Aprovação' deve estar sincronizado com o status do retorno do banco.";
+                }
+            }
+
+            if (statusAprovacao40 == "rejeitado" && (parecerAprovacao40 == null || parecerAprovacao40.trim() == "")) {
+                throw "Atenção: Para aprovação 'Rejeitado', o preenchimento do parecer é obrigatório.";
             }
 
             if (coligada == "14" && isBradesco) {

@@ -2425,7 +2425,7 @@ function iniciarPainelVan40() {
     if (tipoDoc !== "cnab") {
         $("#painel_envio_van_40 .panel-body").html("<div class='alert alert-info'>Atividade não aplicável para Guias/Outros. Movimente a solicitação.</div>");
         // Oculta os de retorno
-        $("#painel_retorno_van_40, #painel_status_geral_40").hide();
+        $("#painel_retorno_van_40, #painel_status_geral_40, #painel_aprovacao_40").hide();
         return;
     }
 
@@ -2458,6 +2458,37 @@ function iniciarPainelVan40() {
 function buscarRetornoAutomatico() {
     // Abre a modal que lista os arquivos direto da pasta do FileServer e permite leitura
     RetornoFileServer.abrirModalRetornos();
+}
+
+function visualizarArquivosPastaEnviar40() {
+    var loading = FLUIGC.loading(window);
+    loading.show();
+
+    var c1 = DatasetFactory.createConstraint("pasta", "Enviar", "Enviar", ConstraintType.MUST);
+    DatasetFactory.getDataset("DS_LISTAR_RETORNOS", null, [c1], null, {
+        success: function (ds) {
+            loading.hide();
+            var $tbody = $("#tabela_enviar_40_visual");
+            $tbody.empty();
+
+            if (!ds || !ds.values || ds.values.length === 0) {
+                $tbody.append('<tr><td colspan="3" class="text-muted">Nenhum arquivo encontrado.</td></tr>');
+            } else {
+                ds.values.forEach(function (arq) {
+                    var nome = arq["Nome_do_Arquivo"] || "";
+                    var tamanho = arq["Tamanho"] || "-";
+                    var data = arq["Data_Modificacao"] || "-";
+                    $tbody.append('<tr><td><i class="flaticon flaticon-document icon-sm"></i> <b>' + nome + '</b></td><td>' + tamanho + '</td><td>' + data + '</td></tr>');
+                });
+            }
+
+            $("#painel_lista_enviar_40").slideDown();
+        },
+        error: function () {
+            loading.hide();
+            FLUIGC.toast({ title: 'Erro', message: 'Falha ao listar pasta Enviar.', type: 'danger' });
+        }
+    });
 }
 
 function lerRetornoManual(input) {
@@ -2520,6 +2551,12 @@ function processarTextoRetornoAuditoria(texto, nomeArquivo) {
 
         $("input[name='flag_status_retorno'][value='aceito']").prop("checked", true);
         $("input[name='flag_status_geral'][value='autorizado']").prop("checked", true);
+        if (typeof sincronizarStatusGeralComRetornoBanco === "function") {
+            sincronizarStatusGeralComRetornoBanco();
+        }
+        if (typeof sincronizarPainelAprovacao40 === "function") {
+            sincronizarPainelAprovacao40();
+        }
 
     } catch (err) {
         FLUIGC.toast({ title: 'Erro na Leitura do Retorno', message: err.message, type: 'danger' });
@@ -2528,6 +2565,12 @@ function processarTextoRetornoAuditoria(texto, nomeArquivo) {
         $("#fileNameRetorno").val("");
         $("input[name='flag_status_retorno']").prop("checked", false);
         $("input[name='flag_status_geral']").prop("checked", false);
+        if (typeof sincronizarStatusGeralComRetornoBanco === "function") {
+            sincronizarStatusGeralComRetornoBanco();
+        }
+        if (typeof sincronizarPainelAprovacao40 === "function") {
+            sincronizarPainelAprovacao40();
+        }
     }
 }
 
@@ -2728,6 +2771,91 @@ $(document).ready(function () {
 // ============================================================
 // INICIALIZAÇÃO AUTOMÁTICA AO CARREGAR A PÁGINA (F5)
 // ============================================================
+function sincronizarStatusGeralComRetornoBanco() {
+    var statusRetorno = $("input[name='flag_status_retorno']:checked").val();
+    var $radioGeralRejeitado = $("input[name='flag_status_geral'][value='rejeitado']");
+    var $radioGeralAutorizado = $("input[name='flag_status_geral'][value='autorizado']");
+
+    if (!$radioGeralRejeitado.length) {
+        return;
+    }
+
+    if (statusRetorno === "rejeitado") {
+        if ($radioGeralAutorizado.is(":checked")) {
+            $radioGeralAutorizado.prop("checked", false);
+        }
+        $radioGeralAutorizado.prop("disabled", true);
+        $radioGeralRejeitado.prop("disabled", false).prop("checked", true);
+        return;
+    }
+
+    if (statusRetorno === "aceito") {
+        if ($radioGeralRejeitado.is(":checked")) {
+            $radioGeralRejeitado.prop("checked", false);
+        }
+        $radioGeralRejeitado.prop("disabled", true);
+        $radioGeralAutorizado.prop("disabled", false);
+        return;
+    }
+
+    $radioGeralRejeitado.prop("disabled", false);
+    $radioGeralAutorizado.prop("disabled", false);
+}
+
+function sincronizarPainelAprovacao40() {
+    var statusRetorno = $("input[name='flag_status_retorno']:checked").val();
+    var $radiosAprovacao = $("input[name='flag_aprovacao_40_view']");
+    var $hiddenAprovacao = $("#flag_aprovacao_40");
+    var $statusRetornoVan = $("#status_retorno_van");
+    var $parecerBloco = $("#bloco_parecer_aprovacao_40");
+    var $parecerCampo = $("#txt_parecer_aprovacao_40");
+
+    if (!$radiosAprovacao.length || !$hiddenAprovacao.length) {
+        return;
+    }
+
+    $radiosAprovacao.prop("checked", false).prop("disabled", true);
+    $hiddenAprovacao.val("");
+    if ($statusRetornoVan.length) {
+        $statusRetornoVan.val("pendente");
+    }
+    $parecerBloco.hide();
+    $parecerCampo.prop("required", false);
+
+    if (statusRetorno === "aceito") {
+        $("input[name='flag_aprovacao_40_view'][value='aprovado']").prop("checked", true);
+        $hiddenAprovacao.val("aprovado");
+        if ($statusRetornoVan.length) {
+            $statusRetornoVan.val("aprovado");
+        }
+        return;
+    }
+
+    if (statusRetorno === "rejeitado") {
+        $("input[name='flag_aprovacao_40_view'][value='rejeitado']").prop("checked", true);
+        $hiddenAprovacao.val("rejeitado");
+        if ($statusRetornoVan.length) {
+            $statusRetornoVan.val("rejeitado");
+        }
+        $parecerBloco.show();
+        $parecerCampo.prop("required", true);
+    }
+}
+
+$(document).ready(function () {
+    $("input[name='flag_status_retorno']").off("change.syncStatusGeral40").on("change.syncStatusGeral40", function () {
+        sincronizarStatusGeralComRetornoBanco();
+        sincronizarPainelAprovacao40();
+    });
+
+    sincronizarStatusGeralComRetornoBanco();
+    sincronizarPainelAprovacao40();
+
+    $("#btn_visualizar_pasta_enviar_40").off("click").on("click", function () {
+        visualizarArquivosPastaEnviar40();
+    });
+});
+
 $(window).on('load', function () {
     console.log("Gatilho de Janela carregado. A aguardar o Fluig...");
 

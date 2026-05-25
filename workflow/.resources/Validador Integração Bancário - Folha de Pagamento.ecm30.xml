@@ -28,7 +28,7 @@
     <processDefinitionVersionPK>
       <companyId>1</companyId>
       <processId>Validador Integração Financeira - Folha de Pagamento	</processId>
-      <version>54</version>
+      <version>63</version>
     </processDefinitionVersionPK>
     <versionDescription></versionDescription>
     <formId>288823</formId>
@@ -478,7 +478,7 @@
         <companyId>1</companyId>
         <processId>Validador Integração Bancário - Folha de Pagamento</processId>
         <expressionOrder>1</expressionOrder>
-        <version>54</version>
+        <version>63</version>
         <sequence>28</sequence>
       </conditionProcessStatePK>
       <condition>hAPI.getCardValue(&quot;cpTemDivergencia&quot;) == &quot;sim&quot;</condition>
@@ -492,7 +492,7 @@
         <companyId>1</companyId>
         <processId>Validador Integração Bancário - Folha de Pagamento</processId>
         <expressionOrder>2</expressionOrder>
-        <version>54</version>
+        <version>63</version>
         <sequence>28</sequence>
       </conditionProcessStatePK>
       <condition>true</condition>
@@ -506,14 +506,28 @@
         <companyId>1</companyId>
         <processId>Validador Integração Bancário - Folha de Pagamento</processId>
         <expressionOrder>1</expressionOrder>
-        <version>54</version>
+        <version>63</version>
         <sequence>47</sequence>
       </conditionProcessStatePK>
-      <condition>hAPI.getCardValue(&quot;status_retorno_van&quot;) == &quot;aprovado&quot;</condition>
+      <condition></condition>
+      <destinationSequenceId>12</destinationSequenceId>
+      <engineAllocationConfiguration>&lt;AssignmentController&gt;&lt;FormField&gt;status_retorno_van&lt;/FormField&gt;&lt;/AssignmentController&gt;</engineAllocationConfiguration>
+      <engineAllocationId>Campo Formulário</engineAllocationId>
+      <conditionType>1</conditionType>
+    </ConditionProcessState>
+    <ConditionProcessState>
+      <conditionProcessStatePK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <expressionOrder>2</expressionOrder>
+        <version>63</version>
+        <sequence>47</sequence>
+      </conditionProcessStatePK>
+      <condition></condition>
       <destinationSequenceId>32</destinationSequenceId>
-      <engineAllocationConfiguration>&lt;AssignmentController&gt;&lt;User&gt;soter_ti&lt;/User&gt;&lt;/AssignmentController&gt;</engineAllocationConfiguration>
-      <engineAllocationId>Usuário</engineAllocationId>
-      <conditionType>0</conditionType>
+      <engineAllocationConfiguration>&lt;AssignmentController&gt;&lt;FormField&gt;status_retorno_van&lt;/FormField&gt;&lt;/AssignmentController&gt;</engineAllocationConfiguration>
+      <engineAllocationId>Campo Formulário</engineAllocationId>
+      <conditionType>1</conditionType>
     </ConditionProcessState>
   </list>
   <list>
@@ -701,6 +715,23 @@
       <returnPermited>false</returnPermited>
       <initialStateSequence>40</initialStateSequence>
       <finalStateSequence>47</finalStateSequence>
+      <returnLabel></returnLabel>
+      <name></name>
+      <automaticLink>false</automaticLink>
+      <defaultLink>false</defaultLink>
+      <type>0</type>
+    </ProcessLink>
+    <ProcessLink>
+      <processLinkPK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>1</version>
+        <linkSequence>53</linkSequence>
+      </processLinkPK>
+      <actionLabel></actionLabel>
+      <returnPermited>false</returnPermited>
+      <initialStateSequence>47</initialStateSequence>
+      <finalStateSequence>12</finalStateSequence>
       <returnLabel></returnLabel>
       <name></name>
       <automaticLink>false</automaticLink>
@@ -1054,12 +1085,23 @@ function converterParaData(dataStr) {&#xd;
       <processLinkBendPK>
         <companyId>1</companyId>
         <processId>Validador Integração Bancário - Folha de Pagamento</processId>
-        <version>54</version>
+        <version>63</version>
         <linkSequence>25</linkSequence>
         <bendSequence>1</bendSequence>
       </processLinkBendPK>
       <positionX>969</positionX>
       <positionY>58</positionY>
+    </ProcessLinkBend>
+    <ProcessLinkBend>
+      <processLinkBendPK>
+        <companyId>1</companyId>
+        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
+        <version>63</version>
+        <linkSequence>53</linkSequence>
+        <bendSequence>1</bendSequence>
+      </processLinkBendPK>
+      <positionX>593</positionX>
+      <positionY>387</positionY>
     </ProcessLinkBend>
   </list>
   <list/>
@@ -1081,5 +1123,24 @@ function converterParaData(dataStr) {&#xd;
   <list/>
   <list/>
   <list/>
-  <list/>
+  <list>
+    <ConditionProcessAutomaticRules>
+      <sequence>47</sequence>
+      <expressionOrder>1</expressionOrder>
+      <ruleOrder>1</ruleOrder>
+      <field>status_retorno_van</field>
+      <value>rejeitado</value>
+      <operator>1</operator>
+      <valueType>1</valueType>
+    </ConditionProcessAutomaticRules>
+    <ConditionProcessAutomaticRules>
+      <sequence>47</sequence>
+      <expressionOrder>2</expressionOrder>
+      <ruleOrder>1</ruleOrder>
+      <field>status_retorno_van</field>
+      <value>rejeitado</value>
+      <operator>1</operator>
+      <valueType>1</valueType>
+    </ConditionProcessAutomaticRules>
+  </list>
 </list>

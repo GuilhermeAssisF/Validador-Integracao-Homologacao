@@ -167,7 +167,7 @@ function displayFields(form, customHTML) {
         customHTML.append("     $('#painel_leitura, #painel_erp, #painel_rateio, #painel_resumo, #painel_multi_lancamentos, #painel_consolidado_guia, #container_resumo_guia, #row_cnab_inputs, #painel_resumo_14, #painel_retornos_fileserver').hide(); \n");
         customHTML.append("     $('#painel_info').find('input, select, button').prop('disabled', true); \n");
         // Mostra os nossos novos painéis
-        customHTML.append("     $('#painel_envio_van_40, #painel_retorno_van_40, #painel_status_geral_40').show(); \n");
+        customHTML.append("     $('#painel_envio_van_40, #painel_retorno_van_40, #painel_status_geral_40, #painel_aprovacao_40').show(); \n");
         customHTML.append("     setTimeout(function(){ if(typeof iniciarPainelVan40 === 'function'){ iniciarPainelVan40(); } }, 500); \n");
     }
 
