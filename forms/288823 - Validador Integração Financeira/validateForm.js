@@ -78,17 +78,8 @@ function validateForm(form) {
             // Pega as marcações do usuário
             var statusGeral = form.getValue("flag_status_geral");
             var statusRetorno = form.getValue("flag_status_retorno");
-            var statusAprovacao40 = form.getValue("flag_aprovacao_40");
+            var statusAprovacao40 = form.getValue("status_retorno_van");
             var parecerAprovacao40 = form.getValue("txt_parecer_aprovacao_40");
-
-            // Garante persistência do campo usado no gateway.
-            if (statusAprovacao40 == "aprovado") {
-                form.setValue("status_retorno_van", "aprovado");
-            } else if (statusAprovacao40 == "rejeitado") {
-                form.setValue("status_retorno_van", "rejeitado");
-            } else {
-                form.setValue("status_retorno_van", "pendente");
-            }
 
             // 1. O Status Geral é sempre obrigatório
             if (statusGeral == null || statusGeral == "") {

@@ -25,14 +25,13 @@ function createDataset(fields, constraints, sortFields) {
             return dataset;
         }
 
-        // Caminho da pasta solicitada (Enviar ou Enviados)
-        var pathBase = "\\\\\\\\sotersrv38\\\\FileServer\\\\RH\\\\03. Dpto Pessoal\\\\24. BPO - Interativa\\\\" + pastaInicial + "\\\\";
+        // NOVO CAMINHO BASE DE PRODUÇÃO
+        var pathBase = "\\\\\\\\sotersrv38\\\\FileServer\\\\RH\\\\03. Dpto Pessoal\\\\00- ARQUIVOS DE PAGAMENTO FINANCEIRO\\\\02 - BRAD_Retorno_Automatico\\\\" + pastaInicial + "\\\\";
         var arquivo = new File(pathBase + nomeArquivo);
 
-        // Se não encontrar na primeira pasta, tenta na outra (fallback de segurança)
         if (!arquivo.exists()) {
             var outraPasta = (pastaInicial == "Enviar") ? "Enviados" : "Enviar";
-            pathBase = "\\\\\\\\sotersrv38\\\\FileServer\\\\RH\\\\03. Dpto Pessoal\\\\24. BPO - Interativa\\\\" + outraPasta + "\\\\";
+            pathBase = "\\\\\\\\sotersrv38\\\\FileServer\\\\RH\\\\03. Dpto Pessoal\\\\00- ARQUIVOS DE PAGAMENTO FINANCEIRO\\\\02 - BRAD_Retorno_Automatico\\\\" + outraPasta + "\\\\";
             arquivo = new File(pathBase + nomeArquivo);
             
             if (!arquivo.exists()) {
@@ -41,7 +40,6 @@ function createDataset(fields, constraints, sortFields) {
             }
         }
 
-        // Lê o ficheiro e devolve linha a linha
         var reader = new BufferedReader(new InputStreamReader(new FileInputStream(arquivo), "ISO-8859-1"));
         var linha;
         var numero = 0;

@@ -27,9 +27,9 @@ function createDataset(fields, constraints, sortFields) {
         }
 
         // =========================================================
-        // CAMINHO DO FILESERVER (Pasta Retorno - BPO Interativa)
+        // CAMINHO DO FILESERVER (Pasta Retorno - Bradesco)
         // =========================================================
-        var pathBase = "\\\\\\\\sotersrv38\\\\FileServer\\\\RH\\\\03. Dpto Pessoal\\\\24. BPO - Interativa\\\\Retorno\\\\";
+        var pathBase = "\\\\\\\\sotersrv38\\\\FileServer\\\\RH\\\\03. Dpto Pessoal\\\\00- ARQUIVOS DE PAGAMENTO FINANCEIRO\\\\02 - BRAD_Retorno_Automatico\\\\Retornos\\\\Pagamento\\\\";
         var arquivo = new File(pathBase + nomeArquivo);
 
         if (!arquivo.exists()) {

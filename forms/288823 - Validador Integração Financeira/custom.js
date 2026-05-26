@@ -429,6 +429,9 @@ function processarConteudo(texto) {
         FLUIGC.toast({ title: 'Sucesso', message: 'Leitura concluída!', type: 'success' });
 
         validarDivergencias();
+        if (($("#wkNumState_hidden").val() || "").toString() === "40" && typeof iniciarPainelVan40 === "function") {
+            iniciarPainelVan40();
+        }
 
     } catch (err) {
         FLUIGC.toast({ title: 'Erro', message: err.message, type: 'danger' });
@@ -484,6 +487,9 @@ function zoomEmpresa() {
 
         // CHAMA VALIDAÇÃO
         validarDivergencias();
+        if (($("#wkNumState_hidden").val() || "").toString() === "40" && typeof iniciarPainelVan40 === "function") {
+            iniciarPainelVan40();
+        }
 
     }
     zoom.Abrir();
@@ -513,6 +519,9 @@ function zoomBanco() {
 
         // Atualiza o botão de upload (caso esteja em CNAB)
         controlarBotaoUpload();
+        if (($("#wkNumState_hidden").val() || "").toString() === "40" && typeof iniciarPainelVan40 === "function") {
+            iniciarPainelVan40();
+        }
     }
     zoom.Abrir();
 }
@@ -1591,6 +1600,9 @@ function zoomEmpresaERP() {
         $("#erp_id_lan, #erp_historico, #erp_valor, #erp_data_cred, #erp_data_emissao").val("");
 
         validarDivergencias(); //
+        if (($("#wkNumState_hidden").val() || "").toString() === "40" && typeof iniciarPainelVan40 === "function") {
+            iniciarPainelVan40();
+        }
     };
     zoom.Abrir(); //
 }
@@ -1876,7 +1888,56 @@ function anexarArquivoGuia(input) {
 var beforeSendValidate = function (numState, nextState) {
     console.log(">>> Gerando Resumo Estático para Congelamento...");
     gerarResumoEstatico();
+    if (parseInt(numState, 10) === 12 && parseInt(nextState, 10) === 40 && typeof limparCamposTemporariosEnvioFinanceiro === "function") {
+        limparCamposTemporariosEnvioFinanceiro();
+    }
+    if (parseInt(numState, 10) === 40 && typeof MonitoramentoVAN !== "undefined" && typeof MonitoramentoVAN.limparEstadoServidor === "function") {
+        MonitoramentoVAN.limparEstadoServidor();
+    }
     return true;
+}
+
+function limparCamposTemporariosEnvioFinanceiro() {
+    var camposTexto = [
+        "fileNameVan",
+        "fileNameRetorno",
+        "txt_aprovacao_40",
+        "txt_parecer_aprovacao_40"
+    ];
+
+    camposTexto.forEach(function (id) {
+        $("#" + id).val("");
+    });
+
+    $("#status_retorno_van").val("pendente");
+    $("#origem_aprovacao_40").val("");
+
+    $("input[name='flag_status_retorno']").prop("checked", false).prop("disabled", false);
+    $("input[name='flag_status_geral']").prop("checked", false).prop("disabled", false);
+
+    $("#lbl_van_empresa, #lbl_van_cnpj, #lbl_van_dados_bancarios, #lbl_van_convenio, #lbl_van_data, #lbl_van_valor").text("");
+    $("#lbl_ret_empresa, #lbl_ret_cnpj, #lbl_ret_dados_bancarios, #lbl_ret_data, #lbl_ret_valor, #lbl_ret_arquivo").text("");
+    $("#tabela_enviar_40_visual").empty();
+
+    $("#resumo_van_extraido, #resumo_retorno_extraido, #painel_multipag_inline, #painel_lista_enviar_40").hide();
+    $("#painel_multipag_inline").empty();
+    $("#bloco_parecer_aprovacao_40").hide();
+    $("#txt_parecer_aprovacao_40").prop("required", false);
+
+    $("#btn_download_retorno").hide();
+    $("#btn_enviar_fileserver")
+        .prop("disabled", false)
+        .removeClass("btn-default")
+        .addClass("btn-success")
+        .html('<i class="flaticon flaticon-send"></i> Enviar para File Server');
+
+    if (typeof conteudoArquivoParaEnvio !== "undefined") {
+        conteudoArquivoParaEnvio = "";
+    }
+
+    if (typeof MonitoramentoVAN !== "undefined" && typeof MonitoramentoVAN.limparEstadoServidor === "function") {
+        MonitoramentoVAN.limparEstadoServidor();
+    }
 }
 
 // =================================================================================
@@ -2074,18 +2135,42 @@ var MonitoramentoVAN = (function () {
         DatasetFactory.getDataset("DS_ESTADO_VAN", null, [c1, c2, c3, c4], null, {});
     };
 
+    var limparEstadoServidor = function () {
+        var numProcesso = pegarNumeroProcesso();
+        if (!numProcesso) return;
+
+        var c1 = DatasetFactory.createConstraint("acao", "LIMPAR", "LIMPAR", ConstraintType.MUST);
+        var c2 = DatasetFactory.createConstraint("numProcesso", numProcesso, numProcesso, ConstraintType.MUST);
+
+        DatasetFactory.getDataset("DS_ESTADO_VAN", null, [c1, c2], null, {});
+
+        if (typeof intervalo !== "undefined" && intervalo) {
+            clearInterval(intervalo);
+            intervalo = null;
+        }
+
+        if (typeof conteudoArquivoParaEnvio !== "undefined") {
+            conteudoArquivoParaEnvio = "";
+        }
+
+        $("#fileNameVan").val("");
+        $("#painel_monitoramento_van").hide().removeClass("panel-success").addClass("panel-info");
+        $("#texto_monitoramento_van").html("Aguardando envio do arquivo...");
+        $("#barra_progresso_van").hide();
+    };
+
     var montarPainelSucesso = function (nomeArquivo) {
         $("#barra_progresso_van").hide();
         $("#painel_monitoramento_van").removeClass("panel-info").addClass("panel-success").show();
 
-        var caminhoVisor = "\\\\sotersrv38\\FileServer\\RH\\03. Dpto Pessoal\\24. BPO - Interativa\\Enviados\\";
+        var caminhoVisor = "\\\\sotersrv38\\FileServer\\RH\\03. Dpto Pessoal\\00- ARQUIVOS DE PAGAMENTO FINANCEIRO\\02 - BRAD_Retorno_Automatico\\Enviados\\";
         var htmlVisual = '<div class="text-left" style="margin-top: 10px; padding: 0 20px;">';
         htmlVisual += '  <p class="text-muted" style="font-size: 13px; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;">';
         htmlVisual += '    <i class="flaticon flaticon-folder-open icon-sm" style="color: #f39c12;"></i> <b>Destino Atual:</b> ' + caminhoVisor;
         htmlVisual += '  </p>';
         htmlVisual += '  <ul class="list-group" style="max-width: 600px; margin: 0 auto;">';
         htmlVisual += '    <li class="list-group-item text-muted" style="opacity: 0.5; background: #fdfdfd; border-style: dashed;"><i class="flaticon flaticon-document icon-sm"></i> <i>...outros_arquivos_anteriores.txt</i></li>';
-        htmlVisual += '    <li class="list-group-item list-group-item-success" style="font-size: 16px; border-left: 5px solid #4cae4c; padding: 15px;"><i class="flaticon flaticon-check-circle icon-md"></i> <b>' + nomeArquivo + '</b><span class="badge pull-right" style="background-color: #4cae4c; margin-top: 2px;">Na Pasta</span></li>';
+        htmlVisual += '    <li class="list-group-item" style="font-size: 16px; border-left: 5px solid #f0ad4e; padding: 15px; background-color:#fff3cd; color:#856404;"><i class="flaticon flaticon-check-circle icon-md" style="color:#f0ad4e;"></i> <span style="background:#fff8db; color:#856404; font-weight:bold; padding:2px 6px; border-radius:3px;">' + nomeArquivo + '</span><span class="badge pull-right" style="background-color: #f0ad4e; margin-top: 2px;">Na Pasta</span></li>';
         htmlVisual += '    <li class="list-group-item text-muted" style="opacity: 0.5; background: #fdfdfd; border-style: dashed;"><i class="flaticon flaticon-document icon-sm"></i> <i>...aguardando_novos_arquivos.txt</i></li>';
         htmlVisual += '  </ul>';
         htmlVisual += '  <div class="text-center" style="margin-top: 20px;"><span class="text-success" style="font-size: 16px;"><b><i class="flaticon flaticon-done-all"></i> Sucesso! O robô capturou e moveu o arquivo para a pasta Enviados.</b></span></div>';
@@ -2097,7 +2182,7 @@ var MonitoramentoVAN = (function () {
     var iniciar = function (nomeArquivo) {
         salvarEstadoServidor(nomeArquivo, "PENDENTE");
         $("#painel_monitoramento_van").show();
-        $("#texto_monitoramento_van").html("Aguardando o robô da VAN capturar o arquivo: <b>" + nomeArquivo + "</b>");
+        $("#texto_monitoramento_van").html("Aguardando o robô da VAN capturar o arquivo: <span style=\"background:#fff3cd; color:#856404; font-weight:bold; padding:2px 6px; border-radius:3px;\">" + nomeArquivo + "</span>");
         $("#barra_progresso_van").show();
         setTimeout(function () { verificar(nomeArquivo); }, 3000);
         intervalo = setInterval(function () { verificar(nomeArquivo); }, 10000);
@@ -2168,6 +2253,16 @@ var MonitoramentoVAN = (function () {
     };
 
     var restaurarEstadoSeExistir = function () {
+        var atividadeAtual = ($("#wkNumState_hidden").val() || "").toString();
+        if (atividadeAtual !== "40") {
+            $("#painel_envio_van_40, #painel_retorno_van_40, #painel_status_geral_40, #painel_aprovacao_40, #painel_lista_enviar_40, #painel_monitoramento_van").hide();
+            $("#painel_monitoramento_van").hide().removeClass("panel-success").addClass("panel-info");
+            $("#texto_monitoramento_van").html("Aguardando envio do arquivo...");
+            $("#barra_progresso_van").hide();
+            $("#fileNameVan").val("");
+            return;
+        }
+
         var numProcesso = pegarNumeroProcesso();
         if (!numProcesso) return;
 
@@ -2208,7 +2303,8 @@ var MonitoramentoVAN = (function () {
 
     return {
         iniciar: iniciar,
-        restaurarEstadoSeExistir: restaurarEstadoSeExistir
+        restaurarEstadoSeExistir: restaurarEstadoSeExistir,
+        limparEstadoServidor: limparEstadoServidor
     };
 })();
 
@@ -2429,6 +2525,10 @@ function iniciarPainelVan40() {
         return;
     }
 
+    $("#painel_retorno_van_40").show();
+    $("#bloco_retorno_h23").show();
+    $("#bloco_retorno_manual").hide();
+
     var empresaDesc = $("#txt_empresa").val() || "";
     var bancoDesc = $("#txt_banco").val() || "";
 
@@ -2439,16 +2539,10 @@ function iniciarPainelVan40() {
         // Envio
         $("#bloco_van_automatica").show();
         $("#bloco_van_manual").hide();
-        // Retorno
-        $("#bloco_retorno_h23").show();
-        $("#bloco_retorno_manual").hide();
     } else {
         // Envio
         $("#bloco_van_automatica").hide();
         $("#bloco_van_manual").show();
-        // Retorno
-        $("#bloco_retorno_h23").hide();
-        $("#bloco_retorno_manual").show();
     }
 }
 
@@ -2468,26 +2562,69 @@ function visualizarArquivosPastaEnviar40() {
     DatasetFactory.getDataset("DS_LISTAR_RETORNOS", null, [c1], null, {
         success: function (ds) {
             loading.hide();
-            var $tbody = $("#tabela_enviar_40_visual");
-            $tbody.empty();
+            var arquivoAtual = $("#fileNameVan").val() || "";
+            var html = '<div class="alert alert-warning" style="margin-bottom: 15px;">';
+            html += '<strong>Atenção:</strong> esta visualização não altera a pasta <b>Enviar</b>. Para remover um arquivo de verdade, apague-o manualmente na pasta física.';
+            html += '</div>';
+            html += '<div class="table-responsive"><table class="table table-striped table-hover table-condensed">';
+            html += '<thead><tr><th>Arquivo</th><th>Tamanho</th><th>Data</th></tr></thead><tbody>';
 
             if (!ds || !ds.values || ds.values.length === 0) {
-                $tbody.append('<tr><td colspan="3" class="text-muted">Nenhum arquivo encontrado.</td></tr>');
+                html += '<tr><td colspan="3" class="text-muted">Nenhum arquivo encontrado.</td></tr>';
             } else {
                 ds.values.forEach(function (arq) {
                     var nome = arq["Nome_do_Arquivo"] || "";
                     var tamanho = arq["Tamanho"] || "-";
                     var data = arq["Data_Modificacao"] || "-";
-                    $tbody.append('<tr><td><i class="flaticon flaticon-document icon-sm"></i> <b>' + nome + '</b></td><td>' + tamanho + '</td><td>' + data + '</td></tr>');
+                    var isAtual = arquivoAtual && nome === arquivoAtual;
+                    html += '<tr' + (isAtual ? ' style="background-color:#fff3cd;"' : '') + '>';
+                    html += '<td><i class="flaticon flaticon-document icon-sm"></i> <b>' + nome + '</b>';
+                    if (isAtual) {
+                        html += ' <span class="label label-warning" style="margin-left:8px;">Arquivo selecionado</span>';
+                    }
+                    html += '</td><td>' + tamanho + '</td><td>' + data + '</td></tr>';
                 });
             }
 
-            $("#painel_lista_enviar_40").slideDown();
+            html += '</tbody></table></div>';
+
+            FLUIGC.modal({
+                title: 'Arquivos da Pasta Enviar',
+                content: html,
+                id: 'modal-arquivos-enviar-40',
+                size: 'large',
+                actions: [{
+                    label: 'Fechar',
+                    autoClose: true
+                }]
+            });
         },
         error: function () {
             loading.hide();
             FLUIGC.toast({ title: 'Erro', message: 'Falha ao listar pasta Enviar.', type: 'danger' });
         }
+    });
+}
+
+function limparArquivoVanTela() {
+    $("#fileNameVan").val("").css({ backgroundColor: "", color: "", fontWeight: "" });
+    $("#resumo_van_extraido").hide();
+    $("#painel_monitoramento_van").hide().removeClass("panel-success").addClass("panel-info");
+    $("#texto_monitoramento_van").html("Aguardando envio do arquivo...");
+    $("#barra_progresso_van").hide();
+    $("#btn_enviar_fileserver").prop("disabled", true);
+    $("#btn_limpar_arquivo_van").prop("disabled", true);
+    $("#fileUploadVan").val("");
+    if (typeof conteudoArquivoParaEnvio !== "undefined") {
+        conteudoArquivoParaEnvio = "";
+    }
+    if (typeof MonitoramentoVAN !== "undefined" && typeof MonitoramentoVAN.limparEstadoServidor === "function") {
+        MonitoramentoVAN.limparEstadoServidor();
+    }
+    FLUIGC.toast({
+        title: 'Arquivo removido da tela',
+        message: 'Para excluir de fato, apague manualmente o arquivo na pasta Enviar.',
+        type: 'warning'
     });
 }
 
@@ -2689,7 +2826,11 @@ function processarTextoVanAuditoria(texto, nomeArquivo) {
         $("#lbl_van_valor").text("R$ " + dados.valor);
 
         // A MÁGICA: Atualiza o campo com o nome do arquivo para liberar a validação do processo
-        $("#fileNameVan").val(nomeArquivo);
+        $("#fileNameVan")
+            .val(nomeArquivo)
+            .css({ backgroundColor: "#fff3cd", color: "#856404", fontWeight: "bold" });
+        $("#btn_enviar_fileserver").prop("disabled", false);
+        $("#btn_limpar_arquivo_van").prop("disabled", false);
 
         // Exibe o resumo
         $("#resumo_van_extraido").slideDown();
@@ -2706,7 +2847,9 @@ function processarTextoVanAuditoria(texto, nomeArquivo) {
         
         // Esconde o painel e limpa o nome do arquivo para bloquear o botão de envio
         $("#resumo_van_extraido").hide();
-        $("#fileNameVan").val(""); 
+        $("#fileNameVan").val("").css({ backgroundColor: "", color: "", fontWeight: "" });
+        $("#btn_enviar_fileserver").prop("disabled", true);
+        $("#btn_limpar_arquivo_van").prop("disabled", true);
         conteudoArquivoParaEnvio = "";
     }
 }
@@ -2803,39 +2946,50 @@ function sincronizarStatusGeralComRetornoBanco() {
 }
 
 function sincronizarPainelAprovacao40() {
-    var statusRetorno = $("input[name='flag_status_retorno']:checked").val();
-    var $radiosAprovacao = $("input[name='flag_aprovacao_40_view']");
-    var $hiddenAprovacao = $("#flag_aprovacao_40");
-    var $statusRetornoVan = $("#status_retorno_van");
-    var $parecerBloco = $("#bloco_parecer_aprovacao_40");
-    var $parecerCampo = $("#txt_parecer_aprovacao_40");
-
-    if (!$radiosAprovacao.length || !$hiddenAprovacao.length) {
+    var atividadeAtual = ($("#wkNumState_hidden").val() || "").toString();
+    if (atividadeAtual !== "40") {
         return;
     }
 
-    $radiosAprovacao.prop("checked", false).prop("disabled", true);
-    $hiddenAprovacao.val("");
+    var statusRetorno = $("input[name='flag_status_retorno']:checked").val();
+    var $aprovacaoCampo = $("#txt_aprovacao_40");
+    var $statusRetornoVan = $("#status_retorno_van");
+    var $origemAprovacao40 = $("#origem_aprovacao_40");
+    var $parecerBloco = $("#bloco_parecer_aprovacao_40");
+    var $parecerCampo = $("#txt_parecer_aprovacao_40");
+
+    if (!$aprovacaoCampo.length) {
+        return;
+    }
+
+    $aprovacaoCampo.val("");
     if ($statusRetornoVan.length) {
         $statusRetornoVan.val("pendente");
+    }
+    if ($origemAprovacao40.length) {
+        $origemAprovacao40.val("");
     }
     $parecerBloco.hide();
     $parecerCampo.prop("required", false);
 
     if (statusRetorno === "aceito") {
-        $("input[name='flag_aprovacao_40_view'][value='aprovado']").prop("checked", true);
-        $hiddenAprovacao.val("aprovado");
+        $aprovacaoCampo.val("aprovado");
         if ($statusRetornoVan.length) {
             $statusRetornoVan.val("aprovado");
+        }
+        if ($origemAprovacao40.length) {
+            $origemAprovacao40.val("40");
         }
         return;
     }
 
     if (statusRetorno === "rejeitado") {
-        $("input[name='flag_aprovacao_40_view'][value='rejeitado']").prop("checked", true);
-        $hiddenAprovacao.val("rejeitado");
+        $aprovacaoCampo.val("rejeitado");
         if ($statusRetornoVan.length) {
             $statusRetornoVan.val("rejeitado");
+        }
+        if ($origemAprovacao40.length) {
+            $origemAprovacao40.val("40");
         }
         $parecerBloco.show();
         $parecerCampo.prop("required", true);
@@ -2843,13 +2997,16 @@ function sincronizarPainelAprovacao40() {
 }
 
 $(document).ready(function () {
-    $("input[name='flag_status_retorno']").off("change.syncStatusGeral40").on("change.syncStatusGeral40", function () {
+    var atividadeAtual = ($("#wkNumState_hidden").val() || "").toString();
+    if (atividadeAtual === "40") {
+        $("input[name='flag_status_retorno']").off("change.syncStatusGeral40").on("change.syncStatusGeral40", function () {
+            sincronizarStatusGeralComRetornoBanco();
+            sincronizarPainelAprovacao40();
+        });
+
         sincronizarStatusGeralComRetornoBanco();
         sincronizarPainelAprovacao40();
-    });
-
-    sincronizarStatusGeralComRetornoBanco();
-    sincronizarPainelAprovacao40();
+    }
 
     $("#btn_visualizar_pasta_enviar_40").off("click").on("click", function () {
         visualizarArquivosPastaEnviar40();
