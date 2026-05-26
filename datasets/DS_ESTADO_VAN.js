@@ -47,7 +47,14 @@ function createDataset(fields, constraints, sortFields) {
             stream.write(conteudo.getBytes("UTF-8"));
             stream.close();
             dataset.addRow([nomeArquivo, status]);
-        } 
+        }
+        // LIMPAR O ESTADO
+        else if (acao == "LIMPAR") {
+            if (file.exists()) {
+                file["delete"]();
+            }
+            dataset.addRow(["LIMPO", "LIMPO"]);
+        }
         // LER O ESTADO
         else if (acao == "LER") {
             if (file.exists()) {
