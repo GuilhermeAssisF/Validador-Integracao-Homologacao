@@ -1,4 +1,4 @@
-function Zoom() {
+﻿function Zoom() {
   var Element = this;
   this.Id = "Temp";
   this.Titulo = "";
@@ -197,3 +197,5 @@ function setSelectedZoomItem(selectedItem) {
         $("[name='item_cod_filial___" + index + "']").val(selectedItem["CODFILIAL"]);
     }
 }
+
+

@@ -1,4 +1,4 @@
-var Compartilhados = (function() {
+﻿var Compartilhados = (function() {
 	
 	/*
 	// FUNÇÕES COMPARTILHADAS PARA USO DE DATASETS
@@ -232,7 +232,7 @@ var Compartilhados = (function() {
 
     var carregaManual = function(codigoProcesso, targetElement) {
         // Nota: URL original mantida, verifique se está correta
-        var urlPrefix = "http://http://192.168.7.104:8080/portal/p/1/ecmnavigation?app_ecm_navigation_doc=";
+        var urlPrefix = "http://192.168.7.104:8080/portal/p/1/ecmnavigation?app_ecm_navigation_doc=";
         var numeroManual = getCodigoManual(codigoProcesso);
         $("#" + targetElement).attr('href', urlPrefix + numeroManual);
     };
@@ -475,3 +475,6 @@ var Compartilhados = (function() {
 	};
 
 })();
+
+
+

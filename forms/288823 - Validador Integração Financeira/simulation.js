@@ -1,4 +1,4 @@
-// simulation.js
+﻿// simulation.js
 
 $(document).ready(function() {
     console.log(">>> Módulo de Simulação Carregado <<<");
@@ -132,3 +132,4 @@ function carregarCenarioParcial() {
     $("#erp_conta").val("9999-9"); 
     $("#erp_valor").val("5.000,00");
 }
+

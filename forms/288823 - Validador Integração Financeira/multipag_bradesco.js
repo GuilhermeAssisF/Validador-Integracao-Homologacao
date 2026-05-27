@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // VALIDADOR BANCÁRIO - RELATÓRIO MULTIPAG (STANDALONE)
 // ============================================================
 window.MultipagBradesco = (function () {
@@ -157,3 +157,5 @@ window.MultipagBradesco = (function () {
         renderizarNaTela: renderizarNaTela
     };
 })();
+
+

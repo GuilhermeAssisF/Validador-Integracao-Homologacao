@@ -1,4 +1,4 @@
-function validateForm(form) {
+﻿function validateForm(form) {
     // Garante que o número da atividade seja inteiro
     var atividade = parseInt(getValue("WKNumState"));
     var proximaAtividade = getValue("WKNextState");
@@ -118,3 +118,6 @@ function validateForm(form) {
         }
     }
 }
+
+
+

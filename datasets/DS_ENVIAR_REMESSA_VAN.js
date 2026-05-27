@@ -1,4 +1,4 @@
-function createDataset(fields, constraints, sortFields) {
+﻿function createDataset(fields, constraints, sortFields) {
     var dataset = DatasetBuilder.newDataset();
     dataset.addColumn("STATUS");
     dataset.addColumn("MENSAGEM");
@@ -33,7 +33,7 @@ function createDataset(fields, constraints, sortFields) {
         var bytes = Base64.decodeBase64(javaString.getBytes("UTF-8"));
 
         // =========================================================
-        // CAMINHO DO FILESERVER (Pasta Enviar - BPO Interativa)
+        // CAMINHO DO FILESERVER (Pasta Enviar - Produção)
         // =========================================================
         // O Javascript exige 4 barras para representar 2 na rede (\\\\ = \\)
         var pathEnvio = "\\\\\\\\sotersrv38\\\\FileServer\\\\RH\\\\03. Dpto Pessoal\\\\00- ARQUIVOS DE PAGAMENTO FINANCEIRO\\\\02 - BRAD_Retorno_Automatico\\\\Enviar\\\\"; 
@@ -56,3 +56,4 @@ function createDataset(fields, constraints, sortFields) {
 
     return dataset;
 }
+

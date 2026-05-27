@@ -8,19 +8,8 @@ function createDataset(fields, constraints, sortFields) {
         importClass(Packages.java.io.File);
         importClass(Packages.java.text.SimpleDateFormat);
 
-        var pastaSolicitada = "Retorno";
-        if (constraints != null) {
-            for (var c = 0; c < constraints.length; c++) {
-                if (constraints[c].fieldName == "pasta" && constraints[c].initialValue != null && constraints[c].initialValue != "") {
-                    pastaSolicitada = String(constraints[c].initialValue);
-                }
-            }
-        }
-
-        // Mantem Retorno como padrao para nao alterar o comportamento atual.
-        var pathBase = "\\\\\\\\sotersrv38\\\\FileServer\\\\RH\\\\03. Dpto Pessoal\\\\00- ARQUIVOS DE PAGAMENTO FINANCEIRO\\\\02 - BRAD_Retorno_Automatico\\\\";
-        var nomePasta = (pastaSolicitada.toLowerCase() == "enviar") ? "Enviar" : "Retornos\\Pagamento";
-        var pasta = new File(pathBase + nomePasta + "\\\\");
+        var caminhoPasta = "\\\\\\\\sotersrv38\\\\FileServer\\\\RH\\\\03. Dpto Pessoal\\\\00- ARQUIVOS DE PAGAMENTO FINANCEIRO\\\\02 - BRAD_Retorno_Automatico\\\\Enviados\\\\";
+        var pasta = new File(caminhoPasta);
 
         if (pasta.exists() && pasta.isDirectory()) {
             var arquivos = pasta.listFiles();
@@ -39,13 +28,13 @@ function createDataset(fields, constraints, sortFields) {
                     }
                 }
             } else {
-                dataset.addRow(["Aviso", "A pasta " + nomePasta + " esta vazia", "-"]);
+                dataset.addRow(["Aviso", "A pasta Enviados esta vazia", "-"]);
             }
         } else {
-            dataset.addRow(["Erro", "Diretorio " + nomePasta + " nao encontrado ou sem permissao", "-"]);
+            dataset.addRow(["Erro", "Diretorio Enviados nao encontrado ou sem permissao", "-"]);
         }
     } catch (e) {
-        log.error("### ERRO DS_LISTAR_RETORNOS: " + e);
+        log.error("### ERRO DS_LISTAR_ENVIADOS_VAN: " + e);
         dataset.addRow(["Erro_Exception", e.toString(), "-"]);
     }
 
