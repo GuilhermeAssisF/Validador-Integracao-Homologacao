@@ -11,12 +11,17 @@ function createDataset(fields, constraints, sortFields) {
         importClass(Packages.java.io.FileInputStream);
 
         var nomeArquivo = "";
-        var pastaInicial = "Enviar"; 
+        var pastaInicial = "Enviar";
+        var semFallback = false;
 
         if (constraints != null) {
             for (var i = 0; i < constraints.length; i++) {
                 if (constraints[i].fieldName == "nomeArquivo") nomeArquivo = constraints[i].initialValue;
                 if (constraints[i].fieldName == "pasta") pastaInicial = constraints[i].initialValue;
+                if (constraints[i].fieldName == "semFallback") {
+                    var flag = String(constraints[i].initialValue).toLowerCase();
+                    semFallback = (flag == "sim" || flag == "true");
+                }
             }
         }
 
@@ -26,26 +31,29 @@ function createDataset(fields, constraints, sortFields) {
         }
 
         // Caminho da pasta solicitada (Enviar ou Enviados)
-        var pathBase = "\\\\\\\\sotersrv38\\\\FileServer\\\\RH\\\\03. Dpto Pessoal\\\\24. BPO - Interativa\\\\" + pastaInicial + "\\\\";
+        var pathBase = "\\\\sotersrv38\\FileServer\\RH\\03. Dpto Pessoal\\24. BPO - Interativa\\" + pastaInicial + "\\";
         var arquivo = new File(pathBase + nomeArquivo);
 
-        // Se não encontrar na primeira pasta, tenta na outra (fallback de segurança)
-        if (!arquivo.exists()) {
+        // Se não encontrar na primeira pasta, tenta na outra apenas quando o fallback estiver habilitado.
+        if (!arquivo.exists() && !semFallback) {
             var outraPasta = (pastaInicial == "Enviar") ? "Enviados" : "Enviar";
-            pathBase = "\\\\\\\\sotersrv38\\\\FileServer\\\\RH\\\\03. Dpto Pessoal\\\\24. BPO - Interativa\\\\" + outraPasta + "\\\\";
+            pathBase = "\\\\sotersrv38\\FileServer\\RH\\03. Dpto Pessoal\\24. BPO - Interativa\\" + outraPasta + "\\";
             arquivo = new File(pathBase + nomeArquivo);
-            
+
             if (!arquivo.exists()) {
                 dataset.addRow([0, "", "ERRO: Arquivo não encontrado na rede"]);
                 return dataset;
             }
+        } else if (!arquivo.exists()) {
+            dataset.addRow([0, "", "ERRO: Arquivo não encontrado na rede"]);
+            return dataset;
         }
 
         // Lê o ficheiro e devolve linha a linha
         var reader = new BufferedReader(new InputStreamReader(new FileInputStream(arquivo), "ISO-8859-1"));
         var linha;
         var numero = 0;
-        
+
         while ((linha = reader.readLine()) != null) {
             numero++;
             dataset.addRow([numero, linha + "", "OK"]);
