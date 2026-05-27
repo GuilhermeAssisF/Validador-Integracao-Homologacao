@@ -1,4 +1,4 @@
-function createDataset(fields, constraints, sortFields) {
+﻿function createDataset(fields, constraints, sortFields) {
     var dataset = DatasetBuilder.newDataset();
     dataset.addColumn("STATUS");
 
@@ -23,7 +23,7 @@ function createDataset(fields, constraints, sortFields) {
         // =========================================================
         // CAMINHO DA PASTA 'ENVIADOS'
         // =========================================================
-        var pathEnviados = "\\\\\\\\sotersrv38\\\\FileServer\\\\RH\\\\03. Dpto Pessoal\\\\00- ARQUIVOS DE PAGAMENTO FINANCEIRO\\\\02 - BRAD_Retorno_Automatico\\\\Enviados\\\\";
+        var pathEnviados = "\\\\\\\\sotersrv38\\\\FileServer\\\\RH\\\\03. Dpto Pessoal\\\\24. BPO - Interativa\\\\Enviados\\\\";
         var arquivo = new File(pathEnviados + nomeArquivo);
 
         // Verifica se o arquivo já existe lá

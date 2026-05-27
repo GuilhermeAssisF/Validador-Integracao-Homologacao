@@ -1,10 +1,12 @@
-function displayFields(form, customHTML) {
+﻿function displayFields(form, customHTML) {
     var atividade = getValue("WKNumState");
     var usuario = getValue("WKUser");
     var numeroSolicitacao = getValue("WKNumProces");
     var mode = form.getFormMode();
+    var visualizacaoFinal = (mode == "VIEW");
 
     customHTML.append("<script>function getWKNumState(){ return " + atividade + "; }</script>");
+    customHTML.append("<script>window.__VALIDADOR_FINANCEIRO_FINALIZADO = " + (visualizacaoFinal ? "true" : "false") + "; window.__VALIDADOR_FINANCEIRO_MODO = '" + mode + "';</script>");
 
     form.setShowDisabledFields(true);
     form.setHidePrintLink(true);
@@ -167,12 +169,12 @@ function displayFields(form, customHTML) {
     if (atividade == 40) {
         // Como o script e o document.ready já foram abertos na linha 35/36, injetamos direto!
         customHTML.append("     $('#painel_leitura, #painel_erp, #painel_rateio, #painel_resumo, #painel_multi_lancamentos, #painel_consolidado_guia, #container_resumo_guia, #row_cnab_inputs, #painel_resumo_14, #painel_retornos_fileserver').hide(); \n");
-        customHTML.append("     $('#painel_parecer_rejeicao_40').hide(); \n");
+        customHTML.append("     var parecerRejeicao40 = $.trim($('#txt_parecer_aprovacao_40').val() || ''); if($('#origem_aprovacao_40').val() == '40' && $('#status_retorno_van').val() == 'rejeitado' && parecerRejeicao40 !== '') { $('#texto_parecer_rejeicao_40').text(parecerRejeicao40); $('#painel_parecer_rejeicao_40').show(); } else { $('#painel_parecer_rejeicao_40').hide(); } \n");
         customHTML.append("     var respostaParecer40 = $.trim($('#txt_resposta_parecer_40').val() || ''); if(respostaParecer40 !== '') { $('#texto_resposta_parecer_12_40').text(respostaParecer40); $('#painel_resposta_parecer_12_40').show(); } else { $('#painel_resposta_parecer_12_40').hide(); }\n");
         customHTML.append("     $('#painel_info').find('input:not([type=\"hidden\"]), textarea').prop('readonly', true); \n");
         customHTML.append("     $('#painel_info').find('select, button').css('pointer-events', 'none').attr('tabindex', '-1'); \n");
         // Mostra os nossos novos painéis
-        customHTML.append("     $('#painel_envio_van_40, #painel_retorno_van_40, #painel_status_geral_40, #painel_aprovacao_40').show(); \n");
+        customHTML.append("     $('#painel_envio_van_40, #painel_monitoramento_van, #painel_retorno_van_40, #painel_status_geral_40, #painel_aprovacao_40').show(); \n");
         customHTML.append("     setTimeout(function(){ if(typeof iniciarPainelVan40 === 'function'){ iniciarPainelVan40(); } }, 500); \n");
     }
 
@@ -186,3 +188,6 @@ function displayFields(form, customHTML) {
 
 
 }
+
+
+

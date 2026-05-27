@@ -1,4 +1,4 @@
-var BradescoStrategy = {
+﻿var BradescoStrategy = {
     name: "CNAB 240 - Bradesco (SOTER)",
 
     processar: function (conteudoArquivo) {
@@ -67,3 +67,5 @@ var BradescoStrategy = {
         };
     }
 };
+
+

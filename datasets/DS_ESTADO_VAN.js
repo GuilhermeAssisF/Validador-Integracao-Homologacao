@@ -1,4 +1,4 @@
-function createDataset(fields, constraints, sortFields) {
+﻿function createDataset(fields, constraints, sortFields) {
     var dataset = DatasetBuilder.newDataset();
     dataset.addColumn("ARQUIVO");
     dataset.addColumn("STATUS");
@@ -80,3 +80,5 @@ function createDataset(fields, constraints, sortFields) {
 
     return dataset;
 }
+
+

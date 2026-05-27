@@ -1,9 +1,45 @@
 ﻿// =================================================================================
-// INÃCIO DO SCRIPT PRINCIPAL
+// INÍCIO DO SCRIPT PRINCIPAL
 // =================================================================================
+
+function isVisualizacaoFinalValidadorFinanceiro() {
+    return String(window.__VALIDADOR_FINANCEIRO_FINALIZADO || "").toLowerCase() === "true";
+}
+
+function aplicarModoVisualizacaoFinalVan() {
+    var atividadeAtual = ($("#wkNumState_hidden").val() || "").toString();
+    if (!isVisualizacaoFinalValidadorFinanceiro() || atividadeAtual !== "40") {
+        return;
+    }
+
+    if (typeof MonitoramentoVAN !== "undefined" && typeof MonitoramentoVAN.pararMonitoramentoSilenciosoControle === "function") {
+        MonitoramentoVAN.pararMonitoramentoSilenciosoControle();
+    }
+
+    if (typeof intervalo !== "undefined" && intervalo) {
+        clearInterval(intervalo);
+        intervalo = null;
+    }
+
+    $("#painel_envio_van_40, #painel_monitoramento_van, #painel_retorno_van_40, #painel_status_geral_40, #painel_aprovacao_40, #painel_resposta_parecer_12_40, #painel_parecer_rejeicao_40").show();
+    $("#painel_envio_van_40, #painel_monitoramento_van, #painel_retorno_van_40, #painel_status_geral_40, #painel_aprovacao_40").css("pointer-events", "auto");
+
+    $("#fileUploadVan, #fileUploadRetorno").hide();
+    $("#btn_enviar_fileserver, #btn_limpar_arquivo_van, #btn_visualizar_pasta_enviar_40, #btn_refresh_envio_van_40, #btn_refresh_monitoramento_van_40, #btn_visualizar_pasta_enviados_40, #btn_refresh_retorno_van_40, #btn_download_retorno, #btn_validador_multipag").hide().prop("disabled", true);
+    $("#painel_envio_van_40 .input-group-btn button, #painel_retorno_van_40 button, #painel_monitoramento_van button").hide().prop("disabled", true);
+
+    $("#painel_envio_van_40 input, #painel_envio_van_40 textarea, #painel_retorno_van_40 input, #painel_retorno_van_40 textarea, #painel_monitoramento_van input, #painel_monitoramento_van textarea, #painel_status_geral_40 input, #painel_aprovacao_40 input, #painel_aprovacao_40 textarea").prop("readonly", true);
+    $("#painel_status_geral_40 input[type='radio'], #painel_retorno_van_40 input[type='radio'], #painel_retorno_van_40 input[type='checkbox']").prop("disabled", true);
+    $("#txt_aprovacao_40, #txt_parecer_aprovacao_40, #fileNameVan, #fileNameRetorno").prop("readonly", true);
+
+    if (typeof iniciarPainelVan40 === "function") {
+        iniciarPainelVan40();
+    }
+}
+
 $(document).ready(function () {
 
-    // 1. DETECÃ‡ÃƒO DE CONTEXTO: ESTAMOS NA ATIVIDADE DE ENVIO (12)?
+    // 1. DETECÇÃO DE CONTEXTO: ESTAMOS NA ATIVIDADE DE ENVIO (12)?
     var isAtividadeEnvio = $("#painel_email_rh").is(":visible");
 
     if (isAtividadeEnvio) {
@@ -16,107 +52,113 @@ $(document).ready(function () {
 
         $("#btn_copiar_anexo").show();
 
-        // B. GERAÃ‡ÃƒO AUTOMÃTICA DE E-MAIL
+        // B. GERAÇÃO AUTOMÁTICA DE E-MAIL
         setTimeout(function () {
             gerarTextoEmail();
         }, 500);
 
     } else {
         // =========================================================================
-        // COMPORTAMENTO PADRÃƒO (INÃCIO, CORREÃ‡ÃƒO, ANÃLISE)
+        // COMPORTAMENTO PADRÃO (INÍCIO, CORREÇÃO, ANÁLISE)
         // =========================================================================
 
-        // 2. MONITORAMENTO DE TIPO DE DOCUMENTO
-        $("#tipo_documento").change(function () {
-            ajustarInterfacePorTipo($(this).val());
-            controlarBotaoUpload();
-            limparCamposFinanceiros();
-        });
+        var atividadeAtual = ($("#wkNumState_hidden").val() || "").toString();
 
-        // Executa ajuste inicial
-        ajustarInterfacePorTipo($("#tipo_documento").val());
-        controlarBotaoUpload();
-
-        $("#btn_upload_cnab").click(function () {
-            if ($("#tipo_documento").val() == "cnab" && !$("#cod_banco").val()) {
-                FLUIGC.toast({ title: 'AtenÃ§Ã£o', message: 'Selecione o Banco antes de anexar o arquivo.', type: 'warning' });
-                return;
-            }
-            $("#fileUpload").click();
-        });
-
-        // 3. RESTAURAÃ‡ÃƒO DE CORES/VALIDAÃ‡ÃƒO
-        if ($("#erp_id_lan").val() && $("#erp_historico").val()) {
-            console.log("Dados encontrados. Reaplicando validaÃ§Ã£o visual...");
-            validarDivergencias();
-        }
-
-        // 4. EVENTOS DE GUIA
-        $("#guia_valor_total, #guia_data_venc").on("blur change", function () {
-            atualizarResumoGuia();
-        });
-
-        // 5. EVENTOS GERAIS
-        $("#txt_justificativa").on("blur", function () {
-            gerarTextoEmail();
-        });
-
-        // 6. MONITORAMENTO DO ID LAN
-        $("#erp_id_lan").off("blur").on("blur", function () {
-            var idDigitado = $(this).val();
-            var coligada = $("#cod_empresa").val();
-
-            if (idDigitado && idDigitado.trim() !== "") {
-                if (coligada) {
-                    verificarDisponibilidadeID(coligada, idDigitado);
-                } else {
-                    FLUIGC.toast({ title: 'AtenÃ§Ã£o', message: 'Selecione a empresa antes de digitar o ID LAN.', type: 'warning' });
-                    $(this).val("");
-                }
-            } else {
+        if (isVisualizacaoFinalValidadorFinanceiro() && atividadeAtual === "40") {
+            aplicarModoVisualizacaoFinalVan();
+        } else {
+            // 2. MONITORAMENTO DE TIPO DE DOCUMENTO
+            $("#tipo_documento").change(function () {
+                ajustarInterfacePorTipo($(this).val());
+                controlarBotaoUpload();
                 limparCamposFinanceiros();
-            }
-        });
+            });
 
-        // 7. CARGA DE CARD GUIA
-        if ($("input[name^='card_id_lan___']").length > 0) {
-            atualizarResumoGuia();
+            // Executa ajuste inicial
+            ajustarInterfacePorTipo($("#tipo_documento").val());
+            controlarBotaoUpload();
+
+            $("#btn_upload_cnab").click(function () {
+                if ($("#tipo_documento").val() == "cnab" && !$("#cod_banco").val()) {
+                    FLUIGC.toast({ title: 'Atenção', message: 'Selecione o Banco antes de anexar o arquivo.', type: 'warning' });
+                    return;
+                }
+                $("#fileUpload").click();
+            });
+
+            // 3. RESTAURAÇÃO DE CORES/VALIDAÇÃO
+            if ($("#erp_id_lan").val() && $("#erp_historico").val()) {
+                console.log("Dados encontrados. Reaplicando validação visual...");
+                validarDivergencias();
+            }
+
+            // 4. EVENTOS DE GUIA
+            $("#guia_valor_total, #guia_data_venc").on("blur change", function () {
+                atualizarResumoGuia();
+            });
+
+            // 5. EVENTOS GERAIS
+            $("#txt_justificativa").on("blur", function () {
+                gerarTextoEmail();
+            });
+
+            // 6. MONITORAMENTO DO ID LAN
+            $("#erp_id_lan").off("blur").on("blur", function () {
+                var idDigitado = $(this).val();
+                var coligada = $("#cod_empresa").val();
+
+                if (idDigitado && idDigitado.trim() !== "") {
+                    if (coligada) {
+                        verificarDisponibilidadeID(coligada, idDigitado);
+                    } else {
+                        FLUIGC.toast({ title: 'Atenção', message: 'Selecione a empresa antes de digitar o ID LAN.', type: 'warning' });
+                        $(this).val("");
+                    }
+                } else {
+                    limparCamposFinanceiros();
+                }
+            });
+
+            // 7. CARGA DE CARD GUIA
+            if ($("input[name^='card_id_lan___']").length > 0) {
+                atualizarResumoGuia();
+            }
         }
     }
 
     // =========================================================================
-    // LÃ“GICA DO PAINEL DE RESUMO ESTÃTICO (CONGELADO)
+    // LÓGICA DO PAINEL DE RESUMO ESTÁTICO (CONGELADO)
     // =========================================================================
 
     // Identifica atividade atual (campo hidden criado no HTML e populado pelo displayFields)
     var atividade = $("#wkNumState_hidden").val() || 0;
 
-    // Verifica se jÃ¡ temos um resumo salvo
+    // Verifica se já temos um resumo salvo
     var resumoSalvo = $("#html_resumo_congelado").val();
 
     // EXIBE O RESUMO APENAS SE: 
-    // - NÃ£o for InÃ­cio (0) nem CorreÃ§Ã£o (4)
-    // - NÃ£o for Envio Financeiro (12)
-    // - NÃ£o for Validar DivergÃªncias (14)
-    // - Tiver conteÃºdo salvo
-    // (Basicamente: sÃ³ exibe em Modo de Consulta HistÃ³rica ou Processo Finalizado)
+    // - Não for INÍCIO (0) nem Correção (4)
+    // - Não for Envio Financeiro (12)
+    // - Não for Validar Divergências (14)
+    // - Tiver conteúdo salvo
+    // (Basicamente: só exibe em Modo de Consulta Histórica ou Processo Finalizado)
 
     if (atividade != 0 && atividade != 4 && atividade != 12 && atividade != 14 && atividade != 40 && resumoSalvo && resumoSalvo.trim() !== "") {
 
         console.log(">>> MODO CONSULTA: Exibindo Resumo Congelado <<<");
 
-        // 1. Exibe o painel estÃ¡tico
+        // 1. Exibe o painel estático
         $("#painel_resumo_14").show();
         $("#conteudo_resumo_estatico").html(resumoSalvo);
 
         // POSICIONAMENTO: Move o painel de resumo para o topo (acima do painel de email se existir)
         $("#painel_resumo_14").insertBefore("#painel_email_rh");
 
-        // 2. Oculta TODOS os painÃ©is de formulÃ¡rio originais para limpar a visÃ£o
+        // 2. Oculta TODOS os painéis de formulário originais para limpar a visão
         $("#painel_info, #painel_leitura, #painel_erp, #painel_rateio, #painel_resumo").hide();
         $("#painel_multi_lancamentos, #painel_consolidado_guia, #container_resumo_guia").hide();
         $("#campos_originais_cnab, #row_cnab_inputs, #row_guia_header").hide();
-        $("#painel_email_rh").hide(); // Oculta tambÃ©m o painel de email na consulta histÃ³rica se desejar
+        $("#painel_email_rh").hide(); // Oculta também o painel de email na consulta histórica se desejar
 
     } else {
         // Durante o fluxo normal (0, 4, 12, 14), o resumo fica oculto
@@ -137,13 +179,13 @@ function getUserCode() {
     try { return window.parent.WCMAPI.userCode; } catch (e) { return ""; }
 }
 
-// Remove caracteres especiais para comparaÃ§Ã£o (pontos, traÃ§os, barras)
+// Remove caracteres especiais para comparação (pontos, traços, barras)
 function limparCaracteres(valor) {
     if (!valor) return "";
     return valor.replace(/[\.\-\/]/g, "").trim();
 }
 
-// Extrai apenas o NOME se o campo estiver no formato "CÃ“DIGO - NOME"
+// Extrai apenas o NOME se o campo estiver no formato "CÓDIGO - NOME"
 function extrairNome(valor) {
     if (!valor) return "";
     if (valor.indexOf(" - ") > -1) {
@@ -152,7 +194,7 @@ function extrairNome(valor) {
     return valor.trim();
 }
 
-// FunÃ§Ã£o para converter "2008-07-01T00:00:00" para "01/07/2008"
+// Função para converter "2008-07-01T00:00:00" para "01/07/2008"
 function formatarDataISO(dataISO) {
     if (!dataISO) return "";
 
@@ -165,36 +207,36 @@ function formatarDataISO(dataISO) {
         return partes[2] + "/" + partes[1] + "/" + partes[0];
     }
 
-    return dataISO; // Retorna original se nÃ£o estiver no padrÃ£o esperado
+    return dataISO; // Retorna original se não estiver no padrão esperado
 }
 
-// FunÃ§Ã£o para converter "1813.4000" para "1.813,40"
+// Função para converter "1813.4000" para "1.813,40"
 function formatarValorMonetario(valor) {
     if (!valor) return "0,00";
 
-    // Garante que Ã© um nÃºmero (limpa caracteres estranhos se houver)
+    // Garante que ? um número (limpa caracteres estranhos se houver)
     var numero = parseFloat(valor);
 
-    // Se nÃ£o for nÃºmero vÃ¡lido, retorna zerado
+    // Se não for número válido, retorna zerado
     if (isNaN(numero)) return "0,00";
 
     // 1. Fixa em 2 casas decimais (Ex: 1813.4 -> "1813.40")
-    // 2. Troca ponto por vÃ­rgula (Ex: "1813.40" -> "1813,40")
+    // 2. Troca ponto por vírgula (Ex: "1813.40" -> "1813,40")
     // 3. Adiciona ponto de milhar usando Regex (Ex: "1813,40" -> "1.813,40")
     return numero.toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
 }
 
 // =================================================================================
-// 1. LÃ“GICA DE VALIDAÃ‡ÃƒO (Nova FunÃ§Ã£o)
+// 1. LÓGICA DE VALIDAÇÃO (Nova Função)
 // =================================================================================
 
 function validarDivergencias() {
-    console.log("Executando validaÃ§Ã£o cruzada (POR CÃ“DIGO DO BANCO)...");
+    console.log("Executando validação cruzada (POR CÓDIGO DO BANCO)...");
 
-    // Helper simples para limpar qualquer coisa que nÃ£o seja nÃºmero (ex: "341 - Itau" vira "341")
+    // Helper simples para limpar qualquer coisa que não seja número (ex: "341 - Itau" vira "341")
     function apenasNumeros(str) {
         if (!str) return "";
-        // Pega apenas a parte numÃ©rica ou o primeiro bloco antes de um traÃ§o
+        // Pega apenas a parte numérica ou o primeiro bloco antes de um traço
         // Se vier "341", retorna "341". Se vier "341 - Itau", retorna "341".
         var partes = str.toString().split("-");
         return partes[0].replace(/[^0-9]/g, "");
@@ -202,16 +244,16 @@ function validarDivergencias() {
 
     // --- 1. CAPTURA DOS VALORES ---
 
-    // Painel SolicitaÃ§Ã£o
+    // Painel Solicitação
     var reqEmpresa = extrairNome($("#txt_empresa").val());
     var reqCnpj = limparCaracteres($("#txt_cnpj").val());
-    // MUDANÃ‡A: Pegamos o CODIGO escondido (campo hidden do zoom)
+    // MUDANÇA: Pegamos o CODIGO escondido (campo hidden do zoom)
     var reqBancoCod = apenasNumeros($("#cod_banco").val());
 
     // Painel Arquivo
     var arqEmpresa = extrairNome($("#arq_empresa").val());
     var arqCnpj = limparCaracteres($("#arq_cnpj").val());
-    // MUDANÃ‡A: Pegamos o CODIGO salvo no atributo data-codigo
+    // MUDANÇA: Pegamos o CODIGO salvo no atributo data-codigo
     var arqBancoCod = apenasNumeros($("#arq_banco").val());
 
     var arqValor = $("#arq_valor").val();
@@ -220,13 +262,13 @@ function validarDivergencias() {
     // Painel ERP
     var erpEmpresa = extrairNome($("#erp_empresa").val());
     var erpCnpj = limparCaracteres($("#erp_cnpj").val());
-    // MUDANÃ‡A: Pegamos o valor direto do campo ERP (que vocÃª disse ser 341)
+    // MUDANÇA: Pegamos o valor direto do campo ERP (que você disse ser 341)
     var erpBancoCod = apenasNumeros($("#erp_banco").val());
 
     var erpValor = $("#erp_valor").val();
     var erpData = $("#erp_data_cred").val();
 
-    // --- 2. REGRAS DE COMPARAÃ‡ÃƒO ---
+    // --- 2. REGRAS DE COMPARAÇÃO ---
 
     // A. EMPRESA
     var statusEmpresa = "PENDENTE";
@@ -238,10 +280,10 @@ function validarDivergencias() {
 
         if (nomeOk) {
             statusEmpresa = "OK";
-            msgEmpresa = "RazÃ£o Social confere.";
+            msgEmpresa = "Razão Social confere.";
             corEmpresa = "green";
         } else {
-            statusEmpresa = "ATENÃ‡ÃƒO";
+            statusEmpresa = "ATENÇÃO";
             msgEmpresa = "Nomes divergentes (verifique visualmente).";
             corEmpresa = "#d8b100";
         }
@@ -256,44 +298,44 @@ function validarDivergencias() {
         var cnpjOk = (reqCnpj === arqCnpj && arqCnpj === erpCnpj);
         if (cnpjOk) {
             statusCnpj = "OK";
-            msgCnpj = "CNPJ confere nos 3 painÃ©is.";
+            msgCnpj = "CNPJ confere nos 3 painéis.";
             corCnpj = "green";
         } else {
             statusCnpj = "ERRO";
-            msgCnpj = "DivergÃªncia de CNPJ.";
+            msgCnpj = "Divergência de CNPJ.";
             corCnpj = "red";
         }
     }
 
-    // C. BANCO (VALIDAÃ‡ÃƒO POR CÃ“DIGO)
+    // C. BANCO (VALIDAÇÃO POR CÓDIGO)
     var statusBanco = "PENDENTE";
     var msgBanco = "";
     var corBanco = "black";
 
-    // Verifica se temos os 3 cÃ³digos
+    // Verifica se temos os 3 códigos
     if (reqBancoCod && arqBancoCod && erpBancoCod) {
-        // Compara estritamente os nÃºmeros (ex: "341" == "341")
+        // Compara estritamente os números (ex: "341" == "341")
         if (reqBancoCod === arqBancoCod && arqBancoCod === erpBancoCod) {
             statusBanco = "OK";
-            msgBanco = "CÃ³d. Banco (" + reqBancoCod + ") confere nos 3 painÃ©is.";
+            msgBanco = "Cód. Banco (" + reqBancoCod + ") confere nos 3 painéis.";
             corBanco = "green";
         } else {
-            statusBanco = "ATENÃ‡ÃƒO";
-            msgBanco = "DivergÃªncia: Solicit(" + reqBancoCod + ") x Arq(" + arqBancoCod + ") x ERP(" + erpBancoCod + ")";
+            statusBanco = "ATENÇÃO";
+            msgBanco = "Divergência: Solicit(" + reqBancoCod + ") x Arq(" + arqBancoCod + ") x ERP(" + erpBancoCod + ")";
             corBanco = "#d8b100";
         }
     }
 
     else if (reqBancoCod && arqBancoCod) {
         if (reqBancoCod === arqBancoCod) {
-            // AJUSTE SOLICITADO: Se baterem, mas faltar ERP, avisa que estÃ¡ pendente/faltando campo
+            // AJUSTE SOLICITADO: Se baterem, mas faltar ERP, avisa que está pendente/faltando campo
             statusBanco = "PENDENTE";
             msgBanco = "Falta o Banco no Quadro Contas a Pagar (Verifique o ERP).";
-            corBanco = "#d8b100"; // Cor de atenÃ§Ã£o (Laranja/Amarelo escuro)
+            corBanco = "#d8b100"; // Cor de atenção (Laranja/Amarelo escuro)
         } else {
-            // Se jÃ¡ nÃ£o baterem entre si, mantÃ©m o aviso de divergÃªncia
-            statusBanco = "ATENÃ‡ÃƒO";
-            msgBanco = "DivergÃªncia: Solicit(" + reqBancoCod + ") x Arq(" + arqBancoCod + ")";
+            // Se já não baterem entre si, mantém o aviso de divergência
+            statusBanco = "ATENÇÃO";
+            msgBanco = "Divergência: Solicit(" + reqBancoCod + ") x Arq(" + arqBancoCod + ")";
             corBanco = "#d8b100";
         }
     }
@@ -310,7 +352,7 @@ function validarDivergencias() {
         statusData = (arqData === erpData) ? "OK" : "ERRO";
     }
 
-    // --- 3. ATUALIZAÃ‡ÃƒO VISUAL NA TABELA ---
+    // --- 3. ATUALIZAÇÃO VISUAL NA TABELA ---
 
     atualizarLinhaValidacao("chk_empresa", "msg_empresa", statusEmpresa, msgEmpresa, corEmpresa);
     atualizarLinhaValidacao("chk_cnpj", "msg_cnpj", statusCnpj, msgCnpj, corCnpj);
@@ -322,15 +364,15 @@ function validarDivergencias() {
     atualizarLinhaValidacao("chk_valor", "msg_valor", statusValor, (statusValor == "ERRO" ? "Valores Diferentes" : "Valores Iguais"), (statusValor == "OK" ? "green" : statusValor == "ERRO" ? "red" : "black"));
     atualizarLinhaValidacao("chk_data_cred", "msg_data_cred", statusData, (statusData == "ERRO" ? "Datas Diferentes" : "Datas Iguais"), (statusData == "OK" ? "green" : statusData == "ERRO" ? "red" : "black"));
 
-    // LÃ³gica Final de DivergÃªncia
-    // Aceita "OK" OU "ATENÃ‡ÃƒO" na empresa como vÃ¡lido para nÃ£o bloquear o fluxo
+    // L?gica Final de Divergência
+    // Aceita "OK" OU "ATENÇÃO" na empresa como válido para não bloquear o fluxo
     if (statusBanco === "OK" && statusValor === "OK" && statusData === "OK") {
 
         if (statusEmpresa === "OK") {
             // Tudo 100%
             $("#cpTemDivergencia").val("nao");
-        } else if (statusEmpresa === "ATENÃ‡ÃƒO") {
-            // DivergÃªncia leve (Nome Empresa) -> Grava "aviso" para o painel
+        } else if (statusEmpresa === "ATENÇÃO") {
+            // Divergência leve (Nome Empresa) -> Grava "aviso" para o painel
             $("#cpTemDivergencia").val("aviso");
         } else {
             // Erro na empresa (Pendente ou Erro Grave)
@@ -352,9 +394,9 @@ function atualizarLinhaValidacao(idInput, idSpan, valor, mensagem, cor) {
 }
 
 // =================================================================================
-// 2. LÃ“GICA DE LEITURA DO ARQUIVO (CNAB / TXT)
+// 2. LÓGICA DE LEITURA DO ARQUIVO (CNAB / TXT)
 // =================================================================================
-// FunÃ§Ã£o Ajustada para o CNAB (LÃª para validar E pede para anexar)
+// Função Ajustada para o CNAB (L? para validar E pede para anexar)
 // function lerArquivo(inputElement) {
 //     if (inputElement.files && inputElement.files[0]) {
 //         var file = inputElement.files[0];
@@ -362,22 +404,22 @@ function atualizarLinhaValidacao(idInput, idSpan, valor, mensagem, cor) {
 
 //         var reader = new FileReader();
 //         reader.onload = function (e) {
-//             // 1. Processa e Valida (Chama a funÃ§Ã£o acima com o alerta do banco)
+//             // 1. Processa e Valida (Chama a função acima com o alerta do banco)
 //             processarConteudo(e.target.result);
 
-//             // 2. Solicita Anexo Manual (LÃ³gica Original "Voltou")
+//             // 2. Solicita Anexo Manual (L?gica Original "Voltou")
 //             FLUIGC.message.alert({
-//                 message: '<b>Leitura concluÃ­da!</b><br><br>' +
-//                     'Para salvar o arquivo no processo, a janela de anexos serÃ¡ aberta.<br>' +
+//                 message: '<b>Leitura concluída!</b><br><br>' +
+//                     'Para salvar o arquivo no processo, a janela de anexos ser? aberta.<br>' +
 //                     'Por favor, <b>anexe o arquivo novamente</b> para confirmar.',
-//                 title: 'AÃ§Ã£o NecessÃ¡ria',
+//                 title: 'Ação Necessária',
 //                 label: 'Anexar Agora'
 //             }, function (el, ev) {
-//                 // Abre a interface nativa de anexos/cÃ¢mera
+//                 // Abre a interface nativa de anexos/câmera
 //                 if (window.JSInterface && JSInterface.showCamera) {
 //                     JSInterface.showCamera(file.name);
 //                 } else {
-//                     // Fallback se nÃ£o estiver no mobile/app
+//                     // Fallback se não estiver no mobile/app
 //                     FLUIGC.toast({ title: 'Anexo', message: 'Utilize o clipe de papel para anexar o arquivo.', type: 'info' });
 //                 }
 //             });
@@ -388,10 +430,10 @@ function atualizarLinhaValidacao(idInput, idSpan, valor, mensagem, cor) {
 
 function processarConteudo(texto) {
     try {
-        if (typeof BradescoStrategy === 'undefined') throw new Error("EstratÃ©gia JS nÃ£o encontrada.");
+        if (typeof BradescoStrategy === 'undefined') throw new Error("Estratégia JS não encontrada.");
         var dados = BradescoStrategy.processar(texto);
 
-        // 1. ValidaÃ§Ã£o de Alerta (DivergÃªncia Zoom x Arquivo)
+        // 1. Validação de Alerta (Divergência Zoom x Arquivo)
         var codBancoZoom = $("#cod_banco").val();
         var codBancoArquivo = dados.codigoBanco;
 
@@ -400,11 +442,11 @@ function processarConteudo(texto) {
 
         if (bZoom && bArq && bZoom !== bArq) {
             FLUIGC.message.alert({
-                message: '<b>ATENÃ‡ÃƒO: DIVERGÃŠNCIA DE BANCO!</b><br><br>' +
-                    'No formulÃ¡rio: <b>' + bZoom + '</b><br>' +
+                message: '<b>ATENÇÃO: DIVERGÊNCIA DE BANCO!</b><br><br>' +
+                    'No formulário: <b>' + bZoom + '</b><br>' +
                     'No arquivo: <b>' + bArq + '</b><br><br>' +
-                    'Verifique se o arquivo anexo estÃ¡ correto.',
-                title: 'Aviso de SeguranÃ§a',
+                    'Verifique se o arquivo anexo está correto.',
+                title: 'Aviso de Segurança',
                 label: 'Estou Ciente'
             });
         }
@@ -413,7 +455,7 @@ function processarConteudo(texto) {
         $("#arq_empresa").val(dados.empresa);
         $("#arq_cnpj").val(dados.cnpj);
 
-        // --- CORREÃ‡ÃƒO AQUI: Salvamos "CÃ“DIGO - NOME" no value para persistir no banco ---
+        // --- CORREÇÃO AQUI: Salvamos "CÓDIGO - NOME" no value para persistir no banco ---
         // Antes era: $("#arq_banco").val(dados.banco);
         // Agora fica:
         var bancoCompleto = dados.codigoBanco + " - " + dados.banco;
@@ -426,7 +468,7 @@ function processarConteudo(texto) {
         $("#arq_data_cred").val(dados.dataCredito);
         $("#arq_valor").val(dados.valor);
 
-        FLUIGC.toast({ title: 'Sucesso', message: 'Leitura concluÃ­da!', type: 'success' });
+        FLUIGC.toast({ title: 'Sucesso', message: 'Leitura concluída!', type: 'success' });
 
         validarDivergencias();
         if (($("#wkNumState_hidden").val() || "").toString() === "40" && typeof iniciarPainelVan40 === "function") {
@@ -439,7 +481,7 @@ function processarConteudo(texto) {
 }
 
 // =================================================================================
-// 3. FUNÃ‡Ã•ES DE ZOOM
+// 3. FUNÇÕES DE ZOOM
 // =================================================================================
 
 function zoomEmpresa() {
@@ -454,25 +496,25 @@ function zoomEmpresa() {
 
     // 1. ADICIONADO O CAMPO "FILIAL" NA LISTA DE COLUNAS
     zoom.Colunas = [
-        { title: "CÃ³d. Coligada", name: "CODCOLIGADA" },
+        { title: "Cód. Coligada", name: "CODCOLIGADA" },
         { title: "Empresa", name: "EMPRESA" },
-        { title: "CÃ³d. Filial", name: "CODFILIAL" },
+        { title: "Cód. Filial", name: "CODFILIAL" },
         { title: "Nome Filial", name: "FILIAL" }, // Nova coluna vinda do seu Dataset
         { title: "CNPJ", name: "CNPJ" }
     ];
 
     zoom.Retorno = function (linha) {
-        // Como adicionamos uma coluna no meio (Ã­ndice 3), o Ã­ndice do CNPJ mudou para 4
+        // Como adicionamos uma coluna no meio (índice 3), o índice do CNPJ mudou para 4
         var codColigada = linha[0];
         var nomeEmpresa = linha[1];
         var codFilial = linha[2];
         var nomeFilial = linha[3]; // Novo valor recuperado
-        var cnpj = linha[4];       // Ajustado Ã­ndice (era 3)
+        var cnpj = linha[4];       // Ajustado índice (era 3)
 
         $("#txt_empresa").val(codColigada + " - " + nomeEmpresa);
         $("#cod_empresa").val(codColigada);
 
-        // 2. ALTERADA A CONCATENAÃ‡ÃƒO AQUI
+        // 2. ALTERADA A CONCATENAÇÃO AQUI
         // Antes: $("#txt_filial").val(codFilial + " - " + nomeEmpresa);
         $("#txt_filial").val(codFilial + " - " + nomeFilial);
 
@@ -485,7 +527,7 @@ function zoomEmpresa() {
 
         FLUIGC.toast({ title: 'Empresa Alterada', message: 'Selecione um novo ID LAN.', type: 'info' });
 
-        // CHAMA VALIDAÃ‡ÃƒO
+        // CHAMA VALIDAÇÃO
         validarDivergencias();
         if (($("#wkNumState_hidden").val() || "").toString() === "40" && typeof iniciarPainelVan40 === "function") {
             iniciarPainelVan40();
@@ -503,7 +545,7 @@ function zoomBanco() {
     zoom.FieldsName = [];
     zoom.Linhas = [];
     zoom.Colunas = [
-        { title: "CÃ³d. Banco", name: "NUMBANCO" },
+        { title: "Cód. Banco", name: "NUMBANCO" },
         { title: "Nome", name: "NOME" },
         { title: "Reduzido", name: "NOMEREDUZIDO", display: false }
     ];
@@ -514,10 +556,10 @@ function zoomBanco() {
         $("#txt_banco").val(codBanco + " - " + nomeBanco);
         $("#cod_banco").val(codBanco);
 
-        // CHAMA VALIDAÃ‡ÃƒO
+        // CHAMA VALIDAÇÃO
         validarDivergencias();
 
-        // Atualiza o botÃ£o de upload (caso esteja em CNAB)
+        // Atualiza o botão de upload (caso esteja em CNAB)
         controlarBotaoUpload();
         if (($("#wkNumState_hidden").val() || "").toString() === "40" && typeof iniciarPainelVan40 === "function") {
             iniciarPainelVan40();
@@ -526,7 +568,7 @@ function zoomBanco() {
     zoom.Abrir();
 }
 
-// FunÃ§Ã£o para controlar o que aparece ou some na tela
+// Função para controlar o que aparece ou some na tela
 function ajustarInterfacePorTipo(tipo) {
     if (tipo === "cnab") {
         console.log("Modo CNAB selecionado");
@@ -562,17 +604,17 @@ function ajustarInterfacePorTipo(tipo) {
 }
 
 function buscarDadosFinanceiros(idLan) {
-    // CORREÃ‡ÃƒO: Usa os IDs globais (#cod_empresa) que valem tanto para CNAB quanto ERP
+    // CORREÇÃO: Usa os IDs globais (#cod_empresa) que valem tanto para CNAB quanto ERP
     var codColigada = $("#cod_empresa").val();
     var codFilial = $("#cod_filial").val();
 
     if (!codColigada || !codFilial) {
-        // Tenta buscar pelo nome antigo caso tenha algum legado, senÃ£o avisa
+        // Tenta buscar pelo nome antigo caso tenha algum legado, senão avisa
         codColigada = $("#erp_cod_coligada").val();
         codFilial = $("#erp_cod_filial").val();
 
         if (!codColigada || !codFilial) {
-            FLUIGC.toast({ title: 'AtenÃ§Ã£o', message: 'Selecione a Empresa (no cabeÃ§alho ou quadro ERP) antes de digitar o ID LAN.', type: 'warning' });
+            FLUIGC.toast({ title: 'Atenção', message: 'Selecione a Empresa (no cabeçalho ou quadro ERP) antes de digitar o ID LAN.', type: 'warning' });
             $("#erp_id_lan").val("");
             return;
         }
@@ -600,7 +642,7 @@ function buscarDadosFinanceiros(idLan) {
             $("#erp_data_cred").val(formatarDataISO(linha["DTVENCIMENTO"]));
             $("#erp_data_emissao").val(formatarDataISO(linha["DTEMISSAO"]));
 
-            // Preenche dados da empresa para confirmaÃ§Ã£o visual
+            // Preenche dados da empresa para confirmação visual
             $("#erp_empresa").val(linha["EMPRESA"]);
             $("#erp_cnpj").val(linha["CNPJ"]);
 
@@ -609,12 +651,12 @@ function buscarDadosFinanceiros(idLan) {
 
             buscarRateio(codColigada, idLan);
 
-            FLUIGC.toast({ title: 'Sucesso', message: 'TÃ­tulo encontrado.', type: 'success' });
+            FLUIGC.toast({ title: 'Sucesso', message: 'T?tulo encontrado.', type: 'success' });
 
             validarDivergencias();
 
         } else {
-            FLUIGC.toast({ title: 'NÃ£o Encontrado', message: 'ID LAN nÃ£o encontrado nesta Empresa/Filial.', type: 'warning' });
+            FLUIGC.toast({ title: 'Não Encontrado', message: 'ID LAN não encontrado nesta Empresa/Filial.', type: 'warning' });
             limparCamposFinanceiros();
             $("#erp_id_lan").val(idLan);
         }
@@ -629,14 +671,14 @@ function buscarDadosFinanceiros(idLan) {
 }
 
 function limparCamposFinanceiros() {
-    // Limpa apenas os campos do quadro ERP (exceto o ID LAN que o usuÃ¡rio digitou)
+    // Limpa apenas os campos do quadro ERP (exceto o ID LAN que o usuário digitou)
     var campos = ["erp_historico", "erp_valor", "erp_data_cred", "erp_empresa", "erp_cnpj", "erp_data_emissao"];
     campos.forEach(function (id) { $("#" + id).val(""); });
 
-    // LIMPA A TABELA DE RATEIO TAMBÃ‰M
+    // LIMPA A TABELA DE RATEIO TAMBÉM
     limparTabelaRateio();
 
-    // Reseta as validaÃ§Ãµes visuais para "Pendente"
+    // Reseta as validações visuais para "Pendente"
     validarDivergencias();
 }
 
@@ -662,7 +704,7 @@ function buscarRateio(codColigada, idLan) {
                 var item = dataset.values[i];
                 var index = wdkAddChild('tbl_rateio');
 
-                // Realiza a concatenaÃ§Ã£o: CÃ³digo - Nome
+                // Realiza a concatenação: Código - Nome
                 var ccExibicao = item["CODCCUSTO"] + " - " + item["NOMECCUSTO"];
 
                 // Preenche os campos da tabela
@@ -708,11 +750,11 @@ function calcularTotalRateio() {
     var totalValorFormatado = totalValor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     $("#rateio_total_calculado").val(totalValorFormatado);
 
-    // ValidaÃ§Ã£o Visual (Apenas Texto Colorido)
+    // Validação Visual (Apenas Texto Colorido)
     var valorErp = $("#erp_valor").val();
 
-    // Compara removendo formataÃ§Ã£o para garantir igualdade numÃ©rica
-    // Mas para visualizaÃ§Ã£o rÃ¡pida, string exacta funciona bem se ambos estiverem formatados iguais
+    // Compara removendo formatação para garantir igualdade numérica
+    // Mas para visualização rápida, string exacta funciona bem se ambos estiverem formatados iguais
     if (valorErp && valorErp === totalValorFormatado) {
         // Verde e sem bordas/fundo, apenas destaque no texto
         $("#rateio_total_calculado").css("color", "#28a745");
@@ -733,19 +775,19 @@ function calcularTotalRateio() {
 }
 
 function limparTabelaRateio() {
-    // Seleciona todos os inputs que possuem o sufixo de Ã­ndice (___)
+    // Seleciona todos os inputs que possuem o sufixo de índice (___)
     // e remove a linha (TR) inteira correspondente.
     $("input[name^='rateio_cc___']").each(function () {
-        fnWdkRemoveChild(this); // FunÃ§Ã£o nativa do Fluig para remover filho corretamente
+        fnWdkRemoveChild(this); // Função nativa do Fluig para remover filho corretamente
     });
 }
 
 // =================================================================================
-// 6. GERAÃ‡ÃƒO DE TEXTO PARA E-MAIL (ATIVIDADE RH)
+// 6. GERAÇÃO DE TEXTO PARA E-MAIL (ATIVIDADE RH)
 // =================================================================================
 
 // =================================================================================
-// 6. GERAÃ‡ÃƒO DE TEXTO PARA E-MAIL (ATIVIDADE RH) - VERSÃƒO CUSTOMIZADA
+// 6. GERAÇÃO DE TEXTO PARA E-MAIL (ATIVIDADE RH) - VERSÃO CUSTOMIZADA
 // =================================================================================
 
 function gerarTextoEmail() {
@@ -759,12 +801,12 @@ function gerarTextoEmail() {
     var valorTotal = "";
     var textoBanco = "";
 
-    // VariÃ¡veis para o loop de itens
+    // Variáveis para o loop de itens
     var listaItens = [];
 
     // --- MODO CNAB ---
     if (tipoDoc == "cnab") {
-        tipoLancamento = $("#cnab_tipo_lancamento").val() || "(Tipo nÃ£o informado)";
+        tipoLancamento = $("#cnab_tipo_lancamento").val() || "(Tipo não informado)";
 
         var empRaw = $("#erp_empresa").val() || $("#txt_empresa").val();
         nomeEmpresa = extrairNome(empRaw);
@@ -776,7 +818,7 @@ function gerarTextoEmail() {
         if (bancoNome && bancoNome.trim() !== "") {
             textoBanco = bancoNome;
         } else {
-            textoBanco = "ERRO: BANCO NÃƒO INFORMADO / EM BRANCO";
+            textoBanco = "ERRO: BANCO NÃO INFORMADO / EM BRANCO";
         }
 
         var filialRaw = $("#txt_filial").val();
@@ -820,7 +862,7 @@ function gerarTextoEmail() {
         } else { dataVenc = dataRaw; }
 
         valorTotal = $("#guia_valor_total").val();
-        textoBanco = "Conforme Guias Anexas / MÃºltiplos";
+        textoBanco = "Conforme Guias Anexas / Múltiplos";
 
         $("input[name^='card_id_lan___']").each(function () {
             var idx = this.name.split("___")[1];
@@ -866,7 +908,7 @@ function gerarTextoEmail() {
     var assunto = "Folha de Pagamento - " + tipoLancamento + " - " + nomeEmpresa + " - Vencimento: " + dataVenc;
 
     // 3. MONTAGEM DO CORPO
-    var corpo = "OlÃ¡,\n\n";
+    var corpo = "Olá,\n\n";
     corpo += "Segue pagamento " + (tipoDoc == "cnab" ? "CNAB" : "Guia") + " - " + tipoLancamento + " validado e integrado com financeiro.\n\n";
 
     corpo += "Empresa: " + nomeEmpresa + "\n";
@@ -875,7 +917,7 @@ function gerarTextoEmail() {
     corpo += "Vencimento: " + dataVenc + "\n";
     corpo += "Valor: R$ " + valorTotal + "\n\n";
 
-    corpo += "Rateio LanÃ§amento Financeiro\n";
+    corpo += "Rateio Lançamento Financeiro\n";
     corpo += "========================================\n";
 
     // Loop dos Itens (ORGANIZADO)
@@ -886,18 +928,18 @@ function gerarTextoEmail() {
         // Linha Principal: IDLAN X: Dados...
         corpo += "IDLAN " + indice + ": " + item.idLan + " - " + item.codFilial + " - " + item.nomeFilial + " - R$ " + item.valor + "\n";
 
-        // Linhas de Rateio (Indentadas com espaÃ§o para hierarquia)
+        // Linhas de Rateio (Indentadas com espaço para hierarquia)
         if (item.rateios && item.rateios.length > 0) {
             for (var j = 0; j < item.rateios.length; j++) {
                 var rat = item.rateios[j];
-                // Adicionei 3 espaÃ§os no inÃ­cio para recuar e ficar visualmente "dentro" do IDLAN
+                // Adicionei 3 espaços no INÍCIO para recuar e ficar visualmente "dentro" do IDLAN
                 corpo += "   Rateio: " + rat.cc + " -- R$ " + rat.valor + "\n";
             }
         } else {
             corpo += "   (Sem rateio detalhado)\n";
         }
 
-        corpo += "\n"; // Linha em branco para separar do prÃ³ximo bloco
+        corpo += "\n"; // Linha em branco para separar do próximo bloco
     }
 
     // 4. PREENCHIMENTO DOS CAMPOS
@@ -910,10 +952,10 @@ function gerarTextoEmail() {
 //     copyText.select();
 //     copyText.setSelectionRange(0, 99999); /* Para mobile */
 //     document.execCommand("copy");
-//     FLUIGC.toast({ title: 'Copiado', message: 'Texto copiado para a Ã¡rea de transferÃªncia.', type: 'info' });
+//     FLUIGC.toast({ title: 'Copiado', message: 'Texto copiado para a área de transferência.', type: 'info' });
 // }
 
-// // FunÃ§Ã£o para copiar o Assunto
+// // Função para copiar o Assunto
 // function copiarAssuntoEmail() {
 //     var copyText = document.getElementById("txt_assunto_email");
 //     copyText.select();
@@ -922,7 +964,7 @@ function gerarTextoEmail() {
 //     FLUIGC.toast({ title: 'Copiado', message: 'Assunto copiado.', type: 'info' });
 // }
 
-// 2. FunÃ§Ã£o para baixar anexo (Task 12)
+// 2. Função para baixar anexo (Task 12)
 // function baixarAnexoValidado() {
 //     var numProcesso = $("#cpNumeroSolicitacao").val();
 
@@ -932,7 +974,7 @@ function gerarTextoEmail() {
 //         : $("#fileNameGuia").val();
 
 //     if (!numProcesso || numProcesso == "0") {
-//         FLUIGC.toast({ title: 'AtenÃ§Ã£o', message: 'SolicitaÃ§Ã£o ainda nÃ£o iniciada.', type: 'warning' });
+//         FLUIGC.toast({ title: 'Atenção', message: 'Solicitação ainda não iniciada.', type: 'warning' });
 //         return;
 //     }
 
@@ -971,13 +1013,13 @@ function gerarTextoEmail() {
 //                         "&WDNrDocto=" + docId +
 //                         "&WDNrVersao=" + version;
 
-//                     // --- TRUQUE PARA FORÃ‡AR O DOWNLOAD ---
-//                     // Cria um elemento <a> temporÃ¡rio
+//                     // --- TRUQUE PARA FORÇAR O DOWNLOAD ---
+//                     // Cria um elemento <a> temporário
 //                     var link = document.createElement('a');
 //                     link.href = urlDownloadDireto;
 
-//                     // O atributo 'download' forÃ§a o navegador a salvar em vez de abrir
-//                     // Usamos o nome que estava salvo no formulÃ¡rio
+//                     // O atributo 'download' for?a o navegador a salvar em vez de abrir
+//                     // Usamos o nome que estava salvo no formulário
 //                     link.download = nomeArquivoEsperado || ("Anexo_Processo_" + numProcesso);
 
 //                     document.body.appendChild(link);
@@ -985,7 +1027,7 @@ function gerarTextoEmail() {
 //                     document.body.removeChild(link); // Limpa
 
 //                 } else {
-//                     FLUIGC.toast({ title: 'Aviso', message: 'Nenhum arquivo vÃ¡lido encontrado.', type: 'warning' });
+//                     FLUIGC.toast({ title: 'Aviso', message: 'Nenhum arquivo válido encontrado.', type: 'warning' });
 //                 }
 //             } else {
 //                 FLUIGC.toast({ title: 'Vazio', message: 'Nenhum anexo encontrado.', type: 'warning' });
@@ -998,34 +1040,34 @@ function gerarTextoEmail() {
 //     });
 // }
 
-// 1. FunÃ§Ã£o para preparar o arquivo no GED (Etapa Inicial)
+// 1. Função para preparar o arquivo no GED (Etapa Inicial)
 function enviarArquivoParaAnexos(input) {
     if (input.files && input.files[0]) {
         var file = input.files[0];
 
         try {
-            // Verifica se a interface de anexos do Fluig estÃ¡ disponÃ­vel (PadrÃ£o Web)
+            // Verifica se a interface de anexos do Fluig está disponível (Padr?o Web)
             if (window.parent && window.parent.WKFViewAttachment) {
 
-                // Adiciona o arquivo diretamente Ã  fila de anexos do processo
+                // Adiciona o arquivo diretamente ? fila de anexos do processo
                 window.parent.WKFViewAttachment.addItems([file]);
 
                 FLUIGC.toast({
                     title: 'Anexado',
-                    message: 'Arquivo vinculado Ã  aba de anexos do processo com sucesso.',
+                    message: 'Arquivo vinculado ? aba de anexos do processo com sucesso.',
                     type: 'success'
                 });
 
-                // Atualiza o texto do e-mail (Atividade 12) se necessÃ¡rio
+                // Atualiza o texto do e-mail (Atividade 12) se necessário
                 if (typeof gerarTextoEmail === 'function') {
                     gerarTextoEmail();
                 }
 
             } else {
-                // Fallback para Mobile ou caso o objeto nÃ£o exista
+                // Fallback para Mobile ou caso o objeto não exista
                 FLUIGC.toast({
-                    title: 'AtenÃ§Ã£o',
-                    message: 'NÃ£o foi possÃ­vel vincular automaticamente. Por favor, clique no clipe de papel (Anexos) e adicione o arquivo manualmente.',
+                    title: 'Atenção',
+                    message: 'Não foi possível vincular automaticamente. Por favor, clique no clipe de papel (Anexos) e adicione o arquivo manualmente.',
                     type: 'warning'
                 });
             }
@@ -1040,32 +1082,32 @@ function enviarArquivoParaAnexos(input) {
     }
 }
 
-// FunÃ§Ã£o para a GUIA (Apenas anexa, nÃ£o precisa ler conteÃºdo)
+// Função para a GUIA (Apenas anexa, não precisa ler conteúdo)
 function anexarArquivoGuiaNativo() {
     try {
-        // O JSInterface Ã© o objeto que comunica o formulÃ¡rio com o container do Fluig
-        // O parÃ¢metro Ã© o nome sugerido para o arquivo
+        // O JSInterface ? o objeto que comunica o formulário com o container do Fluig
+        // O parâmetro ? o nome sugerido para o arquivo
         JSInterface.showCamera("Guia_Pagamento.pdf");
 
-        // Atualiza visualmente para o usuÃ¡rio saber que deve ter anexado
+        // Atualiza visualmente para o usuário saber que deve ter anexado
         $("#fileNameGuia").val("Arquivo anexado via Clipe/Camera");
 
         FLUIGC.toast({
-            title: 'AÃ§Ã£o NecessÃ¡ria',
+            title: 'Ação Necessária',
             message: 'Se a janela de anexos abriu, selecione o arquivo e aguarde o upload.',
             type: 'info'
         });
     } catch (e) {
-        console.error("JSInterface nÃ£o disponÃ­vel: " + e);
+        console.error("JSInterface não disponível: " + e);
         FLUIGC.toast({
-            title: 'AtenÃ§Ã£o',
-            message: 'Utilize a aba de "Anexos" (Ã­cone de clipe) para incluir o arquivo.',
+            title: 'Atenção',
+            message: 'Utilize a aba de "Anexos" (ícone de clipe) para incluir o arquivo.',
             type: 'warning'
         });
     }
 }
 
-// FunÃ§Ã£o Auxiliar para tentar outro endpoint caso o primeiro falhe
+// Função Auxiliar para tentar outro endpoint caso o primeiro falhe
 function tentarUploadSintaxeAlternativa(file) {
     $.ajax({
         url: '/portal/api/rest/wcmservices/rest/content/uploadAttachment/' + file.name,
@@ -1074,21 +1116,21 @@ function tentarUploadSintaxeAlternativa(file) {
         processData: false,
         contentType: "application/octet-stream",
         success: function () {
-            FLUIGC.toast({ title: 'GED', message: 'Ficheiro carregado via redundÃ¢ncia.', type: 'success' });
+            FLUIGC.toast({ title: 'GED', message: 'Ficheiro carregado via redundância.', type: 'success' });
             gerarTextoEmail();
         },
         error: function () {
-            FLUIGC.toast({ title: 'Erro CrÃ­tico', message: 'NÃ£o foi possÃ­vel carregar o anexo. Contacte o suporte.', type: 'danger' });
+            FLUIGC.toast({ title: 'Erro Crítico', message: 'Não foi possível carregar o anexo. Contacte o suporte.', type: 'danger' });
         }
     });
 }
 
-// Esta funÃ§Ã£o Ã© chamada automaticamente pelo Fluig apÃ³s um anexo ser adicionado
+// Esta função ? chamada automaticamente pelo Fluig ap?s um anexo ser adicionado
 // function onFileSelected(file) {
 //     $("#fileNameVisual").val(file.name); //
 
-//     // Como o ficheiro jÃ¡ foi enviado para o servidor, 
-//     // agora podemos lÃª-lo para processar a validaÃ§Ã£o (CNAB)
+//     // Como o ficheiro já foi enviado para o servidor, 
+//     // agora podemos l?-lo para processar a validação (CNAB)
 //     var reader = new FileReader();
 //     reader.onload = function (e) {
 //         processarConteudo(e.target.result); //
@@ -1103,13 +1145,13 @@ function processarEAnexarUnificado(inputElement) {
         var file = inputElement.files[0];
         $("#fileNameVisual").val(file.name);
 
-        // 1. Leitura para validaÃ§Ã£o CNAB (Sua lÃ³gica atual)
+        // 1. Leitura para validação CNAB (Sua l?gica atual)
         var reader = new FileReader();
         reader.onload = function (e) {
             processarConteudo(e.target.result);
 
-            // 2. Disparar o Upload Nativo do Fluig (LÃ³gica Bruno Gasparetto)
-            // Em vez de AJAX, usamos o componente que o Fluig jÃ¡ tem pronto e logado
+            // 2. Disparar o Upload Nativo do Fluig (L?gica Bruno Gasparetto)
+            // Em vez de AJAX, usamos o componente que o Fluig já tem pronto e logado
             var $fileInputClone = parent.$("#ecm-navigation-inputFile-clone");
 
             if ($fileInputClone.length) {
@@ -1117,13 +1159,13 @@ function processarEAnexarUnificado(inputElement) {
                 $fileInputClone.attr({
                     "data-on-camera": "true",
                     "data-file-name-camera": file.name,
-                    "data-inputid": "fileNameVisual", // ID do campo que receberÃ¡ o nome
+                    "data-inputid": "fileNameVisual", // ID do campo que receber? o nome
                     "data-filename": file.name,
                     "multiple": false
                 });
 
-                // Aqui estÃ¡ o segredo: enviamos o arquivo para o componente pai 
-                // e disparamos o evento de adiÃ§Ã£o dele
+                // Aqui está o segredo: enviamos o arquivo para o componente pai 
+                // e disparamos o evento de adição dele
                 var data = { files: [file] };
                 parent.$("#ecm_navigation_fileupload").fileupload('add', data);
 
@@ -1133,7 +1175,7 @@ function processarEAnexarUnificado(inputElement) {
                     type: 'success'
                 });
             } else {
-                console.error("Componente ecm-navigation-inputFile-clone nÃ£o encontrado no parent.");
+                console.error("Componente ecm-navigation-inputFile-clone não encontrado no parent.");
             }
         };
 
@@ -1148,8 +1190,8 @@ function anexarNoGed(input) {
         // Exibe o nome no campo visual
         $("#fileNameVisual").val(file.name);
 
-        // FunÃ§Ã£o nativa do Fluig para anexar arquivos via formulÃ¡rio
-        // Isso coloca o arquivo na lista de anexos que serÃ£o salvos no envio do processo
+        // Função nativa do Fluig para anexar arquivos via formulário
+        // Isso coloca o arquivo na lista de anexos que serão salvos no envio do processo
         parent.WCMAPI.Create({
             url: '/portal/api/rest/wcmservices/rest/content/uploadAttachment',
             contentType: "application/octet-stream",
@@ -1158,7 +1200,7 @@ function anexarNoGed(input) {
             success: function () {
                 FLUIGC.toast({
                     title: 'Sucesso',
-                    message: 'Arquivo preparado para o GED. Ele aparecerÃ¡ nos anexos apÃ³s o envio.',
+                    message: 'Arquivo preparado para o GED. Ele aparecer? nos anexos ap?s o envio.',
                     type: 'success'
                 });
             },
@@ -1170,7 +1212,7 @@ function anexarNoGed(input) {
 }
 
 // =================================================================================
-// VERIFICAÃ‡ÃƒO DE DUPLICIDADE (INTEGRADA COM DATASET CUSTOMIZADO)
+// VERIFICAÇÃO DE DUPLICIDADE (INTEGRADA COM DATASET CUSTOMIZADO)
 // =================================================================================
 
 function verificarDisponibilidadeID(coligada, idLan) {
@@ -1178,8 +1220,8 @@ function verificarDisponibilidadeID(coligada, idLan) {
     var solicitacaoAtual = $("#cpNumeroSolicitacao").val() || "0";
 
     if (!filial) {
-        // Se nÃ£o tiver filial, nÃ£o bloqueia, mas avisa no log
-        console.warn("Filial vazia, pulando verificaÃ§Ã£o.");
+        // Se não tiver filial, não bloqueia, mas avisa no log
+        console.warn("Filial vazia, pulando verificação.");
         buscarDadosFinanceiros(idLan);
         return;
     }
@@ -1212,7 +1254,7 @@ function verificarDisponibilidadeID(coligada, idLan) {
         },
         error: function (jqXHR, textStatus, errorThrown) {
             loading.hide();
-            console.error("Erro verificaÃ§Ã£o duplicidade:", errorThrown);
+            console.error("Erro verificação duplicidade:", errorThrown);
             buscarDadosFinanceiros(idLan);
         }
     });
@@ -1225,10 +1267,10 @@ function avisoDuplicidade(solicitacao, idLan) {
 
     FLUIGC.message.confirm({
         message: '<b>DUPLICIDADE IDENTIFICADA!</b><br><br>' +
-            'O ID LAN <b>' + idLan + '</b> jÃ¡ estÃ¡ em uso na solicitaÃ§Ã£o <b>' + solicitacao + '</b>, que ainda estÃ¡ em andamento.<br><br>' +
-            'NÃ£o Ã© permitido pagar o mesmo tÃ­tulo em dois processos simultÃ¢neos.',
-        title: 'Registro JÃ¡ Existente',
-        labelYes: 'Ver SolicitaÃ§Ã£o Existente',
+            'O ID LAN <b>' + idLan + '</b> já está em uso na solicitação <b>' + solicitacao + '</b>, que ainda está em andamento.<br><br>' +
+            'Não ? permitido pagar o mesmo título em dois processos simultâneos.',
+        title: 'Registro J? Existente',
+        labelYes: 'Ver Solicitação Existente',
         labelNo: 'Cancelar'
     }, function (result) {
         if (result) {
@@ -1269,16 +1311,16 @@ function alternarTipoDocumento() {
         $("#container_resumo_guia").show(); // Exibe Resumo Guia
     }
 
-    // Reseta validaÃ§Ãµes ao trocar
+    // Reseta validações ao trocar
     limparCamposFinanceiros();
 }
 
-// Adiciona um novo card de lanÃ§amento para Guia/Outros
+// Adiciona um novo card de lançamento para Guia/Outros
 function adicionarCardGuia() {
     // 1. Cria o filho (Fluig adiciona ao final)
     var index = wdkAddChild('tbl_lancamentos_guia');
 
-    // 2. Inicializa mÃ¡scaras (se houver campos com mask)
+    // 2. Inicializa máscaras (se houver campos com mask)
     if (window.MaskEvent) MaskEvent.init();
 
     // 3. EMPILHAMENTO INVERSO (LIFO)
@@ -1297,7 +1339,7 @@ function adicionarCardGuia() {
 }
 
 function toggleCard(btn) {
-    // Encontra o corpo do card relativo ao botÃ£o clicado
+    // Encontra o corpo do card relativo ao botão clicado
     var cardBody = $(btn).closest(".panel").find(".panel-body.body-card-collapse");
     var icon = $(btn).find("i");
     var resumo = $(btn).closest(".panel-heading").find(".resumo-card");
@@ -1326,18 +1368,18 @@ function toggleCard(btn) {
     }
 }
 
-// Adiciona uma nova linha na tabela de lanÃ§amentos
+// Adiciona uma nova linha na tabela de lançamentos
 function adicionarNovoLancamento() {
     var index = wdkAddChild('tbl_lancamentos');
     return index;
 }
 
-// Dispara o Zoom de empresa para o card especÃ­fico
+// Dispara o Zoom de empresa para o card específico
 function zoomEmpresaCard(element) {
-    // Pega o Ã­ndice da linha atual (ex: card_empresa___1 -> 1)
+    // Pega o índice da linha atual (ex: card_empresa___1 -> 1)
     var index = element.id ? element.id.split("___")[1] : $(element).closest("tr").find("input")[0].name.split("___")[1];
 
-    // Fallback se o botÃ£o nÃ£o tiver ID mas estiver dentro da estrutura
+    // Fallback se o botão não tiver ID mas estiver dentro da estrutura
     if (!index) {
         var inputName = $(element).closest(".input-group").find("input").attr("name");
         index = inputName.split("___")[1];
@@ -1348,9 +1390,9 @@ function zoomEmpresaCard(element) {
     zoom.Titulo = "Buscar Empresa (Card)";
     zoom.DataSet = "DS_FLUIG_0065"; // Seu dataset de empresas
     zoom.Colunas = [
-        { title: "CÃ³d. Coligada", name: "CODCOLIGADA" },
+        { title: "Cód. Coligada", name: "CODCOLIGADA" },
         { title: "Empresa", name: "EMPRESA" },
-        { title: "CÃ³d. Filial", name: "CODFILIAL" },
+        { title: "Cód. Filial", name: "CODFILIAL" },
         { title: "Nome Filial", name: "FILIAL" },
         { title: "CNPJ", name: "CNPJ" }
     ];
@@ -1373,20 +1415,20 @@ function zoomEmpresaCard(element) {
 // Busca os dados do ERP para o ID LAN do card atual
 function buscarDadosCard(element) {
     var idLan = $(element).val();
-    // Recupera o Ã­ndice pelo nome do campo (Fluig padrÃ£o)
+    // Recupera o índice pelo nome do campo (Fluig padrão)
     var index = element.name.split("___")[1];
 
     // RECUPERA O CONTEXTO DA LINHA (IMPORTANTE)
     var rowContext = $(element).closest("tr");
 
-    // Busca os campos RELATIVOS Ã  linha atual
+    // Busca os campos RELATIVOS ? linha atual
     var coligada = rowContext.find("input[name^='card_cod_coligada']").val();
     var filial = rowContext.find("input[name^='card_cod_filial']").val();
 
     if (!idLan) return;
 
     if (!coligada || !filial) {
-        FLUIGC.toast({ title: 'AtenÃ§Ã£o', message: 'Selecione a empresa do card antes de digitar o ID LAN.', type: 'warning' });
+        FLUIGC.toast({ title: 'Atenção', message: 'Selecione a empresa do card antes de digitar o ID LAN.', type: 'warning' });
         $(element).val("");
         return;
     }
@@ -1413,11 +1455,11 @@ function buscarDadosCard(element) {
             // CHAMADA ATUALIZADA: Passa rowContext
             buscarRateioVisual(coligada, idLan, index, rowContext);
 
-            atualizarResumoGuia(); // Atualiza o resumo geral dos lanÃ§amentos
+            atualizarResumoGuia(); // Atualiza o resumo geral dos lançamentos
 
             FLUIGC.toast({ title: 'Sucesso', message: 'Dados carregados.', type: 'success' });
         } else {
-            FLUIGC.toast({ title: 'Erro', message: 'ID LAN nÃ£o encontrado.', type: 'danger' });
+            FLUIGC.toast({ title: 'Erro', message: 'ID LAN não encontrado.', type: 'danger' });
             $("#card_historico___" + index).val("");
             $("#card_valor___" + index).val("");
             // Limpa tabela visual usando classe
@@ -1435,7 +1477,7 @@ function buscarDadosCard(element) {
     }
 }
 
-// Busca e renderiza o rateio para o card especÃ­fico
+// Busca e renderiza o rateio para o card específico
 function buscarRateioVisual(coligada, idLan, index, rowContext) {
     // Garante que temos o contexto da linha
     if (!rowContext) {
@@ -1478,7 +1520,7 @@ function buscarRateioVisual(coligada, idLan, index, rowContext) {
             listaRateio.push(item);
         }
 
-        // Salva JSON no input hidden (esse tem ID sufixado pelo Fluig, entÃ£o ID funciona)
+        // Salva JSON no input hidden (esse tem ID sufixado pelo Fluig, então ID funciona)
         $("#card_json_rateio___" + index).val(JSON.stringify(listaRateio));
 
         // ATUALIZA VISUAL
@@ -1488,11 +1530,11 @@ function buscarRateioVisual(coligada, idLan, index, rowContext) {
         lblPerc.text(totalPercFixo + "%");
         lblValor.text(totalValorFixo);
 
-        // Cores de ValidaÃ§Ã£o
+        // Cores de Validação
         if (totalPercFixo === 100) lblPerc.css("color", "#28a745");
         else lblPerc.css("color", "#dc3545");
 
-        // Compara com valor do cabeÃ§alho
+        // Compara com valor do cabeçalho
         var valorCabecalho = $("#card_valor___" + index).val();
         if (valorCabecalho === totalValorFixo) lblValor.css("color", "#28a745");
         else lblValor.css("color", "#dc3545");
@@ -1504,7 +1546,7 @@ function buscarRateioVisual(coligada, idLan, index, rowContext) {
     }
 }
 
-// Dispara o Zoom de empresa para uma linha especÃ­fica da tabela
+// Dispara o Zoom de empresa para uma linha específica da tabela
 function zoomEmpresaItem(el) {
     var index = el.name.split("___")[1];
     var zoom = new Zoom();
@@ -1512,11 +1554,11 @@ function zoomEmpresaItem(el) {
     zoom.Titulo = "Buscar Empresa";
     zoom.DataSet = "DS_FLUIG_0065";
 
-    // Colunas idÃªnticas ao zoom global do CNAB
+    // Colunas idênticas ao zoom global do CNAB
     zoom.Colunas = [
-        { title: "CÃ³d. Coligada", name: "CODCOLIGADA" },
+        { title: "Cód. Coligada", name: "CODCOLIGADA" },
         { title: "Empresa", name: "EMPRESA" },
-        { title: "CÃ³d. Filial", name: "CODFILIAL" },
+        { title: "Cód. Filial", name: "CODFILIAL" },
         { title: "Nome Filial", name: "FILIAL" },
         { title: "CNPJ", name: "CNPJ" }
     ];
@@ -1553,7 +1595,7 @@ function buscarDadosItem(el) {
         $("[name='item_valor___" + index + "']").val(formatarValorMonetario(row["VALOR"]));
         $("[name='item_data_venc___" + index + "']").val(formatarDataISO(row["DTVENCIMENTO"]));
 
-        // Busca o rateio para o resumo (como jÃ¡ fazÃ­amos no cnab)
+        // Busca o rateio para o resumo (como já façamos no cnab)
         buscarResumoRateioItem(coligada, idLan, index);
     }
 }
@@ -1580,11 +1622,11 @@ function zoomEmpresaERP() {
     zoom.Titulo = "Buscar Empresa";
     zoom.DataSet = "DS_FLUIG_0065";
 
-    // Colunas idÃªnticas ao zoom original do CNAB
+    // Colunas idênticas ao zoom original do CNAB
     zoom.Colunas = [
-        { title: "CÃ³d. Coligada", name: "CODCOLIGADA" },
+        { title: "Cód. Coligada", name: "CODCOLIGADA" },
         { title: "Empresa", name: "EMPRESA" },
-        { title: "CÃ³d. Filial", name: "CODFILIAL" },
+        { title: "Cód. Filial", name: "CODFILIAL" },
         { title: "Nome Filial", name: "FILIAL" },
         { title: "CNPJ", name: "CNPJ" }
     ];
@@ -1592,7 +1634,7 @@ function zoomEmpresaERP() {
     zoom.Retorno = function (linha) {
         // Preenche os campos do painel ERP usando os IDs originais
         $("#erp_empresa").val(linha[0] + " - " + linha[1]);
-        $("#cod_empresa").val(linha[0]); // MantÃ©m os campos de filtro originais
+        $("#cod_empresa").val(linha[0]); // Mant?m os campos de filtro originais
         $("#cod_filial").val(linha[2]);
         $("#erp_cnpj").val(linha[4]);
 
@@ -1611,7 +1653,7 @@ function zoomEmpresaERP() {
 // LOGICA DE RESUMO / CONSOLIDADO DA GUIA
 // =================================================================================
 
-// 1. FunÃ§Ã£o wrapper para Remover Card e atualizar totais
+// 1. Função wrapper para Remover Card e atualizar totais
 function removerCardGuia(oElement) {
     fnWdkRemoveChild(oElement);
     // Pequeno delay para garantir que o DOM removeu a linha antes de recalcular
@@ -1620,7 +1662,7 @@ function removerCardGuia(oElement) {
     }, 200);
 }
 
-// 2. FunÃ§Ã£o Principal de CÃ¡lculo do Resumo
+// 2. Função Principal de Cálculo do Resumo
 function atualizarResumoGuia() {
     var tbody = $("#tbody_resumo_guia");
     tbody.empty();
@@ -1628,7 +1670,7 @@ function atualizarResumoGuia() {
     var totalAcumulado = 0.00;
     var listaDatas = [];
 
-    // 1. ITERAÃ‡ÃƒO E SOMA
+    // 1. ITERAÇÃO E SOMA
     $("input[name^='card_id_lan___']").each(function () {
         var index = this.name.split("___")[1];
         var idLan = $(this).val();
@@ -1671,11 +1713,11 @@ function atualizarResumoGuia() {
     var totalFormatado = formatarValorMonetario(totalAcumulado);
     $("#lbl_total_consolidado").text(totalFormatado);
 
-    // 3. CHAMA A VALIDAÃ‡ÃƒO
+    // 3. CHAMA A VALIDAÇÃO
     validarGuiaCompleta(totalFormatado, listaDatas);
 }
 
-// FunÃ§Ã£o Centralizada de ValidaÃ§Ã£o da Guia
+// Função Centralizada de Validação da Guia
 function validarGuiaCompleta(totalItens, listaDatas) {
     var temDivergencia = false;
     var qtdItens = listaDatas.length; // Quantidade de cards adicionados
@@ -1689,37 +1731,37 @@ function validarGuiaCompleta(totalItens, listaDatas) {
     var detalheData = $("#detalhe_guia_data");
 
     // =========================================================================
-    // CENÃRIO 1: SEM ITENS (Estado Neutro)
+    // CENÁRIO 1: SEM ITENS (Estado Neutro)
     // =========================================================================
     if (qtdItens === 0) {
-        // Se tem cabeÃ§alho mas nÃ£o tem itens, apenas avisa para adicionar
+        // Se tem cabeçalho mas não tem itens, apenas avisa para adicionar
         if (valorCabecalho || dataCabecalhoRaw) {
-            definirStatus(statusValor, detalheValor, "AGUARDANDO", "Adicione os tÃ­tulos abaixo.", "black");
-            definirStatus(statusData, detalheData, "AGUARDANDO", "Adicione os tÃ­tulos abaixo.", "black");
+            definirStatus(statusValor, detalheValor, "AGUARDANDO", "Adicione os títulos abaixo.", "black");
+            definirStatus(statusData, detalheData, "AGUARDANDO", "Adicione os títulos abaixo.", "black");
         } else {
-            // Se nem cabeÃ§alho tem, limpa tudo
+            // Se nem cabeçalho tem, limpa tudo
             definirStatus(statusValor, detalheValor, "", "", "black");
             definirStatus(statusData, detalheData, "", "", "black");
         }
 
-        // RESET FINAL (NÃ£o Ã© divergÃªncia, Ã© apenas incompleto - validateForm cuida disso)
+        // RESET FINAL (Não é divergência, é apenas incompleto - validateForm cuida disso)
         $("#cpTemDivergencia").val("nao");
         $("#painel_consolidado_guia").removeClass("panel-warning").addClass("panel-primary");
         $("#check_ok").prop("disabled", false);
-        return; // ENCERRA A FUNÃ‡ÃƒO AQUI
+        return; // ENCERRA A FUNÇÃO AQUI
     }
 
     // =========================================================================
-    // CENÃRIO 2: COM ITENS (ValidaÃ§Ã£o Real)
+    // CENÁRIO 2: COM ITENS (Validação Real)
     // =========================================================================
 
-    // --- 1. VALIDAÃ‡ÃƒO DE VALOR ---
+    // --- 1. VALIDAÇÃO DE VALOR ---
     if (!valorCabecalho) {
-        definirStatus(statusValor, detalheValor, "PENDENTE", "Informe o valor no cabeÃ§alho.", "black");
+        definirStatus(statusValor, detalheValor, "PENDENTE", "Informe o valor no cabeçalho.", "black");
     } else if (valorCabecalho === totalItens) {
         definirStatus(statusValor, detalheValor, "OK", "Valores conferem.", "green");
     } else {
-        // CÃLCULO DA DIFERENÃ‡A
+        // C?LCULO DA DIFERENÇA
         var valCabecalhoFloat = parseFloat(valorCabecalho.replace(/\./g, "").replace(",", ".")) || 0;
         var valItensFloat = parseFloat(totalItens.replace(/\./g, "").replace(",", ".")) || 0;
         var diferenca = valCabecalhoFloat - valItensFloat;
@@ -1731,7 +1773,7 @@ function validarGuiaCompleta(totalItens, listaDatas) {
         temDivergencia = true;
     }
 
-    // --- 2. VALIDAÃ‡ÃƒO DE DATA ---
+    // --- 2. VALIDAÇÃO DE DATA ---
     var dataCabecalhoPT = "";
     if (dataCabecalhoRaw) {
         var p = dataCabecalhoRaw.split("-");
@@ -1739,15 +1781,15 @@ function validarGuiaCompleta(totalItens, listaDatas) {
     }
 
     if (!dataCabecalhoPT) {
-        definirStatus(statusData, detalheData, "PENDENTE", "Informe a data no cabeÃ§alho.", "black");
+        definirStatus(statusData, detalheData, "PENDENTE", "Informe a data no cabeçalho.", "black");
     } else {
         var datasDiferentes = listaDatas.filter(function (d) { return d !== dataCabecalhoPT; });
 
         if (datasDiferentes.length === 0) {
-            definirStatus(statusData, detalheData, "OK", "Todas as datas sÃ£o: " + dataCabecalhoPT, "green");
+            definirStatus(statusData, detalheData, "OK", "Todas as datas são: " + dataCabecalhoPT, "green");
         } else {
-            // ALTERAÃ‡ÃƒO DA MENSAGEM DE DATA AQUI
-            definirStatus(statusData, detalheData, "DIVERGENTE", "HÃ¡ " + datasDiferentes.length + " tÃ­tulo(s) com data diferente da Guia/Outros.", "red");
+            // ALTERAÇÃO DA MENSAGEM DE DATA AQUI
+            definirStatus(statusData, detalheData, "DIVERGENTE", "Há " + datasDiferentes.length + " título(s) com data diferente da Guia/Outros.", "red");
             temDivergencia = true;
         }
     }
@@ -1759,11 +1801,11 @@ function validarGuiaCompleta(totalItens, listaDatas) {
         $("#cpTemDivergencia").val("sim");
         $("#painel_consolidado_guia").removeClass("panel-primary").addClass("panel-warning");
 
-        // SÃ³ exibe o toast se realmente houver divergÃªncia confirmada (evita spam ao digitar)
+        // S? exibe o toast se realmente houver divergência confirmada (evita spam ao digitar)
         // Opcional: remover o toast se achar muito intrusivo
         /* FLUIGC.toast({
-            title: 'AtenÃ§Ã£o:',
-            message: 'Valores ou datas nÃ£o conferem.',
+            title: 'Atenção:',
+            message: 'Valores ou datas não conferem.',
             type: 'warning'
         });
         */
@@ -1788,7 +1830,7 @@ function definirStatus(elInput, elDetalhe, texto, detalhe, cor) {
     }
 }
 
-// 3. ValidaÃ§Ã£o entre Soma dos Itens vs CabeÃ§alho
+// 3. Validação entre Soma dos Itens vs Cabeçalho
 function validarTotalGuia(totalItensFormatado) {
     var valorCabecalho = $("#guia_valor_total").val(); // Campo que adicionamos no passo anterior
 
@@ -1800,7 +1842,7 @@ function validarTotalGuia(totalItensFormatado) {
     $("#span_total_lanc").text(totalItensFormatado);
     $("#span_total_cabeca").text(valorCabecalho);
 
-    // ComparaÃ§Ã£o simples de string (jÃ¡ que ambos estÃ£o formatados iguais 0.000,00)
+    // Comparação simples de string (já que ambos estão formatados iguais 0.000,00)
     if (totalItensFormatado === valorCabecalho) {
         $("#alert_divergencia_guia").hide();
         $("#alert_sucesso_guia").show();
@@ -1812,14 +1854,14 @@ function validarTotalGuia(totalItensFormatado) {
     }
 }
 
-// Controla o estado do botÃ£o de upload conforme seleÃ§Ã£o do banco
+// Controla o estado do botão de upload conforme seleção do banco
 function controlarBotaoUpload() {
     var tipo = $("#tipo_documento").val();
     var codBanco = $("#cod_banco").val();
     var btn = $("#btn_upload_cnab");
 
-    // SÃ³ aplica lÃ³gica de bloqueio se for CNAB. 
-    // Se for Guia, o botÃ£o jÃ¡ estarÃ¡ oculto pelo ajustarInterfacePorTipo, entÃ£o nÃ£o mexemos.
+    // S? aplica l?gica de bloqueio se for CNAB. 
+    // Se for Guia, o botão já estar? oculto pelo ajustarInterfacePorTipo, então não mexemos.
     if (tipo === "cnab") {
         if (!codBanco || codBanco === "") {
             // Bloqueia
@@ -1836,7 +1878,7 @@ function controlarBotaoUpload() {
 }
 
 // =================================================================================
-// FUNÃ‡ÃƒO DE UPLOAD SIMPLES PARA GUIA (SEM LEITURA)
+// FUNÇÃO DE UPLOAD SIMPLES PARA GUIA (SEM LEITURA)
 // =================================================================================
 function anexarArquivoGuia(input) {
     if (input.files && input.files[0]) {
@@ -1845,7 +1887,7 @@ function anexarArquivoGuia(input) {
         // 1. Atualiza o campo visual com o nome do arquivo
         $("#fileNameGuia").val(file.name);
 
-        // 2. Envia para a Ã¡rea de upload do Fluig (Staging)
+        // 2. Envia para a área de upload do Fluig (Staging)
         // Isso garante que o arquivo seja persistido como anexo do processo ao enviar
         var formData = new FormData();
         formData.append("file", file);
@@ -1883,10 +1925,10 @@ function anexarArquivoGuia(input) {
 }
 
 // =================================================================================
-// FUNÃ‡ÃƒO BEFORE SEND VALIDATE (Garante a gravaÃ§Ã£o)
+// FUNÇÃO BEFORE SEND VALIDATE (Garante a gravação)
 // =================================================================================
 var beforeSendValidate = function (numState, nextState) {
-    console.log(">>> Gerando Resumo EstÃ¡tico para Congelamento...");
+    console.log(">>> Gerando Resumo Est?tico para Congelamento...");
     gerarResumoEstatico();
     if (parseInt(numState, 10) === 12 && parseInt(nextState, 10) === 40 && typeof limparCamposTemporariosEnvioFinanceiro === "function") {
         limparCamposTemporariosEnvioFinanceiro();
@@ -1941,29 +1983,29 @@ function limparCamposTemporariosEnvioFinanceiro() {
 }
 
 // =================================================================================
-// O GERADOR DE RELATÃ“RIO (MODIFICADO - CORREÃ‡ÃƒO UNDEFINED)
+// O GERADOR DE RELATÓRIO (MODIFICADO - CORREÇÃO UNDEFINED)
 // =================================================================================
 function gerarResumoEstatico() {
     var tipo = $("#tipo_documento").val();
     var html = "";
 
-    // Estilos inline para formataÃ§Ã£o
+    // Estilos inline para formatação
     var styleBox = "border:1px solid #ddd; padding:10px; margin-bottom:10px; border-radius:4px; background:#f9f9f9;";
     var styleTitle = "font-size:14px; font-weight:bold; border-bottom:1px solid #ccc; margin-bottom:10px; padding-bottom:5px;";
 
     if (tipo == "cnab") {
         // --- BLOCO CNAB ---
 
-        // A. Info SolicitaÃ§Ã£o
+        // A. Info Solicitação
         html += "<div style='" + styleBox + "'>";
-        html += "<div style='" + styleTitle + "'>InformaÃ§Ãµes da SolicitaÃ§Ã£o</div>";
+        html += "<div style='" + styleTitle + "'>Informações da Solicitação</div>";
         html += "<div class='row'>";
         html += col(4, "Empresa", $("#txt_empresa").val());
         html += col(4, "Filial", $("#txt_filial").val());
         html += col(4, "CNPJ", $("#txt_cnpj").val());
         html += "</div><div class='row'>";
-        html += col(4, "Tipo Documento", "CNAB BancÃ¡rio");
-        html += col(4, "Tipo LanÃ§amento", $("#cnab_tipo_lancamento").val());
+        html += col(4, "Tipo Documento", "CNAB Bancário");
+        html += col(4, "Tipo Lançamento", $("#cnab_tipo_lancamento").val());
         html += col(4, "Banco Pagamento", $("#txt_banco").val());
         html += "</div><div class='row'>";
         html += col(12, "Arquivo", $("#fileNameVisual").val());
@@ -1971,11 +2013,11 @@ function gerarResumoEstatico() {
 
         // B. Leitura Arquivo
         html += "<div style='" + styleBox + "'>";
-        html += "<div style='" + styleTitle + "'>Dados ExtraÃ­dos do Arquivo</div>";
+        html += "<div style='" + styleTitle + "'>Dados Extra?dos do Arquivo</div>";
         html += "<div class='row'>";
         html += col(3, "Bco/Ag/CC", $("#arq_banco").val() + " / " + $("#arq_agencia").val() + " / " + $("#arq_conta").val());
         html += col(3, "Valor", "<span style='color:blue; font-weight:bold;'>R$ " + $("#arq_valor").val() + "</span>");
-        html += col(3, "Data CrÃ©dito", $("#arq_data_cred").val());
+        html += col(3, "Data Crédito", $("#arq_data_cred").val());
         html += col(3, "Empresa Arq", $("#arq_empresa").val());
         html += "</div></div>";
 
@@ -1984,7 +2026,7 @@ function gerarResumoEstatico() {
         html += "<div style='" + styleTitle + "'>Dados ERP (Contas a Pagar)</div>";
         html += "<div class='row'>";
         html += col(2, "IDLAN", "<strong>" + $("#erp_id_lan").val() + "</strong>");
-        html += col(5, "HistÃ³rico", $("#erp_historico").val());
+        html += col(5, "Histórico", $("#erp_historico").val());
         html += col(3, "Valor ERP", "R$ " + $("#erp_valor").val());
         html += col(2, "Vencimento", $("#erp_data_cred").val());
         html += "</div></div>";
@@ -2004,16 +2046,16 @@ function gerarResumoEstatico() {
         html += "<div class='text-right' style='margin-top:5px;'>Total: <b>R$ " + $("#rateio_total_calculado").val() + "</b> (" + $("#rateio_total_percentual").val() + ")</div>";
         html += "</div>";
 
-        // E. Resultado da ValidaÃ§Ã£o (CORRIGIDO)
+        // E. Resultado da Validação (CORRIGIDO)
         html += "<div style='" + styleBox + "'>";
-        html += "<div style='" + styleTitle + "'>Resultado da ValidaÃ§Ã£o</div>";
+        html += "<div style='" + styleTitle + "'>Resultado da Validação</div>";
         html += "<table class='table table-condensed table-bordered' style='background:white; margin-bottom:0;'>";
-        html += "<thead><tr><th>Item</th><th>Status</th><th>ObservaÃ§Ã£o / Detalhe</th></tr></thead><tbody>";
+        html += "<thead><tr><th>Item</th><th>Status</th><th>Observação / Detalhe</th></tr></thead><tbody>";
 
-        // --- CORREÃ‡ÃƒO AQUI ---
+        // --- CORREÇÃO AQUI ---
         // Alterado para buscar por [name='...'] em vez de ID #
         function valRow(label, inputName, msgId) {
-            var status = $("[name='" + inputName + "']").val(); // CORREÃ‡ÃƒO: Busca pelo name
+            var status = $("[name='" + inputName + "']").val(); // CORREÇÃO: Busca pelo name
             var msg = $("#" + msgId).text();
 
             // Tratamento visual para caso venha vazio ou undefined
@@ -2027,14 +2069,14 @@ function gerarResumoEstatico() {
         html += valRow("Empresa", "chk_empresa", "msg_empresa");
         html += valRow("CNPJ", "chk_cnpj", "msg_cnpj");
         html += valRow("Banco", "chk_banco", "msg_banco");
-        html += valRow("Data CrÃ©dito", "chk_data_cred", "msg_data_cred");
+        html += valRow("Data Crédito", "chk_data_cred", "msg_data_cred");
         html += valRow("Valor", "chk_valor", "msg_valor");
 
         html += "</tbody></table></div>";
 
         // F. Justificativa
         html += "<div class='alert alert-warning'>";
-        html += "<p><strong>Justificativa da DivergÃªncia:</strong> " + ($("#txt_justificativa").val() || "Nenhuma") + "</p>";
+        html += "<p><strong>Justificativa da Divergência:</strong> " + ($("#txt_justificativa").val() || "Nenhuma") + "</p>";
         html += "</div>";
 
     } else {
@@ -2042,7 +2084,7 @@ function gerarResumoEstatico() {
 
         // A. Info Guia
         html += "<div style='" + styleBox + "'>";
-        html += "<div style='" + styleTitle + "'>InformaÃ§Ãµes da Guia</div>";
+        html += "<div style='" + styleTitle + "'>Informações da Guia</div>";
         html += "<div class='row'>";
         html += col(4, "Tipo Documento", "Guia / Outros");
         html += col(4, "Tipo da Guia", $("#guia_tipo").val());
@@ -2056,10 +2098,10 @@ function gerarResumoEstatico() {
         html += col(6, "Valor Total", "<span style='color:blue; font-weight:bold;'>R$ " + $("#guia_valor_total").val() + "</span>");
         html += "</div></div>";
 
-        // B. LanÃ§amentos
+        // B. Lançamentos
         html += "<div style='" + styleBox + "'>";
-        html += "<div style='" + styleTitle + "'>LanÃ§amentos Vinculados</div>";
-        html += "<table class='table table-condensed table-striped table-bordered' style='background:white; margin-bottom:0;'><thead><tr><th>ID LAN</th><th>Empresa</th><th>HistÃ³rico</th><th class='text-right'>Valor</th></tr></thead><tbody>";
+        html += "<div style='" + styleTitle + "'>Lançamentos Vinculados</div>";
+        html += "<table class='table table-condensed table-striped table-bordered' style='background:white; margin-bottom:0;'><thead><tr><th>ID LAN</th><th>Empresa</th><th>Histórico</th><th class='text-right'>Valor</th></tr></thead><tbody>";
 
         $("input[name^='card_id_lan___']").each(function () {
             var idx = this.name.split("___")[1];
@@ -2075,17 +2117,17 @@ function gerarResumoEstatico() {
         html += "</tbody><tfoot><tr><td colspan='3' align='right'><b>Total Consolidado:</b></td><td align='right'><b>R$ " + $("#lbl_total_consolidado").text() + "</b></td></tr></tfoot>";
         html += "</table></div>";
 
-        // C. Status ValidaÃ§Ã£o
+        // C. Status Validação
         var stVal = $("#status_guia_valor").val();
         var stDat = $("#status_guia_data").val();
         var cVal = (stVal == "OK") ? "green" : "red";
         var cDat = (stDat == "OK") ? "green" : "red";
 
         html += "<div style='" + styleBox + "'>";
-        html += "<div style='" + styleTitle + "'>Resultado da ValidaÃ§Ã£o</div>";
+        html += "<div style='" + styleTitle + "'>Resultado da Validação</div>";
         html += "<table class='table table-bordered' style='background:white; margin-bottom:0;'>";
-        html += "<tr><td width='30%'>ValidaÃ§Ã£o Valor</td><td><b style='color:" + cVal + "'>" + stVal + "</b> (" + $("#detalhe_guia_valor").text() + ")</td></tr>";
-        html += "<tr><td>ValidaÃ§Ã£o Data</td><td><b style='color:" + cDat + "'>" + stDat + "</b> (" + $("#detalhe_guia_data").text() + ")</td></tr>";
+        html += "<tr><td width='30%'>Validação Valor</td><td><b style='color:" + cVal + "'>" + stVal + "</b> (" + $("#detalhe_guia_valor").text() + ")</td></tr>";
+        html += "<tr><td>Validação Data</td><td><b style='color:" + cDat + "'>" + stDat + "</b> (" + $("#detalhe_guia_data").text() + ")</td></tr>";
         html += "</table></div>";
 
         // D. Justificativa
@@ -2104,13 +2146,19 @@ function col(size, label, value) {
 }
 
 // ============================================================
-// MÃ“DULO: MONITORAMENTO DA PASTA 'ENVIADOS' (VERSÃƒO DEFINITIVA)
+// MÓDULO: MONITORAMENTO DA PASTA 'ENVIADOS' (VERSÃO DEFINITIVA)
 // ============================================================
 var MonitoramentoVAN = (function () {
     var intervalo = null;
     var intervaloRevalidacaoSilenciosa = null;
-    var periodoRevalidacaoSilenciosa = 45000;
+    var periodoRevalidacaoSilenciosa = 1000;
     var arquivoMonitoradoSilencioso = "";
+    var ultimaPastaVerificada = "Enviados";
+    var ultimoEstadoVisualSilencioso = "";
+    var ultimoEstadoPastas = {
+        enviar: null,
+        enviados: null
+    };
 
     var codificarEstadoMonitoramento = function (estadoCache) {
         return window.btoa(unescape(encodeURIComponent(JSON.stringify(estadoCache))));
@@ -2167,12 +2215,22 @@ var MonitoramentoVAN = (function () {
         $("#texto_monitoramento_van").html(texto);
     };
 
+    var resetarEstadoMonitoramentoSilencioso = function () {
+        ultimaPastaVerificada = "Enviados";
+        ultimoEstadoVisualSilencioso = "";
+        ultimoEstadoPastas = {
+            enviar: null,
+            enviados: null
+        };
+    };
+
     var pararMonitoramentoSilenciosoControle = function () {
         if (intervaloRevalidacaoSilenciosa) {
             clearInterval(intervaloRevalidacaoSilenciosa);
             intervaloRevalidacaoSilenciosa = null;
         }
         arquivoMonitoradoSilencioso = "";
+        resetarEstadoMonitoramentoSilencioso();
     };
 
     var lerConteudoArquivoFisico = function (nomeArquivo, pasta, callback) {
@@ -2274,70 +2332,100 @@ var MonitoramentoVAN = (function () {
         });
     };
 
-    var aplicarEstadoFisicoArquivo = function (arquivoSalvo, statusSalvo, conteudoSalvo, estadoFisico) {
+    var atualizarResumoArquivoSeNecessario = function (arquivoSalvo, conteudoSalvo, pastaOrigem) {
+        if (conteudoSalvo && typeof processarTextoVanAuditoria === "function") {
+            processarTextoVanAuditoria(conteudoSalvo, arquivoSalvo, true);
+            return;
+        }
+
+        lerConteudoArquivoFisico(arquivoSalvo, pastaOrigem, function (erro, conteudoFisico) {
+            if (!erro && conteudoFisico && typeof processarTextoVanAuditoria === "function") {
+                conteudoArquivoParaEnvio = conteudoFisico;
+                processarTextoVanAuditoria(conteudoFisico, arquivoSalvo, true);
+            }
+        });
+    };
+
+    var calcularEstadoVisualArquivo = function () {
+        if (ultimoEstadoPastas.enviar === true) return "ENVIAR";
+        if (ultimoEstadoPastas.enviar === false && ultimoEstadoPastas.enviados === true) return "ENVIADOS";
+        if (ultimoEstadoPastas.enviar === false && ultimoEstadoPastas.enviados === false) return "CONSUMIDO";
+        return "";
+    };
+
+    var sincronizarEstadoPastasPeloEstadoFisico = function (estadoFisico) {
+        if (estadoFisico === "ENVIAR") {
+            ultimoEstadoPastas.enviar = true;
+            ultimoEstadoPastas.enviados = false;
+            return;
+        }
+
+        if (estadoFisico === "ENVIADOS") {
+            ultimoEstadoPastas.enviar = false;
+            ultimoEstadoPastas.enviados = true;
+            return;
+        }
+
+        if (estadoFisico === "CONSUMIDO") {
+            ultimoEstadoPastas.enviar = false;
+            ultimoEstadoPastas.enviados = false;
+        }
+    };
+
+    var renderizarEstadoArquivoVan = function (arquivoSalvo, statusSalvo, conteudoSalvo, estadoAtual) {
         $("#btn_enviar_fileserver")
             .prop("disabled", true)
             .removeClass("btn-success")
             .addClass("btn-default")
             .html('<i class="flaticon flaticon-check"></i> Enviado à VAN');
         $("#fileNameVan").val(arquivoSalvo);
+        ocultarAvisosRevalidacao();
+        $("#painel_monitoramento_van").removeClass("panel-success").addClass("panel-info").show();
+        $("#barra_progresso_van").hide();
 
-        if (estadoFisico === "ENVIAR") {
-            ocultarAvisosRevalidacao();
-            $("#painel_monitoramento_van").removeClass("panel-success").addClass("panel-info").show();
-            if (conteudoSalvo && typeof processarTextoVanAuditoria === "function") {
-                processarTextoVanAuditoria(conteudoSalvo, arquivoSalvo, true);
-            } else if (typeof conteudoSalvo !== "undefined") {
-                lerConteudoArquivoFisico(arquivoSalvo, "Enviar", function (erro, conteudoFisico) {
-                    if (!erro && conteudoFisico && typeof processarTextoVanAuditoria === "function") {
-                        conteudoArquivoParaEnvio = conteudoFisico;
-                        processarTextoVanAuditoria(conteudoFisico, arquivoSalvo, true);
-                    }
-                });
-            }
-            if (statusSalvo === "PENDENTE") {
-                $("#texto_monitoramento_van").html("Aguardando o robô da VAN capturar o arquivo: <span style=\"background:#fff3cd; color:#856404; font-weight:bold; padding:2px 6px; border-radius:3px;\">" + arquivoSalvo + "</span>");
-                $("#barra_progresso_van").show();
-            }
+        if (estadoAtual === "ENVIAR") {
+            atualizarResumoArquivoSeNecessario(arquivoSalvo, conteudoSalvo, "Enviar");
+            $("#texto_monitoramento_van").html("Arquivo localizado na pasta Enviar. Aguardando o robô da VAN capturar o arquivo: <span style=\"background:#fff3cd; color:#856404; font-weight:bold; padding:2px 6px; border-radius:3px;\">" + arquivoSalvo + "</span>");
+            $("#barra_progresso_van").show();
+            ultimoEstadoVisualSilencioso = "ENVIAR";
             return "ENVIAR";
         }
 
-        if (estadoFisico === "ENVIADOS") {
+        if (estadoAtual === "ENVIADOS") {
             mostrarAvisoEnvio("Esse arquivo já foi movido para a pasta Enviados");
-            if (conteudoSalvo && typeof processarTextoVanAuditoria === "function") {
-                processarTextoVanAuditoria(conteudoSalvo, arquivoSalvo, true);
-            } else {
-                lerConteudoArquivoFisico(arquivoSalvo, "Enviados", function (erro, conteudoFisico) {
-                    if (!erro && conteudoFisico && typeof processarTextoVanAuditoria === "function") {
-                        conteudoArquivoParaEnvio = conteudoFisico;
-                        processarTextoVanAuditoria(conteudoFisico, arquivoSalvo, true);
-                    }
-                });
-            }
+            atualizarResumoArquivoSeNecessario(arquivoSalvo, conteudoSalvo, "Enviados");
             montarPainelSucesso(arquivoSalvo);
+            ultimoEstadoVisualSilencioso = "ENVIADOS";
             return "ENVIADOS";
         }
 
         mostrarAvisoEnvio("Esse arquivo já foi movido para a pasta Enviados");
         mostrarAvisoMonitoramento("Esse arquivo já passou por essa pasta e agora está sendo processado pelo banco");
-        if (conteudoSalvo && typeof processarTextoVanAuditoria === "function") {
-            processarTextoVanAuditoria(conteudoSalvo, arquivoSalvo, true);
-        }
+        atualizarResumoArquivoSeNecessario(arquivoSalvo, conteudoSalvo, "Enviados");
         montarPainelConsumido(arquivoSalvo);
-        pararMonitoramentoSilenciosoControle();
+        ultimoEstadoVisualSilencioso = "CONSUMIDO";
         return "CONSUMIDO";
     };
 
-    var revalidarSilenciosamenteControle = function () {
+    var revalidarSilenciosamenteControle = function (opcoes) {
+        opcoes = opcoes || {};
+        var concluir = function (resultado) {
+            if (typeof opcoes.onComplete === "function") {
+                opcoes.onComplete(resultado || {});
+            }
+        };
+
         var atividadeAtual = ($("#wkNumState_hidden").val() || "").toString();
         if (atividadeAtual !== "40") {
             pararMonitoramentoSilenciosoControle();
+            concluir({ finalizado: true, motivo: "atividade_fora_do_contexto" });
             return;
         }
 
         var numProcesso = pegarNumeroProcesso();
         if (!numProcesso || !arquivoMonitoradoSilencioso) {
             pararMonitoramentoSilenciosoControle();
+            concluir({ finalizado: true, motivo: "sem_arquivo_monitorado" });
             return;
         }
 
@@ -2348,6 +2436,7 @@ var MonitoramentoVAN = (function () {
             success: function (ds) {
                 if (!(ds && ds.values && ds.values.length > 0)) {
                     pararMonitoramentoSilenciosoControle();
+                    concluir({ finalizado: true, motivo: "sem_controle_salvo" });
                     return;
                 }
 
@@ -2364,24 +2453,71 @@ var MonitoramentoVAN = (function () {
 
                 if (arquivoSalvo !== arquivoMonitoradoSilencioso || arquivoSalvo === "NAO_EXISTE" || arquivoSalvo === "ERRO" || arquivoSalvo === "VAZIO") {
                     pararMonitoramentoSilenciosoControle();
+                    concluir({ finalizado: true, motivo: "controle_invalido" });
                     return;
                 }
 
-                verificarEstadoFisicoArquivo(arquivoSalvo, function (estadoFisico) {
-                    var resultado = aplicarEstadoFisicoArquivo(arquivoSalvo, statusSalvo, conteudoSalvo, estadoFisico.estadoFisico);
-                    if (resultado === "CONSUMIDO") {
-                        pararMonitoramentoSilenciosoControle();
+                var pastaConsultaAtual = (ultimaPastaVerificada === "Enviar") ? "Enviados" : "Enviar";
+                var callbackPasta = function (resultadoPasta) {
+                    if (!resultadoPasta || resultadoPasta.erro) {
+                        ultimaPastaVerificada = pastaConsultaAtual;
+                        concluir({
+                            finalizado: true,
+                            motivo: "erro_consulta_pasta",
+                            pastaConsultada: pastaConsultaAtual,
+                            erro: true
+                        });
+                        return;
                     }
-                });
+
+                    if (pastaConsultaAtual === "Enviar") {
+                        ultimoEstadoPastas.enviar = resultadoPasta.encontrado;
+                    } else {
+                        ultimoEstadoPastas.enviados = resultadoPasta.encontrado;
+                    }
+
+                    ultimaPastaVerificada = pastaConsultaAtual;
+
+                    var estadoAtual = calcularEstadoVisualArquivo();
+                    if (!estadoAtual || estadoAtual === ultimoEstadoVisualSilencioso) {
+                        concluir({
+                            finalizado: true,
+                            motivo: "sem_alteracao_visual",
+                            pastaConsultada: pastaConsultaAtual,
+                            estadoAtual: estadoAtual || ultimoEstadoVisualSilencioso || "",
+                            arquivo: arquivoSalvo
+                        });
+                        return;
+                    }
+
+                    renderizarEstadoArquivoVan(arquivoSalvo, statusSalvo, conteudoSalvo, estadoAtual);
+                    concluir({
+                        finalizado: true,
+                        motivo: "estado_atualizado",
+                        pastaConsultada: pastaConsultaAtual,
+                        estadoAtual: estadoAtual,
+                        arquivo: arquivoSalvo
+                    });
+                };
+
+                if (pastaConsultaAtual === "Enviar") {
+                    verificarArquivoNaPastaEnviar(arquivoSalvo, callbackPasta);
+                } else {
+                    verificarArquivoNaPastaEnviados(arquivoSalvo, callbackPasta);
+                }
             },
             error: function () {
                 pararMonitoramentoSilenciosoControle();
+                concluir({ finalizado: true, motivo: "erro_leitura_controle", erro: true });
             }
         });
     };
 
     var iniciarMonitoramentoSilenciosoControle = function (nomeArquivo) {
         if (!nomeArquivo) return;
+        if (arquivoMonitoradoSilencioso && arquivoMonitoradoSilencioso !== nomeArquivo) {
+            resetarEstadoMonitoramentoSilencioso();
+        }
         arquivoMonitoradoSilencioso = nomeArquivo;
         if (intervaloRevalidacaoSilenciosa) {
             return;
@@ -2405,7 +2541,7 @@ var MonitoramentoVAN = (function () {
                 .prop("disabled", true)
                 .removeClass("btn-success")
                 .addClass("btn-default")
-                .html('<i class="flaticon flaticon-check"></i> Enviado Ã  VAN');
+                .html('<i class="flaticon flaticon-check"></i> Enviado ? VAN');
         };
 
         if (conteudoSalvo) {
@@ -2428,7 +2564,7 @@ var MonitoramentoVAN = (function () {
                 .prop("disabled", true)
                 .removeClass("btn-success")
                 .addClass("btn-default")
-                .html('<i class="flaticon flaticon-check"></i> Enviado Ã  VAN');
+                .html('<i class="flaticon flaticon-check"></i> Enviado ? VAN');
         });
     };
 
@@ -2501,7 +2637,7 @@ var MonitoramentoVAN = (function () {
         htmlVisual += '    <li class="list-group-item" style="font-size: 16px; border-left: 5px solid #f0ad4e; padding: 15px; background-color:#fff3cd; color:#856404;"><i class="flaticon flaticon-check-circle icon-md" style="color:#f0ad4e;"></i> <span style="background:#fff8db; color:#856404; font-weight:bold; padding:2px 6px; border-radius:3px;">' + nomeArquivo + '</span><span class="badge pull-right" style="background-color: #f0ad4e; margin-top: 2px;">Na Pasta</span></li>';
         htmlVisual += '    <li class="list-group-item text-muted" style="opacity: 0.5; background: #fdfdfd; border-style: dashed;"><i class="flaticon flaticon-document icon-sm"></i> <i>...aguardando_novos_arquivos.txt</i></li>';
         htmlVisual += '  </ul>';
-        htmlVisual += '  <div class="text-center" style="margin-top: 20px;"><span class="text-success" style="font-size: 16px;"><b><i class="flaticon flaticon-done-all"></i> Sucesso! O robÃ´ capturou e moveu o arquivo para a pasta Enviados.</b></span></div>';
+        htmlVisual += '  <div class="text-center" style="margin-top: 20px;"><span class="text-success" style="font-size: 16px;"><b><i class="flaticon flaticon-done-all"></i> Sucesso! O robô capturou e moveu o arquivo para a pasta Enviados.</b></span></div>';
         htmlVisual += '</div>';
 
         $("#texto_monitoramento_van").html(htmlVisual);
@@ -2509,27 +2645,23 @@ var MonitoramentoVAN = (function () {
 
     var montarPainelConsumido = function (nomeArquivo) {
         $("#barra_progresso_van").hide();
-        $("#painel_monitoramento_van").removeClass("panel-info").addClass("panel-success").show();
+        $("#painel_monitoramento_van").removeClass("panel-success").addClass("panel-info").show();
         $("#btn_enviar_fileserver")
             .prop("disabled", true)
             .removeClass("btn-success")
             .addClass("btn-default")
-            .html('<i class="flaticon flaticon-check"></i> Consumido pelo Banco');
+            .html('<i class="flaticon flaticon-check"></i> Em processamento no banco');
 
         var htmlVisual = '<div class="text-left" style="margin-top: 10px; padding: 0 20px;">';
-        htmlVisual += '  <div class="alert alert-success" style="margin-bottom: 15px;">';
-        htmlVisual += '    <strong>Arquivo recolhido pelo banco.</strong> O processamento foi concluÃ­do e nÃ£o Ã© necessÃ¡rio reenviar.';
+        htmlVisual += '  <div class="alert alert-info" style="margin-bottom: 15px;">';
+        htmlVisual += '    <strong>Arquivo movido da pasta Enviar e Enviados.</strong> Acompanhe o retorno do banco para verificar o status do processamento. Normalmente, o arquivo permanece nessa etapa por um período curto, mas isso pode variar conforme o processamento do banco.';
         htmlVisual += '  </div>';
         htmlVisual += '  <p class="text-muted" style="font-size: 13px; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;">';
         htmlVisual += '    <i class="flaticon flaticon-folder-open icon-sm" style="color: #f39c12;"></i> <b>Arquivo preservado no cache:</b> ' + nomeArquivo;
         htmlVisual += '  </p>';
-        htmlVisual += '  <div class="alert alert-info" style="margin-bottom: 0;">';
-        htmlVisual += '    O resumo visual foi restaurado a partir do cache Base64 e permanece disponÃ­vel nesta tela.';
-        htmlVisual += '  </div>';
         htmlVisual += '</div>';
 
         $("#texto_monitoramento_van").html(htmlVisual);
-        pararMonitoramentoSilenciosoControle();
     };
 
     var iniciar = function (nomeArquivo) {
@@ -2562,7 +2694,7 @@ var MonitoramentoVAN = (function () {
     };
 
     // ============================================================
-    // RECUPERA O ARQUIVO E RECONSTRÃ“I O PAINEL SUPERIOR (DEBUG)
+    // RECUPERA O ARQUIVO E RECONSTRÓI O PAINEL SUPERIOR (DEBUG)
     // ============================================================
     var reconstruirPainelSuperior = function (nomeArquivo, statusAtual) {
         var pastaAlvo = (statusAtual === "CONCLUIDO") ? "Enviados" : "Enviar";
@@ -2585,6 +2717,12 @@ var MonitoramentoVAN = (function () {
     };
     var restaurarEstadoSeExistir = function () {
         var atividadeAtual = ($("#wkNumState_hidden").val() || "").toString();
+        var visualizacaoFinal = isVisualizacaoFinalValidadorFinanceiro();
+
+        if (typeof MonitoramentoVAN !== "undefined" && typeof MonitoramentoVAN.pararMonitoramentoSilenciosoControle === "function") {
+            MonitoramentoVAN.pararMonitoramentoSilenciosoControle();
+        }
+
         if (atividadeAtual !== "40") {
             $("#painel_envio_van_40, #painel_retorno_van_40, #painel_status_geral_40, #painel_aprovacao_40, #painel_lista_enviar_40, #painel_monitoramento_van").hide();
             $("#painel_monitoramento_van").hide().removeClass("panel-success").addClass("panel-info");
@@ -2592,6 +2730,9 @@ var MonitoramentoVAN = (function () {
             $("#barra_progresso_van").hide();
             $("#fileNameVan").val("");
             ocultarAvisosRevalidacao();
+            if (visualizacaoFinal) {
+                aplicarModoVisualizacaoFinalVan();
+            }
             return;
         }
 
@@ -2618,6 +2759,43 @@ var MonitoramentoVAN = (function () {
                     }
 
                     if (arquivoSalvo !== "NAO_EXISTE" && arquivoSalvo !== "ERRO" && arquivoSalvo !== "VAZIO") {
+                        if (visualizacaoFinal) {
+                            aplicarModoVisualizacaoFinalVan();
+                            $("#fileNameVan").val(arquivoSalvo);
+                            $("#btn_enviar_fileserver")
+                                .prop("disabled", true)
+                                .removeClass("btn-success")
+                                .addClass("btn-default")
+                                .html('<i class="flaticon flaticon-check"></i> Enviado à VAN');
+
+                            if (conteudoSalvo) {
+                                processarTextoVanAuditoria(conteudoSalvo, arquivoSalvo, true);
+                            } else if (resumoSalvo) {
+                                $("#lbl_van_empresa").text(resumoSalvo.empresa || "");
+                                $("#lbl_van_cnpj").text(resumoSalvo.cnpj || "");
+                                $("#lbl_van_dados_bancarios").text(resumoSalvo.dadosBancarios || "");
+                                $("#lbl_van_convenio").text(resumoSalvo.convenio || "");
+                                $("#lbl_van_data").text(resumoSalvo.dataCredito || "");
+                                $("#lbl_van_valor").text(resumoSalvo.valorTotal || "");
+                                $("#resumo_van_extraido").slideDown();
+                            }
+
+                            if (statusSalvo === "CONCLUIDO") {
+                                montarPainelSucesso(arquivoSalvo);
+                            } else if (statusSalvo === "ENVIADOS") {
+                                montarPainelSucesso(arquivoSalvo);
+                            } else if (statusSalvo === "CONSUMIDO" || statusSalvo === "CONSUMIDO_PELO_BANCO") {
+                                montarPainelConsumido(arquivoSalvo);
+                            } else {
+                                $("#painel_monitoramento_van").removeClass("panel-success").addClass("panel-info").show();
+                                $("#texto_monitoramento_van").html("Estado salvo da VAN: <b>" + (statusSalvo || "indisponivel") + "</b>");
+                                $("#barra_progresso_van").hide();
+                            }
+
+                            aplicarModoVisualizacaoFinalVan();
+                            return;
+                        }
+
                         iniciarMonitoramentoSilenciosoControle(arquivoSalvo);
                         $("#btn_enviar_fileserver")
                             .prop("disabled", true)
@@ -2628,7 +2806,8 @@ var MonitoramentoVAN = (function () {
                         conteudoArquivoParaEnvio = conteudoSalvo || conteudoArquivoParaEnvio || "";
 
                         verificarEstadoFisicoArquivo(arquivoSalvo, function (estadoFisico) {
-                            var resultadoEstado = aplicarEstadoFisicoArquivo(arquivoSalvo, statusSalvo, conteudoSalvo, estadoFisico.estadoFisico);
+                            sincronizarEstadoPastasPeloEstadoFisico(estadoFisico.estadoFisico);
+                            var resultadoEstado = renderizarEstadoArquivoVan(arquivoSalvo, statusSalvo, conteudoSalvo, estadoFisico.estadoFisico);
                             if (resultadoEstado === "ENVIAR" && statusSalvo === "PENDENTE") {
                                 iniciar(arquivoSalvo);
                             }
@@ -2644,12 +2823,13 @@ var MonitoramentoVAN = (function () {
         restaurarEstadoSeExistir: restaurarEstadoSeExistir,
         limparEstadoServidor: limparEstadoServidor,
         pararMonitoramentoSilenciosoControle: pararMonitoramentoSilenciosoControle,
-        iniciarMonitoramentoSilenciosoControle: iniciarMonitoramentoSilenciosoControle
+        iniciarMonitoramentoSilenciosoControle: iniciarMonitoramentoSilenciosoControle,
+        revalidarManual: revalidarSilenciosamenteControle
     };
 })();
 
 // ============================================================
-// MÃ“DULO: LEITURA DE RETORNOS DO FILESERVER (ATUALIZADO)
+// MÓDULO: LEITURA DE RETORNOS DO FILESERVER (ATUALIZADO)
 // ============================================================
 
 var RetornoFileServer = (function () {
@@ -2680,7 +2860,7 @@ var RetornoFileServer = (function () {
             });
         } catch (e) {
             loading.hide();
-            callback("Erro de execuÃ§Ã£o: " + e, []);
+            callback("Erro de execução: " + e, []);
         }
     };
 
@@ -2699,7 +2879,7 @@ var RetornoFileServer = (function () {
                         if (ds.values[0]["status"] && ds.values[0]["status"].indexOf("ERRO") > -1) {
                             callback(ds.values[0]["status"], "");
                         } else {
-                            // Junta as linhas do array num texto Ãºnico simulando o FileReader
+                            // Junta as linhas do array num texto único simulando o FileReader
                             var conteudo = ds.values.map(function (row) {
                                 return row["conteudo"] || "";
                             }).join("\n");
@@ -2720,16 +2900,16 @@ var RetornoFileServer = (function () {
         }
     };
 
-    // Abre uma Modal do Fluig para o usuÃ¡rio selecionar o arquivo de retorno da rede
+    // Abre uma Modal do Fluig para o usuário selecionar o arquivo de retorno da rede
     var abrirModalRetornos = function () {
         listarArquivos(function (erro, arquivos) {
             if (erro) {
-                FLUIGC.toast({ title: 'AtenÃ§Ã£o', message: erro, type: 'warning' });
+                FLUIGC.toast({ title: 'Atenção', message: erro, type: 'warning' });
                 return;
             }
 
             var html = '<div class="table-responsive"><table class="table table-striped table-hover">';
-            html += '<thead><tr><th>Arquivo</th><th>Tamanho</th><th>Data</th><th>AÃ§Ã£o</th></tr></thead><tbody>';
+            html += '<thead><tr><th>Arquivo</th><th>Tamanho</th><th>Data</th><th>Ação</th></tr></thead><tbody>';
 
             arquivos.forEach(function (arq) {
                 html += '<tr>';
@@ -2744,7 +2924,7 @@ var RetornoFileServer = (function () {
             html += '</tbody></table></div>';
 
             var modalRetorno = FLUIGC.modal({
-                title: 'Arquivos de Retorno DisponÃ­veis (FileServer)',
+                title: 'Arquivos de Retorno Disponíveis (FileServer)',
                 content: html,
                 id: 'modal-retornos-fileserver',
                 size: 'large',
@@ -2755,7 +2935,7 @@ var RetornoFileServer = (function () {
             }, function (err, data) {
                 if (err) return;
 
-                // Dispara o clique no botÃ£o de processar dentro da modal
+                // Dispara o clique no botão de processar dentro da modal
                 $('#modal-retornos-fileserver').on('click', '.btn-processar-modal', function () {
                     var nomeArq = $(this).data('arquivo');
                     modalRetorno.remove(); // Fecha a modal
@@ -2772,12 +2952,12 @@ var RetornoFileServer = (function () {
                 return;
             }
 
-            // INTEGRAÃ‡ÃƒO PERFEITA: Passa o conteÃºdo lido na rede para a funÃ§Ã£o que vocÃª jÃ¡ criou!
+            // INTEGRAÇÃO PERFEITA: Passa o conteúdo lido na rede para a função que você já criou!
             // Ela vai extrair, preencher a Atividade 40 e setar o arquivo como Autorizado/Aceito.
             if (typeof processarTextoRetornoAuditoria === "function") {
                 processarTextoRetornoAuditoria(conteudo, nomeArquivo);
             } else {
-                FLUIGC.toast({ title: 'Erro', message: 'FunÃ§Ã£o de auditoria nÃ£o encontrada no formulÃ¡rio.', type: 'danger' });
+                FLUIGC.toast({ title: 'Erro', message: 'Função de auditoria não encontrada no formulário.', type: 'danger' });
             }
         });
     };
@@ -2802,7 +2982,7 @@ function abrirValidadorBradesco() {
     
     // SIDEBAR LATERAL (Esquerda)
     htmlContent += '<div style="width: 280px; background-color: #fdf3f5; border-right: 4px solid #cc092f; padding: 25px 20px; display: flex; flex-direction: column;">';
-    // htmlContent += '  <img src="https://banco.bradesco/assets/classic/geral/img/logo-bradesco-topo.png" style="max-width: 130px; margin-bottom: 25px;">'; // Descomente se quiser forÃ§ar o logo original do banco web
+    // htmlContent += '  <img src="https://banco.bradesco/assets/classic/geral/img/logo-bradesco-topo.png" style="max-width: 130px; margin-bottom: 25px;">'; // Descomente se quiser forçar o logo original do banco web
     htmlContent += '  <h4 style="margin: 0 0 15px 0; color: #cc092f; font-size: 16px; line-height: 1.4;">';
     htmlContent += '    <i class="flaticon flaticon-document icon-sm"></i> <b>Arquivo Atual</b>';
     htmlContent += '  </h4>';
@@ -2810,11 +2990,11 @@ function abrirValidadorBradesco() {
     htmlContent +=       nomeArquivo;
     htmlContent += '  </div>';
     htmlContent += '  <p style="margin: 0; font-size: 13.5px; color: #555; line-height: 1.5;">';
-    htmlContent += '    Para validar a estrutura, certifique-se de que transferiu este arquivo no botÃ£o <b>"Baixar Arquivo"</b> na tela anterior.<br><br>Em seguida, clique na Ã¡rea de upload ao lado e selecione-o.';
+    htmlContent += '    Para validar a estrutura, certifique-se de que transferiu este arquivo no botão <b>"Baixar Arquivo"</b> na tela anterior.<br><br>Em seguida, clique na área de upload ao lado e selecione-o.';
     htmlContent += '  </p>';
     htmlContent += '</div>';
 
-    // SITE DO BANCO (Direita - Ocupa todo o resto do espaÃ§o 'flex: 1')
+    // SITE DO BANCO (Direita - Ocupa todo o resto do espaço 'flex: 1')
     htmlContent += '<div style="flex: 1; background: #fff;">';
     htmlContent += '  <iframe src="' + urlBradesco + '" style="width: 100%; height: 100%; border: none; overflow: hidden;" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>';
     htmlContent += '</div>';
@@ -2831,16 +3011,16 @@ function abrirValidadorBradesco() {
 }
 
 // ============================================================
-// INICIALIZAÃ‡ÃƒO: Carrega lista ao abrir o formulÃ¡rio
+// INICIALIZAÇÃO: Carrega lista ao abrir o formulário
 // ============================================================
 $(document).ready(function () {
 
-    // BotÃ£o para buscar retornos do FileServer
+    // Bot?o para buscar retornos do FileServer
     $("#btn_buscar_retornos").on("click", function () {
         var filtro = $("#txt_filtro_retorno").val();
         RetornoFileServer.listarArquivos(filtro, function (erro, arquivos) {
             if (erro) {
-                Compartilhados.WarningToast(erro, "AtenÃ§Ã£o", "warning");
+                Compartilhados.WarningToast(erro, "Atenção", "warning");
             }
             RetornoFileServer.renderizarTabela(arquivos, "tabela_retornos");
         });
@@ -2848,18 +3028,18 @@ $(document).ready(function () {
 });
 
 // =================================================================================
-// LÃ“GICA DA ATIVIDADE 40 (ENVIO VAN)
+// LÓGICA DA ATIVIDADE 40 (ENVIO VAN)
 // =================================================================================
 
 // =================================================================================
-// LÃ“GICA DA ATIVIDADE 40 (ENVIO E RETORNO VAN)
+// LÓGICA DA ATIVIDADE 40 (ENVIO E RETORNO VAN)
 // =================================================================================
 
 function iniciarPainelVan40() {
     var tipoDoc = $("#tipo_documento").val();
 
     if (tipoDoc !== "cnab") {
-        $("#painel_envio_van_40 .panel-body").html("<div class='alert alert-info'>Atividade nÃ£o aplicÃ¡vel para Guias/Outros. Movimente a solicitaÃ§Ã£o.</div>");
+        $("#painel_envio_van_40 .panel-body").html("<div class='alert alert-info'>Atividade não aplic?vel para Guias/Outros. Movimente a solicitação.</div>");
         // Oculta os de retorno
         $("#painel_retorno_van_40, #painel_status_geral_40, #painel_aprovacao_40").hide();
         return;
@@ -2888,10 +3068,57 @@ function iniciarPainelVan40() {
 
 
 
-// BotÃ£o: Buscar AutomÃ¡tico (Retorno)
+// Bot?o: Buscar Automático (Retorno)
 function buscarRetornoAutomatico() {
     // Abre a modal que lista os arquivos direto da pasta do FileServer e permite leitura
     RetornoFileServer.abrirModalRetornos();
+}
+
+function atualizarMonitoramentoVanManual(botao) {
+    var $botao = botao ? $(botao) : $();
+    var textoOriginal = "";
+
+    if ($botao.length) {
+        textoOriginal = $botao.data("texto-original") || $botao.html();
+        $botao.data("texto-original", textoOriginal);
+        $botao.prop("disabled", true).html('<i class="flaticon flaticon-refresh"></i> Atualizando...');
+    }
+
+    var finalizarBotao = function () {
+        if ($botao.length) {
+            $botao.prop("disabled", false).html($botao.data("texto-original") || textoOriginal);
+        }
+    };
+
+    if (typeof MonitoramentoVAN === "undefined") {
+        finalizarBotao();
+        return;
+    }
+
+    if (typeof MonitoramentoVAN.revalidarManual === "function") {
+        MonitoramentoVAN.revalidarManual({
+            onComplete: function (resultado) {
+                finalizarBotao();
+
+                if (resultado && resultado.erro) {
+                    FLUIGC.toast({
+                        title: "Atenção",
+                        message: "A verificação manual não conseguiu concluir a consulta neste momento.",
+                        type: "warning"
+                    });
+                }
+            }
+        });
+        return;
+    }
+
+    if (typeof MonitoramentoVAN.restaurarEstadoSeExistir === "function") {
+        MonitoramentoVAN.restaurarEstadoSeExistir();
+    }
+
+    setTimeout(function () {
+        finalizarBotao();
+    }, 600);
 }
 
 function visualizarArquivosPastaEnviar40() {
@@ -2946,6 +3173,61 @@ function visualizarArquivosPastaEnviar40() {
     });
 }
 
+function visualizarArquivosPastaEnviados40() {
+    var loading = FLUIGC.loading(window);
+    loading.show();
+
+    DatasetFactory.getDataset("DS_LISTAR_ENVIADOS_VAN", null, null, null, {
+        success: function (ds) {
+            loading.hide();
+            var arquivoAtual = $("#fileNameVan").val() || "";
+            var caminhoVisor = "\\\\sotersrv38\\FileServer\\RH\\03. Dpto Pessoal\\00- ARQUIVOS DE PAGAMENTO FINANCEIRO\\02 - BRAD_Retorno_Automatico\\Enviados\\";
+            var html = '<div class="alert alert-warning" style="margin-bottom: 15px;">';
+            html += '<strong>Atenção:</strong> esta visualização não altera a pasta <b>Enviados</b>. Para remover um arquivo de verdade, apague-o manualmente na pasta física.';
+            html += '</div>';
+            html += '<p class="text-muted" style="font-size: 13px; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;">';
+            html += '<i class="flaticon flaticon-folder-open icon-sm" style="color: #f39c12;"></i> <b>Caminho monitorado:</b> ' + caminhoVisor;
+            html += '</p>';
+            html += '<div class="table-responsive"><table class="table table-striped table-hover table-condensed">';
+            html += '<thead><tr><th>Arquivo</th><th>Tamanho</th><th>Data</th></tr></thead><tbody>';
+
+            if (!ds || !ds.values || ds.values.length === 0) {
+                html += '<tr><td colspan="3" class="text-muted">Nenhum arquivo encontrado.</td></tr>';
+            } else {
+                ds.values.forEach(function (arq) {
+                    var nome = arq["Nome_do_Arquivo"] || "";
+                    var tamanho = arq["Tamanho"] || "-";
+                    var data = arq["Data_Modificacao"] || "-";
+                    var isAtual = arquivoAtual && nome === arquivoAtual;
+                    html += '<tr' + (isAtual ? ' style="background-color:#dff0d8;"' : '') + '>';
+                    html += '<td><i class="flaticon flaticon-document icon-sm"></i> <b>' + nome + '</b>';
+                    if (isAtual) {
+                        html += ' <span class="label label-success" style="margin-left:8px;">Arquivo monitorado</span>';
+                    }
+                    html += '</td><td>' + tamanho + '</td><td>' + data + '</td></tr>';
+                });
+            }
+
+            html += '</tbody></table></div>';
+
+            FLUIGC.modal({
+                title: 'Arquivos da Pasta Enviados',
+                content: html,
+                id: 'modal-arquivo-enviados-40',
+                size: 'large',
+                actions: [{
+                    label: 'Fechar',
+                    autoClose: true
+                }]
+            });
+        },
+        error: function () {
+            loading.hide();
+            FLUIGC.toast({ title: 'Erro', message: 'Falha ao consultar pasta Enviados.', type: 'danger' });
+        }
+    });
+}
+
 function limparArquivoVanTela() {
     $("#fileNameVan").val("").css({ backgroundColor: "", color: "", fontWeight: "" });
     $("#resumo_van_extraido").hide();
@@ -2979,7 +3261,7 @@ function lerRetornoManual(input) {
         reader.onload = function (e) {
             processarTextoRetornoAuditoria(e.target.result, file.name);
         };
-        // O padrÃ£o "ISO-8859-1" garante a leitura correta dos ficheiros bancÃ¡rios
+        // O padrão "ISO-8859-1" garante a leitura correta dos ficheiros bancários
         reader.readAsText(file, "ISO-8859-1");
     }
 }
@@ -2987,7 +3269,7 @@ function lerRetornoManual(input) {
 // Processa o ficheiro de retorno e exibe na tela
 function processarTextoRetornoAuditoria(texto, nomeArquivo) {
     try {
-        if (typeof BradescoStrategy === 'undefined') throw new Error("EstratÃ©gia de leitura nÃ£o encontrada.");
+        if (typeof BradescoStrategy === 'undefined') throw new Error("Estratégia de leitura não encontrada.");
 
         var dados = BradescoStrategy.processar(texto);
 
@@ -3001,16 +3283,16 @@ function processarTextoRetornoAuditoria(texto, nomeArquivo) {
         $("#resumo_retorno_extraido").slideDown();
 
         // ============================================================
-        // 1. GERA O RELATÃ“RIO MULTIPAG FIXO NA TELA AUTOMATICAMENTE
+        // 1. GERA O RELATÓRIO MULTIPAG FIXO NA TELA AUTOMATICAMENTE
         // ============================================================
         if (typeof window.MultipagBradesco !== 'undefined') {
             window.MultipagBradesco.renderizarNaTela(texto); 
         } else {
-            console.error("MÃ³dulo MultipagBradesco nÃ£o encontrado no window.");
+            console.error("Módulo MultipagBradesco não encontrado no window.");
         }
 
         // ============================================================
-        // 2. CONFIGURA O BOTÃƒO DE DOWNLOAD (Mantido visÃ­vel)
+        // 2. CONFIGURA O BOTÃO DE DOWNLOAD (Mantido visível)
         // ============================================================
         $("#btn_download_retorno").show().off("click").on("click", function() {
             var blob = new Blob([texto], { type: "text/plain;charset=ISO-8859-1" });
@@ -3020,12 +3302,12 @@ function processarTextoRetornoAuditoria(texto, nomeArquivo) {
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            FLUIGC.toast({ title: 'Download ConcluÃ­do', message: 'Ficheiro transferido.', type: 'info' });
+            FLUIGC.toast({ title: 'Download Concluído', message: 'Ficheiro transferido.', type: 'info' });
         });
 
         FLUIGC.toast({
-            title: 'Leitura ConcluÃ­da',
-            message: 'Verifique os dados extraÃ­dos do retorno antes de autorizar.',
+            title: 'Leitura Concluída',
+            message: 'Verifique os dados extraídos do retorno antes de autorizar.',
             type: 'success'
         });
 
@@ -3041,7 +3323,7 @@ function processarTextoRetornoAuditoria(texto, nomeArquivo) {
     } catch (err) {
         FLUIGC.toast({ title: 'Erro na Leitura do Retorno', message: err.message, type: 'danger' });
         $("#resumo_retorno_extraido").hide();
-        $("#painel_multipag_inline").hide().empty(); // Limpa o relatÃ³rio em caso de erro
+        $("#painel_multipag_inline").hide().empty(); // Limpa o relatório em caso de erro
         $("#fileNameRetorno").val("");
         $("input[name='flag_status_retorno']").prop("checked", false);
         $("input[name='flag_status_geral']").prop("checked", false);
@@ -3055,10 +3337,10 @@ function processarTextoRetornoAuditoria(texto, nomeArquivo) {
 }
 
 // =================================================================================
-// FUNÃ‡Ã•ES DE LEITURA E AUDITORIA DA VAN (ATIVIDADE 40)
+// FUNÇÕES DE LEITURA E AUDITORIA DA VAN (ATIVIDADE 40)
 // =================================================================================
 
-// FunÃ§Ã£o 1: Acionada ao selecionar o arquivo do computador (Localizar)
+// Função 1: Acionada ao selecionar o arquivo do computador (Localizar)
 function lerArquivoVanAuditoria(inputElement) {
     if (inputElement.files && inputElement.files[0]) {
         var file = inputElement.files[0];
@@ -3071,19 +3353,19 @@ function lerArquivoVanAuditoria(inputElement) {
     }
 }
 
-// FunÃ§Ã£o 2: Acionada ao clicar no botÃ£o "Puxar Anexo" (Baseado no fluig-form-attachment)
+// Função 2: Acionada ao clicar no botão "Puxar Anexo" (Baseado no fluig-form-attachment)
 function puxarAnexoProcessoVan() {
     // Acessa a API nativa do Fluig que gerencia a aba "Anexos" do processo
     if (!parent.ECM || !parent.ECM.attachmentTable) {
-        FLUIGC.toast({ title: 'Erro', message: 'Tabela de anexos nÃ£o encontrada.', type: 'danger' });
+        FLUIGC.toast({ title: 'Erro', message: 'Tabela de anexos não encontrada.', type: 'danger' });
         return;
     }
 
-    // Pega todos os anexos fÃ­sicos que estÃ£o na aba do Fluig
+    // Pega todos os anexos físicos que estão na aba do Fluig
     var anexos = parent.ECM.attachmentTable.getData();
     var anexoAlvo = null;
 
-    // Itera de trÃ¡s pra frente para pegar sempre o anexo mais recente
+    // Itera de trás pra frente para pegar sempre o anexo mais recente
     for (var i = anexos.length - 1; i >= 0; i--) {
         var physicalName = (anexos[i].physicalFileName || "").toLowerCase();
         var descName = (anexos[i].description || "").toLowerCase();
@@ -3101,16 +3383,16 @@ function puxarAnexoProcessoVan() {
         var companyId = parent.WCMAPI.organizationId || 1;
         var nomeArquivo = anexoAlvo.description || anexoAlvo.physicalFileName;
 
-        // Se o arquivo foi anexado agora e a solicitaÃ§Ã£o ainda nÃ£o foi salva (nÃ£o tem ID)
+        // Se o arquivo foi anexado agora e a solicitação ainda não foi salva (não tem ID)
         if (!docId) {
-            FLUIGC.toast({ title: 'Aviso', message: 'O arquivo estÃ¡ na aba de anexos, mas nÃ£o possui ID. Salve a solicitaÃ§Ã£o primeiro.', type: 'warning' });
+            FLUIGC.toast({ title: 'Aviso', message: 'O arquivo está na aba de anexos, mas não possui ID. Salve a solicitação primeiro.', type: 'warning' });
             return;
         }
 
         var loading = FLUIGC.loading(window);
         loading.show();
 
-        // URL nativa de Stream (download fÃ­sico) do Fluig
+        // URL nativa de Stream (download físico) do Fluig
         var urlDownload = "/webdesk/streamcontrol/?WDCompanyId=" + companyId + "&WDNrDocto=" + docId + "&WDNrVersao=" + version;
 
         // Faz um AJAX direto para baixar o texto do txt
@@ -3118,7 +3400,7 @@ function puxarAnexoProcessoVan() {
             url: urlDownload,
             type: 'GET',
             beforeSend: function (jqXHR) {
-                // ForÃ§a a leitura na codificaÃ§Ã£o correta de acentuaÃ§Ã£o para CNAB
+                // Força a leitura na codificação correta de acentuação para CNAB
                 jqXHR.overrideMimeType('text/plain; charset=iso-8859-1');
             },
             success: function (conteudoTexto) {
@@ -3129,18 +3411,18 @@ function puxarAnexoProcessoVan() {
             error: function (err) {
                 loading.hide();
                 console.error("Erro ao ler Stream do anexo:", err);
-                FLUIGC.toast({ title: 'Erro', message: 'Falha ao baixar o conteÃºdo do arquivo no servidor.', type: 'danger' });
+                FLUIGC.toast({ title: 'Erro', message: 'Falha ao baixar o conteúdo do arquivo no servidor.', type: 'danger' });
             }
         });
 
     } else {
-        FLUIGC.toast({ title: 'AtenÃ§Ã£o', message: 'Nenhum arquivo .txt foi encontrado na aba de Anexos do Fluig.', type: 'warning' });
+        FLUIGC.toast({ title: 'Atenção', message: 'Nenhum arquivo .txt foi encontrado na aba de Anexos do Fluig.', type: 'warning' });
     }
 }
 
 var conteudoArquivoParaEnvio = "";
 
-// FunÃ§Ã£o 3: Centraliza a inteligÃªncia de validaÃ§Ã£o
+// Função 3: Centraliza a inteligência de validação
 function processarTextoVanAuditoria(texto, nomeArquivo, modoRestauracao) {
     try {
         // ============================================================
@@ -3200,16 +3482,16 @@ function processarTextoVanAuditoria(texto, nomeArquivo, modoRestauracao) {
     }
 }
 $(document).ready(function () {
-    // Substitua o evento antigo do botÃ£o por este:
+    // Substitua o evento antigo do botão por este:
     $("#btn_enviar_fileserver").off("click").on("click", function () {
         var nomeArquivo = $("#fileNameVan").val();
 
         if (!nomeArquivo || !conteudoArquivoParaEnvio) {
-            FLUIGC.toast({ title: 'AtenÃ§Ã£o', message: 'Nenhum arquivo processado. FaÃ§a a leitura ou puxe o anexo primeiro.', type: 'warning' });
+            FLUIGC.toast({ title: 'Atenção', message: 'Nenhum arquivo processado. Faça a leitura ou puxe o anexo primeiro.', type: 'warning' });
             return;
         }
 
-        // Converte o conteÃºdo para Base64 (btoa nativo do navegador)
+        // Converte o conteúdo para Base64 (btoa nativo do navegador)
         var b64Content = window.btoa(conteudoArquivoParaEnvio);
 
         // Feedback visual de carregamento
@@ -3234,30 +3516,30 @@ $(document).ready(function () {
                         // Marca a flag de Processamento automaticamente
                         $("input[name='flag_status_geral'][value='processamento']").prop("checked", true);
 
-                        // Altera o botÃ£o para evitar reenvio
+                        // Altera o botão para evitar reenvio
                         $("#btn_enviar_fileserver")
                             .prop("disabled", true)
                             .removeClass("btn-success")
                             .addClass("btn-default")
-                            .html('<i class="flaticon flaticon-check"></i> Enviado Ã  VAN');
+                            .html('<i class="flaticon flaticon-check"></i> Enviado ? VAN');
 
                         MonitoramentoVAN.iniciar(nomeArquivo);
 
                     } else {
-                        FLUIGC.toast({ title: 'Erro de PermissÃ£o/Servidor', message: msg, type: 'danger' });
+                        FLUIGC.toast({ title: 'Erro de Permissão/Servidor', message: msg, type: 'danger' });
                     }
                 }
             },
             error: function (err) {
                 loading.hide();
-                FLUIGC.toast({ title: 'Erro de ConexÃ£o', message: 'Falha ao comunicar com o servidor do Fluig.', type: 'danger' });
+                FLUIGC.toast({ title: 'Erro de Conexão', message: 'Falha ao comunicar com o servidor do Fluig.', type: 'danger' });
             }
         });
     });
 });
 
 // ============================================================
-// INICIALIZAÃ‡ÃƒO AUTOMÃTICA AO CARREGAR A PÃGINA (F5)
+// INICIALIZAÇÃO AUTOMÁTICA AO CARREGAR A PÁGINA (F5)
 // ============================================================
 function sincronizarStatusGeralComRetornoBanco() {
     var statusRetorno = $("input[name='flag_status_retorno']:checked").val();
@@ -3343,6 +3625,10 @@ function sincronizarPainelAprovacao40() {
 
 $(document).ready(function () {
     var atividadeAtual = ($("#wkNumState_hidden").val() || "").toString();
+    if (isVisualizacaoFinalValidadorFinanceiro()) {
+        return;
+    }
+
     if (atividadeAtual === "40") {
         $("input[name='flag_status_retorno']").off("change.syncStatusGeral40").on("change.syncStatusGeral40", function () {
             sincronizarStatusGeralComRetornoBanco();
@@ -3356,18 +3642,28 @@ $(document).ready(function () {
     $("#btn_visualizar_pasta_enviar_40").off("click").on("click", function () {
         visualizarArquivosPastaEnviar40();
     });
+
+    $("#btn_visualizar_pasta_enviados_40").off("click").on("click", function () {
+        visualizarArquivosPastaEnviados40();
+    });
+
+    $("#btn_refresh_envio_van_40, #btn_refresh_monitoramento_van_40, #btn_refresh_retorno_van_40")
+        .off("click")
+        .on("click", function () {
+            atualizarMonitoramentoVanManual(this);
+        });
 });
 
 $(window).on('load', function () {
     console.log("Gatilho de Janela carregado. A aguardar o Fluig...");
 
-    // Aguarda 1.5s para garantir que os inputs ocultos como WKNumProces jÃ¡ existem no HTML
+    // Aguarda 1.5s para garantir que os inputs ocultos como WKNumProces já existem no HTML
     setTimeout(function () {
         if (typeof MonitoramentoVAN !== 'undefined') {
-            console.log("A iniciar tentativa de restauraÃ§Ã£o da VAN...");
+            console.log("A iniciar tentativa de restauração da VAN...");
             MonitoramentoVAN.restaurarEstadoSeExistir();
         } else {
-            console.warn("MÃ³dulo MonitoramentoVAN nÃ£o foi carregado corretamente.");
+            console.warn("Módulo MonitoramentoVAN não foi carregado corretamente.");
         }
     }, 1500);
 });
@@ -3377,5 +3673,9 @@ $(window).on('beforeunload unload', function () {
         MonitoramentoVAN.pararMonitoramentoSilenciosoControle();
     }
 });
+
+
+
+
 
 

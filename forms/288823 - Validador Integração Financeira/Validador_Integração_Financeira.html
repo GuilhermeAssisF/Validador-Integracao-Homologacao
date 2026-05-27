@@ -1,4 +1,4 @@
-<html>
+﻿<html>
 
 <head>
 	<link type="text/css" rel="stylesheet" href="/style-guide/css/fluig-style-guide.min.css" />
@@ -776,6 +776,9 @@
 							<button type="button" id="btn_visualizar_pasta_enviar_40" class="btn btn-default btn-lg" style="margin-left: 5px;">
 								<i class="flaticon flaticon-search"></i> Visualizar Pasta Enviar
 							</button>
+							<button type="button" id="btn_refresh_envio_van_40" class="btn btn-info btn-lg" style="margin-left: 5px;">
+								<i class="flaticon flaticon-refresh"></i> Atualizar Monitoramento
+							</button>
 							<button type="button" id="btn_limpar_arquivo_van" class="btn btn-warning btn-lg" style="margin-left: 5px;" onclick="limparArquivoVanTela();" disabled>
 								<i class="flaticon flaticon-trash"></i> Limpar da Tela
 							</button>
@@ -802,6 +805,14 @@
 					</h3>
 				</div>
 				<div class="panel-body text-center">
+					<div style="margin-bottom: 15px;">
+						<button type="button" id="btn_refresh_monitoramento_van_40" class="btn btn-info">
+							<i class="flaticon flaticon-refresh"></i> Atualizar Monitoramento
+						</button>
+						<button type="button" id="btn_visualizar_pasta_enviados_40" class="btn btn-default" style="margin-left: 5px;">
+							<i class="flaticon flaticon-search"></i> Visualizar Pasta Enviados
+						</button>
+					</div>
 					<h4 id="texto_monitoramento_van">Aguardando envio do arquivo...</h4>
 
 					<div class="progress progress-striped active" id="barra_progresso_van"
@@ -821,6 +832,11 @@
 				<div class="panel-body">
 					<div class="alert alert-info" style="margin-bottom: 15px;">
 						Busque ou carregue o retorno do banco aqui para validação
+					</div>
+					<div style="margin-bottom: 15px;">
+						<button type="button" id="btn_refresh_retorno_van_40" class="btn btn-info">
+							<i class="flaticon flaticon-refresh"></i> Atualizar Monitoramento
+						</button>
 					</div>
 					<div id="bloco_retorno_h23" style="display:none;">
 						<div class="row">
@@ -961,3 +977,5 @@
 </body>
 
 </html>
+
+
