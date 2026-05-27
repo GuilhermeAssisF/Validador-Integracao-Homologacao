@@ -36,7 +36,7 @@ function createDataset(fields, constraints, sortFields) {
         // CAMINHO DO FILESERVER (Pasta Enviar - BPO Interativa)
         // =========================================================
         // O Javascript exige 4 barras para representar 2 na rede (\\\\ = \\)
-        var pathEnvio = "\\\\\\\\sotersrv38\\\\FileServer\\\\RH\\\\03. Dpto Pessoal\\\\24. BPO - Interativa\\\\Enviar\\\\"; 
+        var pathEnvio = "\\\\\\\\sotersrv38\\\\FileServer\\\\RH\\\\03. Dpto Pessoal\\\\00- ARQUIVOS DE PAGAMENTO FINANCEIRO\\\\02 - BRAD_Retorno_Automatico\\\\Enviar\\\\"; 
         
         var caminhoCompleto = pathEnvio + nomeArquivo;
 

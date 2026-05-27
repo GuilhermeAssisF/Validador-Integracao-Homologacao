@@ -17,10 +17,19 @@ function createDataset(fields, constraints, sortFields) {
             }
         }
 
-        // Mantem Retorno como padrao para nao alterar o comportamento atual.
-        var pathBase = "\\\\\\\\sotersrv38\\\\FileServer\\\\RH\\\\03. Dpto Pessoal\\\\24. BPO - Interativa\\\\";
-        var nomePasta = (pastaSolicitada.toLowerCase() == "enviar") ? "Enviar" : "Retorno";
-        var pasta = new File(pathBase + nomePasta + "\\\\");
+        // NOVA LÓGICA DE CAMINHOS DE PRODUÇÃO
+        var caminhoPasta = "";
+        var nomePastaExibicao = "";
+        
+        if (pastaSolicitada.toLowerCase() == "enviar") {
+            caminhoPasta = "\\\\\\\\sotersrv38\\\\FileServer\\\\RH\\\\03. Dpto Pessoal\\\\00- ARQUIVOS DE PAGAMENTO FINANCEIRO\\\\02 - BRAD_Retorno_Automatico\\\\Enviar\\\\";
+            nomePastaExibicao = "Enviar";
+        } else {
+            caminhoPasta = "\\\\\\\\sotersrv38\\\\FileServer\\\\RH\\\\03. Dpto Pessoal\\\\00- ARQUIVOS DE PAGAMENTO FINANCEIRO\\\\02 - BRAD_Retorno_Automatico\\\\Retornos\\\\Pagamento\\\\";
+            nomePastaExibicao = "Pagamento (Retorno)";
+        }
+        
+        var pasta = new File(caminhoPasta);
 
         if (pasta.exists() && pasta.isDirectory()) {
             var arquivos = pasta.listFiles();
@@ -39,10 +48,10 @@ function createDataset(fields, constraints, sortFields) {
                     }
                 }
             } else {
-                dataset.addRow(["Aviso", "A pasta " + nomePasta + " esta vazia", "-"]);
+                dataset.addRow(["Aviso", "A pasta " + nomePastaExibicao + " esta vazia", "-"]);
             }
         } else {
-            dataset.addRow(["Erro", "Diretorio " + nomePasta + " nao encontrado ou sem permissao", "-"]);
+            dataset.addRow(["Erro", "Diretorio " + nomePastaExibicao + " nao encontrado ou sem permissao", "-"]);
         }
     } catch (e) {
         log.error("### ERRO DS_LISTAR_RETORNOS: " + e);

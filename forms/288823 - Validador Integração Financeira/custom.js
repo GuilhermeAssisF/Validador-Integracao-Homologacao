@@ -2285,6 +2285,16 @@ var MonitoramentoVAN = (function () {
         if (estadoFisico === "ENVIAR") {
             ocultarAvisosRevalidacao();
             $("#painel_monitoramento_van").removeClass("panel-success").addClass("panel-info").show();
+            if (conteudoSalvo && typeof processarTextoVanAuditoria === "function") {
+                processarTextoVanAuditoria(conteudoSalvo, arquivoSalvo, true);
+            } else if (typeof conteudoSalvo !== "undefined") {
+                lerConteudoArquivoFisico(arquivoSalvo, "Enviar", function (erro, conteudoFisico) {
+                    if (!erro && conteudoFisico && typeof processarTextoVanAuditoria === "function") {
+                        conteudoArquivoParaEnvio = conteudoFisico;
+                        processarTextoVanAuditoria(conteudoFisico, arquivoSalvo, true);
+                    }
+                });
+            }
             if (statusSalvo === "PENDENTE") {
                 $("#texto_monitoramento_van").html("Aguardando o robô da VAN capturar o arquivo: <span style=\"background:#fff3cd; color:#856404; font-weight:bold; padding:2px 6px; border-radius:3px;\">" + arquivoSalvo + "</span>");
                 $("#barra_progresso_van").show();
@@ -2296,6 +2306,13 @@ var MonitoramentoVAN = (function () {
             mostrarAvisoEnvio("Esse arquivo já foi movido para a pasta Enviados");
             if (conteudoSalvo && typeof processarTextoVanAuditoria === "function") {
                 processarTextoVanAuditoria(conteudoSalvo, arquivoSalvo, true);
+            } else {
+                lerConteudoArquivoFisico(arquivoSalvo, "Enviados", function (erro, conteudoFisico) {
+                    if (!erro && conteudoFisico && typeof processarTextoVanAuditoria === "function") {
+                        conteudoArquivoParaEnvio = conteudoFisico;
+                        processarTextoVanAuditoria(conteudoFisico, arquivoSalvo, true);
+                    }
+                });
             }
             montarPainelSucesso(arquivoSalvo);
             return "ENVIADOS";
@@ -2474,7 +2491,7 @@ var MonitoramentoVAN = (function () {
         $("#barra_progresso_van").hide();
         $("#painel_monitoramento_van").removeClass("panel-info").addClass("panel-success").show();
 
-        var caminhoVisor = "\\\\sotersrv38\\FileServer\\RH\\03. Dpto Pessoal\\24. BPO - Interativa\\Enviados\\";
+        var caminhoVisor = "\\\\sotersrv38\\FileServer\\RH\\03. Dpto Pessoal\\00- ARQUIVOS DE PAGAMENTO FINANCEIRO\\02 - BRAD_Retorno_Automatico\\Enviados\\";
         var htmlVisual = '<div class="text-left" style="margin-top: 10px; padding: 0 20px;">';
         htmlVisual += '  <p class="text-muted" style="font-size: 13px; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;">';
         htmlVisual += '    <i class="flaticon flaticon-folder-open icon-sm" style="color: #f39c12;"></i> <b>Destino Atual:</b> ' + caminhoVisor;
@@ -2518,8 +2535,12 @@ var MonitoramentoVAN = (function () {
     var iniciar = function (nomeArquivo) {
         salvarEstadoServidor(nomeArquivo, "PENDENTE");
         iniciarMonitoramentoSilenciosoControle(nomeArquivo);
+        if (typeof intervalo !== "undefined" && intervalo) {
+            clearInterval(intervalo);
+            intervalo = null;
+        }
         $("#painel_monitoramento_van").show();
-        $("#texto_monitoramento_van").html("Aguardando o robÃ´ da VAN capturar o arquivo: <span style=\"background:#fff3cd; color:#856404; font-weight:bold; padding:2px 6px; border-radius:3px;\">" + nomeArquivo + "</span>");
+        $("#texto_monitoramento_van").html("Aguardando o robô da VAN capturar o arquivo: <span style=\"background:#fff3cd; color:#856404; font-weight:bold; padding:2px 6px; border-radius:3px;\">" + nomeArquivo + "</span>");
         $("#barra_progresso_van").show();
         setTimeout(function () { verificar(nomeArquivo); }, 3000);
         intervalo = setInterval(function () { verificar(nomeArquivo); }, 10000);
@@ -2597,6 +2618,7 @@ var MonitoramentoVAN = (function () {
                     }
 
                     if (arquivoSalvo !== "NAO_EXISTE" && arquivoSalvo !== "ERRO" && arquivoSalvo !== "VAZIO") {
+                        iniciarMonitoramentoSilenciosoControle(arquivoSalvo);
                         $("#btn_enviar_fileserver")
                             .prop("disabled", true)
                             .removeClass("btn-success")
@@ -2606,40 +2628,23 @@ var MonitoramentoVAN = (function () {
                         conteudoArquivoParaEnvio = conteudoSalvo || conteudoArquivoParaEnvio || "";
 
                         verificarEstadoFisicoArquivo(arquivoSalvo, function (estadoFisico) {
-                            if (estadoFisico.estadoFisico === "ENVIAR") {
-                                ocultarAvisosRevalidacao();
-                                if (conteudoSalvo) {
-                                    processarTextoVanAuditoria(conteudoSalvo, arquivoSalvo, true);
-                                }
+                            var resultadoEstado = aplicarEstadoFisicoArquivo(arquivoSalvo, statusSalvo, conteudoSalvo, estadoFisico.estadoFisico);
+                            if (resultadoEstado === "ENVIAR" && statusSalvo === "PENDENTE") {
                                 iniciar(arquivoSalvo);
-                                return;
                             }
-
-                            if (estadoFisico.estadoFisico === "ENVIADOS") {
-                                mostrarAvisoEnvio("Esse arquivo já foi movido para a pasta Enviados");
-                                if (conteudoSalvo) {
-                                    processarTextoVanAuditoria(conteudoSalvo, arquivoSalvo, true);
-                                }
-                                montarPainelSucesso(arquivoSalvo);
-                                return;
-                            }
-
-                            mostrarAvisoEnvio("Esse arquivo já foi movido para a pasta Enviados");
-                            mostrarAvisoMonitoramento("Esse arquivo já passou por essa pasta e agora está sendo processado pelo banco");
-                            if (conteudoSalvo) {
-                                processarTextoVanAuditoria(conteudoSalvo, arquivoSalvo, true);
-                            }
-                            montarPainelConsumido(arquivoSalvo);
                         });
                     }
                 }
             }
         });
     };
+
     return {
         iniciar: iniciar,
         restaurarEstadoSeExistir: restaurarEstadoSeExistir,
-        limparEstadoServidor: limparEstadoServidor
+        limparEstadoServidor: limparEstadoServidor,
+        pararMonitoramentoSilenciosoControle: pararMonitoramentoSilenciosoControle,
+        iniciarMonitoramentoSilenciosoControle: iniciarMonitoramentoSilenciosoControle
     };
 })();
 
@@ -2899,7 +2904,7 @@ function visualizarArquivosPastaEnviar40() {
             loading.hide();
             var arquivoAtual = $("#fileNameVan").val() || "";
             var html = '<div class="alert alert-warning" style="margin-bottom: 15px;">';
-            html += '<strong>AtenÃ§Ã£o:</strong> esta visualizaÃ§Ã£o nÃ£o altera a pasta <b>Enviar</b>. Para remover um arquivo de verdade, apague-o manualmente na pasta fÃ­sica.';
+            html += '<strong>Atenção:</strong> esta visualização não altera a pasta <b>Enviar</b>. Para remover um arquivo de verdade, apague-o manualmente na pasta física.';
             html += '</div>';
             html += '<div class="table-responsive"><table class="table table-striped table-hover table-condensed">';
             html += '<thead><tr><th>Arquivo</th><th>Tamanho</th><th>Data</th></tr></thead><tbody>';
@@ -2952,6 +2957,9 @@ function limparArquivoVanTela() {
     $("#fileUploadVan").val("");
     if (typeof conteudoArquivoParaEnvio !== "undefined") {
         conteudoArquivoParaEnvio = "";
+    }
+    if (typeof MonitoramentoVAN !== "undefined" && typeof MonitoramentoVAN.pararMonitoramentoSilenciosoControle === "function") {
+        MonitoramentoVAN.pararMonitoramentoSilenciosoControle();
     }
     if (typeof MonitoramentoVAN !== "undefined" && typeof MonitoramentoVAN.limparEstadoServidor === "function") {
         MonitoramentoVAN.limparEstadoServidor();
@@ -3363,4 +3371,11 @@ $(window).on('load', function () {
         }
     }, 1500);
 });
+
+$(window).on('beforeunload unload', function () {
+    if (typeof MonitoramentoVAN !== 'undefined' && typeof MonitoramentoVAN.pararMonitoramentoSilenciosoControle === 'function') {
+        MonitoramentoVAN.pararMonitoramentoSilenciosoControle();
+    }
+});
+
 

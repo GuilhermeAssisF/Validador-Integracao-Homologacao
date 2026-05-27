@@ -27,12 +27,8 @@
   <ProcessDefinitionVersion>
     <processDefinitionVersionPK>
       <companyId>1</companyId>
-<<<<<<< HEAD
-      <processId>Validador Integração Financeira - Folha de Pagamento	</processId>
-=======
       <processId>Validador Integração Financeira - Folha	</processId>
->>>>>>> 2b0f02b36c2c8d3555578ea4a4aafa32255a2130
-      <version>67</version>
+      <version>5</version>
     </processDefinitionVersionPK>
     <versionDescription></versionDescription>
     <formId>405248</formId>
@@ -482,7 +478,7 @@
         <companyId>1</companyId>
         <processId>Validador Integração Financeira - Folha</processId>
         <expressionOrder>1</expressionOrder>
-        <version>67</version>
+        <version>5</version>
         <sequence>28</sequence>
       </conditionProcessStatePK>
       <condition>hAPI.getCardValue(&quot;cpTemDivergencia&quot;) == &quot;sim&quot;</condition>
@@ -496,7 +492,7 @@
         <companyId>1</companyId>
         <processId>Validador Integração Financeira - Folha</processId>
         <expressionOrder>2</expressionOrder>
-        <version>67</version>
+        <version>5</version>
         <sequence>28</sequence>
       </conditionProcessStatePK>
       <condition>true</condition>
@@ -510,7 +506,7 @@
         <companyId>1</companyId>
         <processId>Validador Integração Financeira - Folha</processId>
         <expressionOrder>1</expressionOrder>
-        <version>67</version>
+        <version>5</version>
         <sequence>47</sequence>
       </conditionProcessStatePK>
       <condition>hAPI.getCardValue(&quot;status_retorno_van&quot;) == &quot;aprovado&quot;</condition>
@@ -522,7 +518,7 @@
         <companyId>1</companyId>
         <processId>Validador Integração Financeira - Folha</processId>
         <expressionOrder>2</expressionOrder>
-        <version>67</version>
+        <version>5</version>
         <sequence>47</sequence>
       </conditionProcessStatePK>
       <condition>hAPI.getCardValue(&quot;status_retorno_van&quot;) == &quot;aprovado&quot;</condition>
@@ -532,13 +528,9 @@
     <ConditionProcessState>
       <conditionProcessStatePK>
         <companyId>1</companyId>
-<<<<<<< HEAD
-        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
-=======
         <processId>Validador Integração Financeira - Folha</processId>
->>>>>>> 2b0f02b36c2c8d3555578ea4a4aafa32255a2130
         <expressionOrder>3</expressionOrder>
-        <version>67</version>
+        <version>5</version>
         <sequence>47</sequence>
       </conditionProcessStatePK>
       <condition>hAPI.getCardValue(&quot;status_retorno_van&quot;) == &quot;rejeitado&quot;</condition>
@@ -1100,12 +1092,8 @@ function converterParaData(dataStr) {&#xd;
     <ProcessLinkBend>
       <processLinkBendPK>
         <companyId>1</companyId>
-<<<<<<< HEAD
-        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
-=======
         <processId>Validador Integração Financeira - Folha</processId>
->>>>>>> 2b0f02b36c2c8d3555578ea4a4aafa32255a2130
-        <version>67</version>
+        <version>5</version>
         <linkSequence>25</linkSequence>
         <bendSequence>1</bendSequence>
       </processLinkBendPK>
@@ -1115,12 +1103,8 @@ function converterParaData(dataStr) {&#xd;
     <ProcessLinkBend>
       <processLinkBendPK>
         <companyId>1</companyId>
-<<<<<<< HEAD
-        <processId>Validador Integração Bancário - Folha de Pagamento</processId>
-=======
         <processId>Validador Integração Financeira - Folha</processId>
->>>>>>> 2b0f02b36c2c8d3555578ea4a4aafa32255a2130
-        <version>67</version>
+        <version>5</version>
         <linkSequence>53</linkSequence>
         <bendSequence>1</bendSequence>
       </processLinkBendPK>

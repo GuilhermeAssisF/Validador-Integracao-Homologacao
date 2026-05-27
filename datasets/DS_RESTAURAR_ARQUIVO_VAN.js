@@ -49,7 +49,6 @@ function createDataset(fields, constraints, sortFields) {
             return dataset;
         }
 
-        // Lê o ficheiro e devolve linha a linha
         var reader = new BufferedReader(new InputStreamReader(new FileInputStream(arquivo), "ISO-8859-1"));
         var linha;
         var numero = 0;
